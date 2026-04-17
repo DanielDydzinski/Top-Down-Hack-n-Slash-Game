@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ee5216dda1b6724881b98192c96922e, type: 3}
+  m_Name: IceBallAbility
+  m_EditorClassIdentifier: 
+  abilityPrefab: {fileID: 1547244944460502, guid: ff743712ab09a72419b3d8b513de23be,
+    type: 3}
+  abilityEffects:
+  - {fileID: 11400000, guid: 76d1d40779a71e4409201d783fcb7e85, type: 2}
+  abilityName: IceBall
+  icon: {fileID: 21300000, guid: 77327bb3e8d5f2d48bc505f348291a9e, type: 3}
+  description: ball of ice
+  targetTag: Enemy
+  friendTag: Player
+  attackState: 2
+  cooldown: 2
+  spawnLocation: 2
+  projectilePrefab: {fileID: 100002, guid: c17698f595aa942cab4326f0ffaf25c2, type: 3}
+  explosionAbility: {fileID: 11400000, guid: 807afd2b4a74e0042838407d0ba694a2, type: 2}
+  projectileSpeed: 5
+  projectileSize: 0.5
+  projectileRange: 15

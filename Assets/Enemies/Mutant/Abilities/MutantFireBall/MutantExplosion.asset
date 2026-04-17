@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f596d8d8b635ae40ac1d99373e0189b, type: 3}
+  m_Name: MutantExplosion
+  m_EditorClassIdentifier: 
+  abilityPrefab: {fileID: 1409139781103608, guid: 7fc41178a8c7bfa4d8f5f6420379f9f5,
+    type: 2}
+  abilityEffects:
+  - {fileID: 11400000, guid: cf70848b3c56dcf42a466bbf14e74f6b, type: 2}
+  - {fileID: 11400000, guid: 30a02de563ca89e47af06e8e0bc4aeb0, type: 2}
+  - {fileID: 11400000, guid: d6517bf64ffad1f4581d9347fa8b2028, type: 2}
+  abilityName: MutantFbExplosion
+  icon: {fileID: 0}
+  description: 
+  targetTag: Player
+  friendTag: Enemy
+  attackState: 0
+  cooldown: 0
+  spawnLocation: 2
+  explosionParticles: {fileID: 100000, guid: 876cb26c7c6ab42e49a9cace28b90b8b, type: 2}
+  radius: 0
+  damageByDistance: 1

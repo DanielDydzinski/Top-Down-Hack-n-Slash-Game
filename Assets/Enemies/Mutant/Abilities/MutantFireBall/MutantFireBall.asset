@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ee5216dda1b6724881b98192c96922e, type: 3}
+  m_Name: MutantFireBall
+  m_EditorClassIdentifier: 
+  abilityPrefab: {fileID: 1547244944460502, guid: ff743712ab09a72419b3d8b513de23be,
+    type: 3}
+  abilityEffects: []
+  abilityName: MutantFireBall
+  icon: {fileID: 0}
+  description: 
+  targetTag: Player
+  friendTag: Enemy
+  attackState: 2
+  cooldown: 5
+  requiredRange: 3
+  priority: 0
+  isRanged: 0
+  canMoveAttack: 0
+  spawnLocation: 2
+  projectilePrefab: {fileID: 100000, guid: 11380b47be58c4fa78a82752a3f61daa, type: 3}
+  explosionAbility: {fileID: 11400000, guid: 9eba5f0ac144fbc4f8294e1705c7a594, type: 2}
+  projectileSpeed: 10
+  projectileSize: 0.5
+  projectileRange: 20

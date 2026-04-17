@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad930e33505696e4b94c6501407643c9, type: 3}
+  m_Name: GoblinMeleeOne
+  m_EditorClassIdentifier: 
+  abilityPrefab: {fileID: 1423304968587218, guid: 348341daf378dcf44a9cc3fcb926178d,
+    type: 3}
+  abilityEffects:
+  - {fileID: 11400000, guid: aab6308cea9c26b4b8cf9d0f5a411c47, type: 2}
+  abilityName: GoblinMeleeHit
+  icon: {fileID: 0}
+  description: 
+  targetTag: Player
+  friendTag: Enemy
+  attackState: 1
+  cooldown: 5
+  requiredRange: 1
+  priority: 10
+  isRanged: 0
+  canMoveAttack: 0
+  spawnLocation: 2
+  attackParticles: {fileID: 0}
+  length: 1
+  halfExtents: {x: 0.2, y: 1, z: 0}
+  TargetLayerMask:
+    serializedVersion: 2
+    m_Bits: 2048

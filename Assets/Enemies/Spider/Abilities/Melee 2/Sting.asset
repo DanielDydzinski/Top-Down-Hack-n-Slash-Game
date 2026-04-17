@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad930e33505696e4b94c6501407643c9, type: 3}
+  m_Name: Sting
+  m_EditorClassIdentifier: 
+  abilityPrefab: {fileID: 1423304968587218, guid: 348341daf378dcf44a9cc3fcb926178d,
+    type: 3}
+  abilityEffects:
+  - {fileID: 11400000, guid: c03a9a1c46dc05a4b87d5a9de45251de, type: 2}
+  - {fileID: 11400000, guid: ab01c76079e1d014ca950b40d499f165, type: 2}
+  - {fileID: 11400000, guid: 43772421db855ed4c8d8c35d29b871a6, type: 2}
+  abilityName: SpiderSting
+  icon: {fileID: 0}
+  description: Sting target applying faded slow and poison.
+  targetTag: Player
+  friendTag: Enemy
+  attackState: 3
+  cooldown: 4
+  requiredRange: 2
+  priority: 1
+  isRanged: 0
+  canMoveAttack: 1
+  spawnLocation: 2
+  attackParticles: {fileID: 1141561905072846, guid: a96fd2b9de6f96f4e9d8352254935266,
+    type: 3}
+  length: 2
+  halfExtents: {x: 0.5, y: 1, z: 0}
+  TargetLayerMask:
+    serializedVersion: 2
+    m_Bits: 2048
