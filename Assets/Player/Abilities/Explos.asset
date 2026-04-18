@@ -3,8 +3,9 @@
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
@@ -12,7 +13,7 @@ MonoBehaviour:
   m_Name: Explos
   m_EditorClassIdentifier: 
   abilityPrefab: {fileID: 1409139781103608, guid: 7fc41178a8c7bfa4d8f5f6420379f9f5,
-    type: 2}
+    type: 3}
   abilityEffects:
   - {fileID: 11400000, guid: feca4658d45ef844db0590a520cf912b, type: 2}
   - {fileID: 11400000, guid: 76d1d40779a71e4409201d783fcb7e85, type: 2}
@@ -25,7 +26,12 @@ MonoBehaviour:
   friendTag: Player
   attackState: 0
   cooldown: 0
+  requiredRange: 0
+  priority: 0
+  isRanged: 0
+  canMoveAttack: 0
   spawnLocation: 2
-  explosionParticles: {fileID: 1000011797152326, guid: acf39d9f4addf294d93fa56fa373961b,
-    type: 2}
+  explosionParticles: {fileID: 6271241949191652176, guid: 739d19610906a434a8d67ca770434aca,
+    type: 3}
+  radius: 2
   damageByDistance: 0

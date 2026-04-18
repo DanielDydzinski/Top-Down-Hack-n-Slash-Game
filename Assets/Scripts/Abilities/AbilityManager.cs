@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using static Ability;
 
 public class AbilityManager : MonoBehaviour {
 	
@@ -22,6 +23,7 @@ public class AbilityManager : MonoBehaviour {
 
     private bool IsCastingAbility = false;
     private Ability activeAbility;
+    private Transform activeTarget; // The target for the current ability execution
     public event Action OnAbilityReady;
 
     // Use this for initialization
@@ -95,11 +97,34 @@ public class AbilityManager : MonoBehaviour {
     // This is what the Animation Event will call ()
     public void ExecuteActiveAbility()
     {
+        Vector3 spawnPos = spawnLocation.position;
+        Quaternion spawnRot = spawnLocation.rotation;
+
         if (activeAbility != null)
         {
+
+            switch (activeAbility.spawnLocation)
+            {
+                case abilitySpawnType.Onself:
+                    // Stays as spawnLocation defaults
+                    break;
+
+                case abilitySpawnType.OnTarget:
+                    if (activeTarget != null)
+                    {
+                        spawnPos = activeTarget.position;
+                        spawnRot = Quaternion.identity;
+                    }
+                    break;
+
+                case abilitySpawnType.SpecifiedPoint:
+                    // Handle third case here
+                    break;
+            }
+
             // We use the already cached activeAbility instead of looking it up by string
-            currentAbilityObject = activeAbility.Cast(spawnLocation.position, spawnLocation.rotation);
-            Debug.Log($"Executed: {activeAbility.abilityName}");
+            currentAbilityObject = activeAbility.Cast(spawnPos, spawnRot);
+           // Debug.Log($"Executed: {activeAbility.abilityName}");
         }
         else
         {
@@ -107,10 +132,12 @@ public class AbilityManager : MonoBehaviour {
         }
     }
 
-    public void StartCastingAbility(Ability ab) // this will trigger animation to play
+    public void StartCastingAbility(Ability ab, Transform target) // this will trigger animation to play
 	{
 		if (cooldowns [ab.abilityName].coolDownReady) 
 		{
+
+            activeTarget = target;
             //activeAbility = cooldowns[ab.name].ability;
             activeAbility = ab;
             animator.SetInteger (AttackStateHash, cooldowns [ab.abilityName].ability.attackState);
