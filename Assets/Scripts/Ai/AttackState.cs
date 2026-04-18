@@ -8,7 +8,7 @@ public class AttackState : BaseAttackState
 
     public override void Enter()
     {
-        _controller.abilityManager.StartCastingAbility(_activeAbility);
+        _controller.abilityManager.StartCastingAbility(_activeAbility,_controller.target);
 
         if (!_activeAbility.canMoveAttack)
             _controller.SetObstacleMode(true); // cant move when attacking

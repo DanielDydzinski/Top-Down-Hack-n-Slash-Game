@@ -717,7 +717,7 @@ ModelImporter:
       events:
       - time: 0.7825421
         functionName: CastAbility
-        data: IceBall
+        data: FireBall
         objectReferenceParameter: {fileID: 1354980020145432, guid: 8a7ca07b72bcbc949b6221e7b7927891,
           type: 3}
         floatParameter: 0
