@@ -1,91 +1,60 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using System.Diagnostics;
 using UnityEngine.AI;
 
-[CreateAssetMenu(menuName = "Effects/Slow", fileName = "new Effect")]
-public class TakeSlow : Effect {
+[CreateAssetMenu(menuName = "Effects/Slow", fileName = "new Slow Effect")]
+public class TakeSlow : Effect
+{
 
-	public float slowAmount;
-	public float slowDuration;
-	public bool fadedSlow;
+    public float slowAmount; // 0.5 = 50% speed
+    public float slowDuration;
+    public bool fadedSlow;
 
-	public override IEnumerator ApplyEffect(GameObject target)
-	{
-		Stats stats = target.GetComponent<Stats> ();
-		float maxSpeed = stats.GetMoveSpeed ();
-		float slowedSpeed = maxSpeed;
-		GameObject particlesObj;
-		bool isPlayer = false;
+    public override IEnumerator ApplyEffect(GameObject target)
+    {
+        Stats stats = target.GetComponent<Stats>();
+        if (stats == null) yield break;
 
-		NavMeshAgent nva = null;
-		Mover mover = null;
+        float maxSpeed = stats.GetMoveSpeed();
+        float slowedSpeed = maxSpeed * slowAmount;
 
-		if (target.tag == "Enemy")
-		{
-		 	nva = target.GetComponent<NavMeshAgent> ();
-			slowedSpeed = maxSpeed * slowAmount;
-			nva.speed = slowedSpeed;
-		}
-		else if(target.tag == "Player")
-		{
-			isPlayer = true;
-			mover = target.GetComponent<Mover> ();
-			slowedSpeed = maxSpeed * slowAmount;
-			mover.SetSpeed (slowedSpeed);
-		}
+        // Get components directly
+        NavMeshAgent nva = target.GetComponent<NavMeshAgent>();
+        Mover mover = target.GetComponent<Mover>();
 
-		if (effectParticles != null) 
-		{
-			if(target.tag == "Enemy" || target.tag == "Player")
-			{
-				EffectManager em = target.GetComponent<EffectManager> ();
+        // Set initial slow
+        SetTargetSpeed(nva, mover, slowedSpeed);
 
-				particlesObj = Instantiate (effectParticles, target.transform.GetChild(5).transform); // 4th child set up to centre. 3rd to over head. 5th to feet.
-				Destroy(particlesObj, slowDuration);
-				em.slowParticles = particlesObj;
-			}
-		}
+        // Handle Particles with Anchors
+        GameObject particlesObj = null;
+        var anchors = target.GetComponent<EffectSpawnPossitions>();
+        if (effectParticles != null && anchors != null)
+        {
+            particlesObj = Instantiate(effectParticles, anchors.feet.position, Quaternion.identity, anchors.feet);
+            Destroy(particlesObj, slowDuration);
+        }
 
-		Stopwatch stopwatch = new Stopwatch ();
-		stopwatch.Start ();
+        float elapsed = 0f;
+        while (elapsed < slowDuration)
+        {
+            elapsed += Time.deltaTime; // Respects pause/timescale
 
-		while (stopwatch.Elapsed.TotalSeconds <= slowDuration)
-		{
-			yield return null;
+            if (fadedSlow)
+            {
+                // Smoothly return to maxSpeed over time
+                float currentSlowSpeed = Mathf.Lerp(slowedSpeed, maxSpeed, elapsed / slowDuration);
+                SetTargetSpeed(nva, mover, currentSlowSpeed);
+            }
+            yield return null;
+        }
 
-			if (fadedSlow)
-			{
-				float newSpeed = Mathf.Lerp (slowedSpeed, maxSpeed, (float)stopwatch.Elapsed.TotalSeconds / slowDuration);
+        // Reset to full speed at the end
+        SetTargetSpeed(nva, mover, maxSpeed);
+    }
 
-				if (isPlayer)
-				{
-					mover.SetSpeed (newSpeed);
-				} 
-				else 
-				{
-					nva.speed = newSpeed;
-				}
-
-			}
-		}
-
-		if (target.tag == "Enemy")
-		{
-			nva.speed = maxSpeed;
-		}
-		else if(target.tag == "Player")
-		{
-			mover.SetSpeed (maxSpeed);
-		}
-
-		stopwatch.Stop ();
-		stopwatch.Reset ();
-	}
-
-	public void DestroyParticles()
-	{
-		 
-	}
+    private void SetTargetSpeed(NavMeshAgent nva, Mover mover, float speed)
+    {
+        if (nva != null) nva.speed = speed;
+        if (mover != null) mover.SetSpeed(speed);
+    }
 }

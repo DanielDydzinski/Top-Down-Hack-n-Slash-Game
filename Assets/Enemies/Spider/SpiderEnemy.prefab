@@ -2167,6 +2167,9 @@ GameObject:
   - component: {fileID: 5730610957194913011}
   - component: {fileID: 5315869849921809516}
   - component: {fileID: 4388060837916109378}
+  - component: {fileID: 9216428788226169497}
+  - component: {fileID: 2703082237088673733}
+  - component: {fileID: 90117731257876822}
   m_Layer: 9
   m_Name: SpiderEnemy
   m_TagString: Enemy
@@ -2355,6 +2358,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 74081b7072221dd43b0fa6c1d73a4e70, type: 2}
   - {fileID: 11400000, guid: 864f7a5bcb1587644baddcfb1ff37208, type: 2}
   - {fileID: 11400000, guid: 3800c2b5990662f4594d816ab343829c, type: 2}
+  - {fileID: 11400000, guid: ad2367b1ab9fff745ae45c7f37ccfedf, type: 2}
 --- !u!114 &5730610957194913011
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2393,6 +2397,7 @@ MonoBehaviour:
   rotationSpeed: 5
   patrolRate: 5
   patrolDistance: 10
+  rangedDistance: 0
 --- !u!114 &4388060837916109378
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2409,6 +2414,47 @@ MonoBehaviour:
   moveSpeed: 4
   abilityPower: 0
   physicalPower: 0
+--- !u!114 &9216428788226169497
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1849966180446146}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 273e50682db33ac48b5e2b75ac3731cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2703082237088673733
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1849966180446146}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 961c12d61d7c25649bb0acf59dfcd185, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  faction: 1
+--- !u!114 &90117731257876822
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1849966180446146}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6738a6b1b01f144eaf5d40a7e6b3388, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  abilitySpawnPos: {fileID: 4317155146273618}
+  head: {fileID: 2252801136995282490}
+  center: {fileID: 6596047996126918913}
+  feet: {fileID: 701682774800059011}
 --- !u!1 &1851782130573292
 GameObject:
   m_ObjectHideFlags: 0

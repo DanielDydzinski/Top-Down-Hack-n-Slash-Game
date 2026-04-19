@@ -24,7 +24,7 @@ public class MeleeAttackAbility : Ability {
 			return null;
 		}
 
-		meleeAttackBehavaiour.UpdateValues (this.targetTag, this.friendTag,this.abilityEffects,length, halfExtents, attackParticles,TargetLayerMask);
+		meleeAttackBehavaiour.UpdateValues (this.myFaction,this.abilityEffects,length, halfExtents, attackParticles,this.damageType);
 
 		return Instantiate(abilityPrefab,pos,rot);
 	}

@@ -25,7 +25,7 @@ public class FireBall : Ability {
 			return null;
 		}
 
-		fbBehaviour.UpdateValues (this.abilityEffects,this.targetTag,this.friendTag,projectileSpeed, projectileSize,projectileRange ,projectilePrefab,explosionAbility);
+		fbBehaviour.UpdateValues (this.abilityEffects,this.targetTag,this.friendTag,projectileSpeed, projectileSize,projectileRange ,projectilePrefab,explosionAbility,this.myFaction, this.damageType);
 
 		return Instantiate(abilityPrefab,pos,rot);
 	}

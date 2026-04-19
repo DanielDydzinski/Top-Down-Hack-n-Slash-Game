@@ -9,6 +9,7 @@ public class Explosion : Ability {
 	public float radius;
 	public bool damageByDistance;
 
+
 	ExplosionBehaviour explosionBehaviour;
 
 	
@@ -23,7 +24,7 @@ public class Explosion : Ability {
 			return null;
 		}
 
-		explosionBehaviour.UpdateValues (this.targetTag,this.friendTag, this.abilityEffects,explosionParticles,damageByDistance,radius);
+		explosionBehaviour.UpdateValues ( this.abilityEffects,explosionParticles,radius,this.myFaction,this.damageType);
 		return Instantiate(abilityPrefab,pos,rot);
 	}
 }

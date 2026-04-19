@@ -19,8 +19,10 @@ public class Health : MonoBehaviour {
 	private Coroutine GetHitCo;
     private bool inCombat;
     private bool isDead;
+    private DamageReceiver _receiver;
+    private static readonly int getHitHash = Animator.StringToHash("GetHit");
 
-	[SerializeField]
+    [SerializeField]
 	private Image hpFillImage; // reference to hp sprite
 	private Animator animator;
 
@@ -28,7 +30,15 @@ public class Health : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 
-		if (hpFillImage == null) 
+       
+         var receiver = GetComponent<DamageReceiver>();
+        if (receiver != null)
+        {
+            receiver.OnHitReceived += HandleDamage;
+        }
+        
+
+        if (hpFillImage == null) 
 		{
             Debug.LogError("no hpFill sprite found in " + gameObject.name);
         }
@@ -58,6 +68,13 @@ public class Health : MonoBehaviour {
 			}
 			UpdateHealthBar ();
 		}
+    }
+
+    void HandleDamage(HitInfo info)
+    {
+        // Damage(info.damage); // Health only cares about the number
+
+        Debug.Log("we called HandleDamage from health script");
     }
 
     public void Damage(float amount)
@@ -144,19 +161,37 @@ public class Health : MonoBehaviour {
 
 	}
 
-	IEnumerator SetGetHit()
+    void OnEnable()
+    {
+        if (_receiver != null)
+        {
+            // Subscribe to the event
+            _receiver.OnHitReceived += HandleDamage;
+        }
+    }
+
+    void OnDisable()
+    {
+        if (_receiver != null)
+        {
+            // IMPORTANT: Unsubscribe to avoid memory leaks!
+            _receiver.OnHitReceived -= HandleDamage;
+        }
+    }
+
+    IEnumerator SetGetHit()
 	{
-		if (animator.GetBool ("GetHit")) 
+		if (animator.GetBool (getHitHash)) 
 		{
-			animator.SetBool ("GetHit", false);
+			animator.SetBool (getHitHash, false);
 		} 
 		else 
 		{
-			animator.SetBool ("GetHit", true);
+			animator.SetBool (getHitHash, true);
 			yield break;
 		}
 		yield return new WaitForSeconds(0.02f);
-		animator.SetBool ("GetHit", true);
+		animator.SetBool (getHitHash, true);
 
 	}
 }

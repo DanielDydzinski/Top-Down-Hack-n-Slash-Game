@@ -14,9 +14,39 @@ public class EffectManager : MonoBehaviour
 	private Coroutine kbTimerCo;
 	public GameObject knockBackParticles{ set; get;}
 
-	[field:SerializeField]public List<Effect> aEffects {set; get;}
 
-	public void ApplyEffects()
+
+    private DamageReceiver _receiver;
+
+    [field:SerializeField]public List<Effect> aEffects {set; get;}
+
+    void Awake()
+    {
+        _receiver = GetComponent<DamageReceiver>();
+    }
+
+    void OnEnable()
+    {
+        if (_receiver != null) _receiver.OnHitReceived += HandleHit;
+    }
+
+    void OnDisable()
+    {
+        if (_receiver != null) _receiver.OnHitReceived -= HandleHit;
+    }
+
+    private void HandleHit(HitInfo info)
+    {
+        // EffectManager only cares about the list of effects
+        if (info.effects != null && info.effects.Count > 0)
+        {
+            this.aEffects = new List<Effect>(info.effects); // Copy the list
+            ApplyEffects();
+        }
+    }
+
+
+    public void ApplyEffects()
 	{
 		foreach (Effect e in aEffects) 
 		{
