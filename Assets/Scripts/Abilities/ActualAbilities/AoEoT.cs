@@ -23,7 +23,7 @@ public class AoEoT : Ability {
 			return null;
 		}
 
-		aoeotBehaviour.UpdateValues (this.abilityEffects, duration, rate, radius, this.targetTag, abilityParticles);
+		aoeotBehaviour.UpdateValues (this.abilityEffects, duration, rate, radius,this.myFaction, abilityParticles,this.damageType);
 
 		return Instantiate(abilityPrefab,pos,rot);
 	}

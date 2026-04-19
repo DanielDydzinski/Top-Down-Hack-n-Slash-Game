@@ -51,6 +51,9 @@ GameObject:
   - component: {fileID: 114001468093418812}
   - component: {fileID: 5635723544765518505}
   - component: {fileID: 2804357905075449291}
+  - component: {fileID: 9067594002234386465}
+  - component: {fileID: 9051799835636711504}
+  - component: {fileID: 9038358105409897225}
   m_Layer: 9
   m_Name: GoblinEnemy
   m_TagString: Enemy
@@ -272,6 +275,48 @@ MonoBehaviour:
   rotationSpeed: 5
   patrolRate: 5
   patrolDistance: 10
+  rangedDistance: 0
+--- !u!114 &9067594002234386465
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1018636452319246}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 961c12d61d7c25649bb0acf59dfcd185, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  faction: 1
+--- !u!114 &9051799835636711504
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1018636452319246}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 273e50682db33ac48b5e2b75ac3731cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &9038358105409897225
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1018636452319246}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6738a6b1b01f144eaf5d40a7e6b3388, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  abilitySpawnPos: {fileID: 4704926387111780}
+  head: {fileID: 2242187868704429345}
+  center: {fileID: 8410029883155895924}
+  feet: {fileID: 4786687978473659285}
 --- !u!1 &1033657495849930
 GameObject:
   m_ObjectHideFlags: 0

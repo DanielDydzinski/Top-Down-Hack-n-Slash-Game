@@ -11,6 +11,7 @@ public class EnemyAIController : MonoBehaviour
     public AbilityManager abilityManager;
     public Animator aiAnim;
     public Health hp;
+    private static readonly int SpeedHash = Animator.StringToHash("speed");
 
     [Header("Settings")]
     public float engagedDistance = 10f;
@@ -73,7 +74,7 @@ public class EnemyAIController : MonoBehaviour
             currentState.UpdateState();
 
         // Update animator speed for all states
-        aiAnim.SetFloat("speed", nav.velocity.magnitude);
+        aiAnim.SetFloat(SpeedHash, nav.velocity.magnitude);
     }
 
     public void ChangeState(IState newState)

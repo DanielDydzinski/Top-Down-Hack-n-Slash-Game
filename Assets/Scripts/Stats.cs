@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using static UnityEngine.GraphicsBuffer;
 
 public class Stats : MonoBehaviour
 {
@@ -25,15 +26,15 @@ public class Stats : MonoBehaviour
 	{
 		isPlayer = false;
 
-		health = GetComponent<Health> ();
-		if (this.tag == "Player")
+        // Get components directly
+        navMeshAgent = GetComponent<NavMeshAgent>();
+        mover = GetComponent<Mover>();
+
+        health = GetComponent<Health> ();
+
+		if (mover!=null)
 		{
 			isPlayer = true;
-			mover = GetComponent<Mover> ();
-		}
-		else if(this.tag == "Enemy")
-		{
-			navMeshAgent = GetComponent<NavMeshAgent> ();	
 		}
 
 		UpdateMaxHealth ();
@@ -59,11 +60,11 @@ public class Stats : MonoBehaviour
 		}
 	}
 
-	//update ability power
-	//update physical power
+    //update ability power
+    //update physical power
 
 
-	public void SetMaxHealth(float health)
+    public void SetMaxHealth(float health)
 	{
 		maxHealth = health;
 	}

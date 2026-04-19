@@ -107,12 +107,15 @@ public class AbilityManager : MonoBehaviour {
             {
                 case abilitySpawnType.Onself:
                     // Stays as spawnLocation defaults
+                    spawnPos += activeAbility.spawnLocationOffset;
+
                     break;
 
                 case abilitySpawnType.OnTarget:
                     if (activeTarget != null)
                     {
                         spawnPos = activeTarget.position;
+                        spawnPos += activeAbility.spawnLocationOffset;
                         spawnRot = Quaternion.identity;
                     }
                     break;

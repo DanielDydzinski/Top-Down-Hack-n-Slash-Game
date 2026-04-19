@@ -661,6 +661,9 @@ GameObject:
   - component: {fileID: 114452055952631264}
   - component: {fileID: 4472514632291939825}
   - component: {fileID: 7181025010779760237}
+  - component: {fileID: 8533695173713363553}
+  - component: {fileID: 6520223191181450096}
+  - component: {fileID: 3220390435586721019}
   m_Layer: 9
   m_Name: MutantEnemy
   m_TagString: Enemy
@@ -848,7 +851,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 5299b0dcae636b945b9564abbbd7f995, type: 2}
   - {fileID: 11400000, guid: 3fa4c2ef8511cad408b6b436760c4ee4, type: 2}
   - {fileID: 11400000, guid: 6ca363157e35c894a9d39af33f78e5c4, type: 2}
-  - {fileID: 11400000, guid: 6ca363157e35c894a9d39af33f78e5c4, type: 2}
+  - {fileID: 11400000, guid: 0c884bafef749fc4e935d3eb4bb78129, type: 2}
 --- !u!114 &4472514632291939825
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -888,6 +891,47 @@ MonoBehaviour:
   patrolRate: 5
   patrolDistance: 10
   rangedDistance: 0
+--- !u!114 &8533695173713363553
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1201061559704186}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 961c12d61d7c25649bb0acf59dfcd185, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  faction: 1
+--- !u!114 &6520223191181450096
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1201061559704186}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 273e50682db33ac48b5e2b75ac3731cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &3220390435586721019
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1201061559704186}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6738a6b1b01f144eaf5d40a7e6b3388, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  abilitySpawnPos: {fileID: 4625480919753400}
+  head: {fileID: 2823474558105239520}
+  center: {fileID: 6956321479034939977}
+  feet: {fileID: 1643329879608666403}
 --- !u!1 &1201692136702784
 GameObject:
   m_ObjectHideFlags: 0

@@ -22,6 +22,8 @@ MonoBehaviour:
   description: Inflicts damage over time.
   targetTag: Player
   friendTag: Enemy
+  myFaction: 1
+  damageType: 0
   attackState: 2
   cooldown: 5
   requiredRange: 8
@@ -29,6 +31,7 @@ MonoBehaviour:
   isRanged: 1
   canMoveAttack: 0
   spawnLocation: 2
+  spawnLocationOffset: {x: 0, y: 0, z: 0}
   projectilePrefab: {fileID: 1653635828733130, guid: 8e1b221d715d0a24b910eed2c3051c47,
     type: 3}
   explosionAbility: {fileID: 0}

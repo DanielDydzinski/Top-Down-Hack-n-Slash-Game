@@ -821,6 +821,9 @@ GameObject:
   - component: {fileID: 6159956964518088555}
   - component: {fileID: 3632541656258675707}
   - component: {fileID: 4730508318527457396}
+  - component: {fileID: 5566950851032650230}
+  - component: {fileID: 2589627200615846657}
+  - component: {fileID: 3581374160711198903}
   m_Layer: 9
   m_Name: ZombieEnemy
   m_TagString: Enemy
@@ -1045,6 +1048,7 @@ MonoBehaviour:
   rotationSpeed: 5
   patrolRate: 5
   patrolDistance: 10
+  rangedDistance: 0
 --- !u!114 &4730508318527457396
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1061,6 +1065,47 @@ MonoBehaviour:
   moveSpeed: 1
   abilityPower: 0
   physicalPower: 0
+--- !u!114 &5566950851032650230
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1272996731057236}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 273e50682db33ac48b5e2b75ac3731cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2589627200615846657
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1272996731057236}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 961c12d61d7c25649bb0acf59dfcd185, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  faction: 1
+--- !u!114 &3581374160711198903
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1272996731057236}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6738a6b1b01f144eaf5d40a7e6b3388, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  abilitySpawnPos: {fileID: 4632307391019170}
+  head: {fileID: 1318316325642097759}
+  center: {fileID: 7483890480872550965}
+  feet: {fileID: 5949456394876433196}
 --- !u!1 &1286924470810096
 GameObject:
   m_ObjectHideFlags: 0

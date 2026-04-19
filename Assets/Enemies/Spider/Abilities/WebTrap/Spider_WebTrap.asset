@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20830379e8ac15a448fa74e3cb98f25a, type: 3}
+  m_Name: Spider_WebTrap
+  m_EditorClassIdentifier: 
+  abilityPrefab: {fileID: 1660451438789930, guid: 6027d677c07fa8e458cc4af695618ef2,
+    type: 3}
+  abilityEffects:
+  - {fileID: 11400000, guid: e92554653ee973d459a155f71b856c74, type: 2}
+  abilityName: WebTrap
+  icon: {fileID: 0}
+  description: 
+  targetTag: Player
+  friendTag: Enemy
+  myFaction: 1
+  damageType: 0
+  attackState: 4
+  cooldown: 20
+  requiredRange: 5
+  priority: 2
+  isRanged: 1
+  canMoveAttack: 0
+  spawnLocation: 0
+  spawnLocationOffset: {x: 0, y: -0.6, z: 0}
+  abilityParticles: {fileID: 4005515110034528584, guid: 57318686551c7eb41844e0b8f8b90780,
+    type: 3}
+  radius: 2
+  duration: 10
+  rate: 0.5

@@ -33,20 +33,16 @@ public class TakeKnockBack : Effect
             // 3. Switch to Physics Mode (NavMesh OFF, Rigidbody ON)
             controller.TogglePhysicsMode(true);
 
-            // 4. Apply the physical Oomph
+            // 4. Apply the physical Force
             rb.AddExplosionForce(force, explosionPosition, radius);
 
             // 5. Handle Particles (using your existing logic)
-            if (effectParticles != null)
+            var anchors = target.GetComponent<EffectSpawnPossitions>();
+            if (effectParticles != null && anchors != null)
             {
-                if (target.tag == "Enemy" || target.tag == "Player")
-                {
-                    EffectManager em = target.GetComponent<EffectManager>();
-
-                    GameObject particlesObj = Instantiate(effectParticles, target.transform.GetChild(3).transform); // 4th child set up to centre. 3rd to over head. 5th to feet.
-                    Destroy(particlesObj, unconsciousDuration);
-                    em.knockBackParticles = particlesObj;
-                }
+                // Knockback usually looks best spawned at the "Head" (stars/dizzy) or "Center"
+                GameObject particlesObj = Instantiate(effectParticles, anchors.head.position, Quaternion.identity, anchors.head);
+                Destroy(particlesObj, unconsciousDuration);
             }
 
             // 6. Wait for the stun to end

@@ -3,8 +3,9 @@
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
@@ -12,7 +13,7 @@ MonoBehaviour:
   m_Name: MutantExplosion
   m_EditorClassIdentifier: 
   abilityPrefab: {fileID: 1409139781103608, guid: 7fc41178a8c7bfa4d8f5f6420379f9f5,
-    type: 2}
+    type: 3}
   abilityEffects:
   - {fileID: 11400000, guid: cf70848b3c56dcf42a466bbf14e74f6b, type: 2}
   - {fileID: 11400000, guid: 30a02de563ca89e47af06e8e0bc4aeb0, type: 2}
@@ -22,9 +23,16 @@ MonoBehaviour:
   description: 
   targetTag: Player
   friendTag: Enemy
+  myFaction: 1
+  damageType: 1
   attackState: 0
   cooldown: 0
+  requiredRange: 0
+  priority: 0
+  isRanged: 0
+  canMoveAttack: 0
   spawnLocation: 2
-  explosionParticles: {fileID: 100000, guid: 876cb26c7c6ab42e49a9cace28b90b8b, type: 2}
-  radius: 0
-  damageByDistance: 1
+  spawnLocationOffset: {x: 0, y: 0, z: 0}
+  explosionParticles: {fileID: 100000, guid: 876cb26c7c6ab42e49a9cace28b90b8b, type: 3}
+  radius: 2
+  damageByDistance: 0

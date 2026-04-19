@@ -24,6 +24,8 @@ MonoBehaviour:
   description: explodes knocks back and dmg
   targetTag: Enemy
   friendTag: Player
+  myFaction: 0
+  damageType: 1
   attackState: 0
   cooldown: 0
   requiredRange: 0
@@ -31,7 +33,8 @@ MonoBehaviour:
   isRanged: 0
   canMoveAttack: 0
   spawnLocation: 2
+  spawnLocationOffset: {x: 0, y: 0, z: 0}
   explosionParticles: {fileID: 6271241949191652176, guid: 739d19610906a434a8d67ca770434aca,
     type: 3}
-  radius: 2
+  radius: 5
   damageByDistance: 0

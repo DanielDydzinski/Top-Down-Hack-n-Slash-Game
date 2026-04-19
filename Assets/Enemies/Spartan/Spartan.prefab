@@ -2013,6 +2013,9 @@ GameObject:
   - component: {fileID: 114633673114017396}
   - component: {fileID: 114989187313560578}
   - component: {fileID: 258575250132498109}
+  - component: {fileID: 1744511031720291609}
+  - component: {fileID: 7299178939993319106}
+  - component: {fileID: 5229242189936753231}
   m_Layer: 9
   m_Name: Spartan
   m_TagString: Enemy
@@ -2234,6 +2237,48 @@ MonoBehaviour:
   rotationSpeed: 5
   patrolRate: 5
   patrolDistance: 10
+  rangedDistance: 0
+--- !u!114 &1744511031720291609
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1853520728362714}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 273e50682db33ac48b5e2b75ac3731cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &7299178939993319106
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1853520728362714}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 961c12d61d7c25649bb0acf59dfcd185, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  faction: 1
+--- !u!114 &5229242189936753231
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1853520728362714}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6738a6b1b01f144eaf5d40a7e6b3388, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  abilitySpawnPos: {fileID: 4925494708963564}
+  head: {fileID: 4488067953267512}
+  center: {fileID: 4015375182026322}
+  feet: {fileID: 4324502324682002}
 --- !u!1 &1883436760250320
 GameObject:
   m_ObjectHideFlags: 0

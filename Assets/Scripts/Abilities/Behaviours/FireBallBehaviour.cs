@@ -9,9 +9,11 @@ public class FireBallBehaviour : MonoBehaviour {
 	public Ability explosionAbility;
 
 	public string targetTag;
-	public string friendTag;		
+	public string friendTag;
+    public Faction myFaction;
+    public DamageType damageType;
 
-	public float projectileSpeed; 	
+    public float projectileSpeed; 	
 	public float projectileSize;	
 	public float projectileRange;
 
@@ -44,7 +46,7 @@ public class FireBallBehaviour : MonoBehaviour {
 	}
 
 	public void UpdateValues(List<Effect> aeffects ,string atag, string afriendTag, float aprojSpeed, 
-		float aprojSize,float aprojRange, GameObject aproj, Ability aexplo)
+		float aprojSize,float aprojRange, GameObject aproj, Ability aexplo, Faction faction,DamageType dmgType)
 	{
 		effects = aeffects;
 		projectileSpeed = aprojSpeed;
@@ -54,6 +56,8 @@ public class FireBallBehaviour : MonoBehaviour {
 		explosionAbility = aexplo; 
 		targetTag = atag; 
 		friendTag = afriendTag;
+		myFaction = faction;
+        damageType = dmgType;
 	}
 
 	private void DestroyByDistance()
@@ -65,31 +69,67 @@ public class FireBallBehaviour : MonoBehaviour {
 	}
 
 	void OnTriggerEnter(Collider col)
-	{
-		if (howManyExplosions < 1)
-		{
-			if (col.gameObject.tag == targetTag) 
-			{
-				if (col.gameObject.GetComponent<EffectManager> ())
-				{
-					EffectManager em = col.gameObject.GetComponent<EffectManager> ();
-					em.aEffects = effects;
-					em.ApplyEffects ();
-				} 
-				else
-				{
-					Debug.Log (col.gameObject.name + " don't have EffectManager. Can't apply effects.");
-				}
-			}
-			if (col.gameObject.tag != friendTag) // will this work?
-			{
-				if (explosionAbility != null)
-				{
-					GameObject expGO = explosionAbility.Cast (transform.position, Quaternion.identity);
-				}
-				howManyExplosions++;
-				Destroy (this.gameObject);
-			}
-		}
-	}
+	{   //make sure we only do one 
+        if (howManyExplosions < 1)
+        {
+
+            // 1. Check for Identity (The "Who are you?" check)
+            EntityIdentity victimIdentity = col.GetComponent<EntityIdentity>();
+
+            // If they have an identity and it's the same as ours, ignore (Friend)
+            if (victimIdentity != null && victimIdentity.faction == myFaction)
+            {
+                return;
+            }
+
+            // 2. Try to hit the Mail Slot (The "Can I hurt you?" check)
+            IDamageable damageable = col.GetComponent<IDamageable>();
+            if (damageable != null)
+            {
+                // Create the HitInfo envelope
+                HitInfo info = new HitInfo
+                {
+                    type = damageType,
+                    effects = this.effects,
+                    attacker = this.gameObject
+                };
+
+                // Deliver the envelope!
+                damageable.TakeDamage(info);
+            }
+
+            if (explosionAbility != null)
+            {
+                GameObject expGO = explosionAbility.Cast(transform.position, Quaternion.identity);
+            }
+            howManyExplosions++;
+            Destroy(this.gameObject);
+        }
+        
+        //if (howManyExplosions < 1)
+        //{
+        //	if (col.gameObject.tag == targetTag) 
+        //	{
+        //		if (col.gameObject.GetComponent<EffectManager> ())
+        //		{
+        //			EffectManager em = col.gameObject.GetComponent<EffectManager> ();
+        //			em.aEffects = effects;
+        //			em.ApplyEffects ();
+        //		} 
+        //		else
+        //		{
+        //			Debug.Log (col.gameObject.name + " don't have EffectManager. Can't apply effects.");
+        //		}
+        //	}
+        //	if (col.gameObject.tag != friendTag) // will this work?
+        //	{
+        //		if (explosionAbility != null)
+        //		{
+        //			GameObject expGO = explosionAbility.Cast (transform.position, Quaternion.identity);
+        //		}
+        //		howManyExplosions++;
+        //		Destroy (this.gameObject);
+        //	}
+        //}
+    }
 }
