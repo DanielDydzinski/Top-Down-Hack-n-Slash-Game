@@ -38,4 +38,5 @@ MonoBehaviour:
   rate: 0.5
   isDestructible: 1
   lethalType: 1
-  destructionParticles: {fileID: 0}
+  destructionParticles: {fileID: 2754298582772020836, guid: 3fdec124f2b7fa6449b9b5e100a33279,
+    type: 3}

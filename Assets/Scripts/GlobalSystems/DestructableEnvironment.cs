@@ -1,11 +1,12 @@
 using UnityEngine;
-
+using System.Collections;
 public class DestructibleEnvironment : MonoBehaviour, IDamageable
 {
 
     public DamageType lethalType = DamageType.Fire;
     public GameObject destructionParticles;
     public bool ignoreFriendlyFire = true;
+    private float deathDuration = 0.5f;
 
     public void TakeDamage(HitInfo info)
     {
@@ -23,6 +24,7 @@ public class DestructibleEnvironment : MonoBehaviour, IDamageable
         // 2. Type Check
         if (info.type == lethalType)
         {
+            StartCoroutine(Shrink());
             Break();
         }
     }
@@ -33,6 +35,20 @@ public class DestructibleEnvironment : MonoBehaviour, IDamageable
         {
             Instantiate(destructionParticles, transform.position, Quaternion.identity);
         }
-        Destroy(gameObject);
+        Destroy(gameObject,deathDuration + 0.01f);
+    }
+
+    IEnumerator Shrink()
+    {
+        Vector3 startScale = transform.localScale;
+        deathDuration = 0.5f;
+        float time = 0;
+        while (time < deathDuration)
+        {
+            transform.localScale = Vector3.Lerp(startScale, Vector3.zero, time / deathDuration);
+            time += Time.deltaTime;
+            yield return null;
+        }
+        transform.localScale = Vector3.zero;
     }
 }

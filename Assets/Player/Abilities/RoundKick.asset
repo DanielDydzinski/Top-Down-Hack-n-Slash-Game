@@ -22,9 +22,16 @@ MonoBehaviour:
   description: 
   targetTag: Enemy
   friendTag: Player
+  myFaction: 0
+  damageType: 0
   attackState: 4
   cooldown: 4
+  requiredRange: 0
+  priority: 0
+  isRanged: 0
+  canMoveAttack: 0
   spawnLocation: 0
+  spawnLocationOffset: {x: 0, y: 0, z: 0}
   explosionParticles: {fileID: 0}
   radius: 2
   damageByDistance: 1
