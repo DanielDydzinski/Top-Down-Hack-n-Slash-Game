@@ -15,16 +15,20 @@ public class Explosion : Ability {
 	
 	public override GameObject Cast (Vector3 pos, Quaternion rot)
 	{
-		if (abilityPrefab.GetComponent<ExplosionBehaviour> () != null)
+		GameObject instance = Instantiate(abilityPrefab, pos, rot);
+
+		explosionBehaviour = instance.GetComponent<ExplosionBehaviour>();
+		if (explosionBehaviour != null)
 		{
-			explosionBehaviour = abilityPrefab.GetComponent<ExplosionBehaviour> ();
-		} else 
+			explosionBehaviour.UpdateValues(this.abilityEffects, explosionParticles, radius, this.myFaction, this.damageType, damageByDistance);
+		}
+		else
 		{
 			Debug.Log("Explosion needs ExplosionBehaviour");
 			return null;
 		}
 
-		explosionBehaviour.UpdateValues ( this.abilityEffects,explosionParticles,radius,this.myFaction,this.damageType);
-		return Instantiate(abilityPrefab,pos,rot);
+		
+		return instance;
 	}
 }

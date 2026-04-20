@@ -10,7 +10,7 @@ public class TakeHoT : Effect {
 	public float healDuration;
 	public float healRate;
 
-	public override IEnumerator ApplyEffect(GameObject target)
+	public override IEnumerator ApplyEffect(GameObject target, HitInfo info)
 	{
 
         Health hp = target.GetComponent<Health>();

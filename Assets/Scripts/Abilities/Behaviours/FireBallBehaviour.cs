@@ -34,8 +34,9 @@ public class FireBallBehaviour : MonoBehaviour {
 		sc.radius = projectileSize;
 		sc.isTrigger = true;
 
-		GameObject proj = Instantiate (projectile, this.gameObject.transform);
-	}
+        //GameObject proj = Instantiate (projectile, this.gameObject.transform);
+        StartCoroutine(DelayedInstanciate());
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -45,7 +46,7 @@ public class FireBallBehaviour : MonoBehaviour {
 		
 	}
 
-	public void UpdateValues(List<Effect> aeffects ,string atag, string afriendTag, float aprojSpeed, 
+	public void UpdateValues(List<Effect> aeffects , float aprojSpeed, 
 		float aprojSize,float aprojRange, GameObject aproj, Ability aexplo, Faction faction,DamageType dmgType)
 	{
 		effects = aeffects;
@@ -54,13 +55,21 @@ public class FireBallBehaviour : MonoBehaviour {
 		projectileRange = aprojRange;
 		projectile = aproj; 
 		explosionAbility = aexplo; 
-		targetTag = atag; 
-		friendTag = afriendTag;
 		myFaction = faction;
         damageType = dmgType;
-	}
 
-	private void DestroyByDistance()
+    }
+
+    private IEnumerator DelayedInstanciate()
+    {
+        yield return null; // Wait exactly one frame
+        if (projectile != null)
+        {
+            Instantiate(projectile, this.gameObject.transform);
+        }
+    }
+
+    private void DestroyByDistance()
 	{
 		if (Vector3.Distance (spawnPos, transform.position) > projectileRange) {
 
@@ -89,9 +98,12 @@ public class FireBallBehaviour : MonoBehaviour {
                 // Create the HitInfo envelope
                 HitInfo info = new HitInfo
                 {
+                    faction = myFaction,
+                    multiplier = 1.0f,
                     type = damageType,
                     effects = this.effects,
                     attacker = this.gameObject
+                    
                 };
 
                 // Deliver the envelope!

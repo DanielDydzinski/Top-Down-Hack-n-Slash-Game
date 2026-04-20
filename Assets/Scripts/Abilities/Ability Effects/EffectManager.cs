@@ -41,12 +41,12 @@ public class EffectManager : MonoBehaviour
         if (info.effects != null && info.effects.Count > 0)
         {
             this.aEffects = new List<Effect>(info.effects); // Copy the list
-            ApplyEffects();
+            ApplyEffects(info);
         }
     }
 
 
-    public void ApplyEffects()
+    public void ApplyEffects(HitInfo info)
 	{
 		foreach (Effect e in aEffects) 
 		{
@@ -60,7 +60,7 @@ public class EffectManager : MonoBehaviour
 					}
 					StopCoroutine (slowCo);
 				}
-				slowCo = StartCoroutine (e.ApplyEffect (this.gameObject));
+				slowCo = StartCoroutine (e.ApplyEffect (this.gameObject,info));
 			}
             else if (e is TakeKnockBack tke)
             {
@@ -74,7 +74,7 @@ public class EffectManager : MonoBehaviour
 						}
 						StopCoroutine(knockBackCo);
 					}
-					knockBackCo = StartCoroutine(e.ApplyEffect(this.gameObject));
+					knockBackCo = StartCoroutine(e.ApplyEffect(this.gameObject, info));
 					lastKnockBackDuration = tke.unconsciousDuration;
 					if (kbTimerCo != null) StopCoroutine(kbTimerCo);
 					StartCoroutine(RunLastKnockBackTimer());
@@ -82,7 +82,7 @@ public class EffectManager : MonoBehaviour
 			}
 			else
 			{
-				StartCoroutine (e.ApplyEffect (this.gameObject));
+				StartCoroutine (e.ApplyEffect (this.gameObject, info));
 			}
 
 		}
@@ -119,21 +119,21 @@ public class EffectManager : MonoBehaviour
 
 
 
-    private void ReplaceEffect<T>(Effect eff, ref GameObject particles, ref Coroutine co) // check if this works and implement this in the code above if it works
-	{
-		if (eff.GetType () == typeof(T))
-		{
-			if (co != null) 
-			{
-				if (particles != null)
-				{
-					Destroy (particles);
-				}
-				StopCoroutine (co);
-			}
-			co = StartCoroutine (eff.ApplyEffect (this.gameObject));
-		}
-	}
+ //   private void ReplaceEffect<T>(Effect eff, ref GameObject particles, ref Coroutine co) // check if this works and implement this in the code above if it works
+	//{
+	//	if (eff.GetType () == typeof(T))
+	//	{
+	//		if (co != null) 
+	//		{
+	//			if (particles != null)
+	//			{
+	//				Destroy (particles);
+	//			}
+	//			StopCoroutine (co);
+	//		}
+	//		co = StartCoroutine (eff.ApplyEffect (this.gameObject,info));
+	//	}
+	//}
 		
 
 }

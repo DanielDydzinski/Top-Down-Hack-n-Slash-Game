@@ -7,7 +7,7 @@ using UnityEngine.AI;
 public abstract class Effect : ScriptableObject 
 {
 	public GameObject effectParticles;
-	public abstract IEnumerator ApplyEffect (GameObject target);
+	public abstract IEnumerator ApplyEffect (GameObject target, HitInfo info);
 }
 	
 

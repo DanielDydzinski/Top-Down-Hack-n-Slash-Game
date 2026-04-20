@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4914863996197372}
   - component: {fileID: 114586134060441048}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: ExplosionPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -44,11 +44,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c37e9831a4e3c25438462cb2fa24d4fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  explosionParticles: {fileID: 100000, guid: 876cb26c7c6ab42e49a9cace28b90b8b, type: 3}
-  explosionRadius: 2
+  explosionParticles: {fileID: 6271241949191652176, guid: 739d19610906a434a8d67ca770434aca,
+    type: 3}
+  explosionRadius: 5
   damageByDistance: 1
   myFaction: 0
-  damageType: 0
+  damageType: 1
   wallLayer:
     serializedVersion: 2
     m_Bits: 1024

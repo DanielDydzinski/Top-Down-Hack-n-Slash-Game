@@ -10,7 +10,7 @@ public class TakeSlow : Effect
     public float slowDuration;
     public bool fadedSlow;
 
-    public override IEnumerator ApplyEffect(GameObject target)
+    public override IEnumerator ApplyEffect(GameObject target, HitInfo info)
     {
         Stats stats = target.GetComponent<Stats>();
         if (stats == null) yield break;

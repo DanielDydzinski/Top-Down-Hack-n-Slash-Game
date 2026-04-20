@@ -17,7 +17,10 @@ public class MeleeAttackBehavaiour : MonoBehaviour
 
     void Start()
     {
-        CastHitBox();
+        //CastHitBox();
+
+        //wait one frame for values to update
+        StartCoroutine(DelayedStart());
     }
 
     public void UpdateValues(Faction faction, List<Effect> aeffect, float alength, Vector3 ahalfExtents, GameObject aparticles, DamageType dmgType)
@@ -28,6 +31,12 @@ public class MeleeAttackBehavaiour : MonoBehaviour
         halfExtents = ahalfExtents;
         attackParticles = aparticles;
         damageType = dmgType;
+    }
+
+    private IEnumerator DelayedStart()
+    {
+        yield return null; // Wait exactly one frame
+        CastHitBox();
     }
 
     private void CastHitBox()
@@ -59,9 +68,12 @@ public class MeleeAttackBehavaiour : MonoBehaviour
 
                     HitInfo info = new HitInfo
                     {
+                        faction = myFaction,
                         type = damageType,
                         effects = effects,
-                        attacker = this.gameObject
+                        attacker = this.gameObject,
+                        multiplier = 1.0f
+
                     };
                     damageable.TakeDamage(info);
                 }

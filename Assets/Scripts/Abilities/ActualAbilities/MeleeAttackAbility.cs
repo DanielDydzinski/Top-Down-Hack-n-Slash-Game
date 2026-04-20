@@ -15,17 +15,21 @@ public class MeleeAttackAbility : Ability {
 
 	public override GameObject Cast (Vector3 pos, Quaternion rot)
 	{
-		if (abilityPrefab.GetComponent<MeleeAttackBehavaiour> () != null)
+        GameObject instance = Instantiate(abilityPrefab, pos, rot);
+
+
+     
+		meleeAttackBehavaiour = instance.GetComponent<MeleeAttackBehavaiour> ();
+		if(meleeAttackBehavaiour!=null)
 		{
-			meleeAttackBehavaiour = abilityPrefab.GetComponent<MeleeAttackBehavaiour> ();
-		} else 
+            meleeAttackBehavaiour.UpdateValues(this.myFaction, this.abilityEffects, length, halfExtents, attackParticles, this.damageType);
+        }
+		 else 
 		{
 			Debug.Log("MeleeAttack needs MeleeAttackBehavaiour");
 			return null;
 		}
 
-		meleeAttackBehavaiour.UpdateValues (this.myFaction,this.abilityEffects,length, halfExtents, attackParticles,this.damageType);
-
-		return Instantiate(abilityPrefab,pos,rot);
+		return instance;
 	}
 }

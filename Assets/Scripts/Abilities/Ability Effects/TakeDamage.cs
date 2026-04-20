@@ -7,12 +7,12 @@ public class TakeDamage : Effect {
 
 	public float damageAmount;
 
-    public override IEnumerator ApplyEffect(GameObject target)
+    public override IEnumerator ApplyEffect(GameObject target, HitInfo info)
     {
         Health hp = target.GetComponent<Health>();
         if (hp != null)
         {
-            hp.Damage(damageAmount);
+            hp.Damage(damageAmount * info.multiplier);
             // Note: You can now pass info.attacker to Health if you want to track who did the damage!
         }
         if (effectParticles != null)

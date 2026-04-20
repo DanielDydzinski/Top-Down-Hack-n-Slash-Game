@@ -14,7 +14,7 @@ public class TakeKnockBack : Effect
 	public float unconsciousDuration;
 
 
-    public override IEnumerator ApplyEffect(GameObject target)
+    public override IEnumerator ApplyEffect(GameObject target, HitInfo info)
     {
 
         Vector3 FinalExploPos = explosionPosition;
