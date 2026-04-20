@@ -15,11 +15,12 @@ public class AoEoTBehaviour : MonoBehaviour
 
     private float lifeTimer = 0f;
     private float tickTimer = 0f;
+    private SphereCollider sc;
 
     void Start()
     {
-        
-        if (particles != null) Instantiate(particles, transform);
+        //give one frame for values to update
+        StartCoroutine(DelayedStart());
     }
 
     void Update()
@@ -36,6 +37,15 @@ public class AoEoTBehaviour : MonoBehaviour
         if (lifeTimer >= duration) Destroy(gameObject);
     }
 
+    private IEnumerator DelayedStart()
+    {
+        yield return null; // Wait exactly one frame
+        sc = GetComponent<SphereCollider>();
+        sc.radius = radius;
+
+        if (particles != null) Instantiate(particles, transform);
+    }
+
     private void Tick()
     {
         Collider[] targets = Physics.OverlapSphere(transform.position, radius);
@@ -49,9 +59,12 @@ public class AoEoTBehaviour : MonoBehaviour
             {
                 HitInfo info = new HitInfo
                 {
+                    multiplier = 1.0f,
                     type = damageType,
                     effects = this.effects,
-                    attacker = this.gameObject
+                    attacker = this.gameObject,
+                    faction = this.myFaction
+                    
                 };
                 damageable.TakeDamage(info);
             }

@@ -24,7 +24,7 @@ MonoBehaviour:
   damageType: 1
   attackState: 2
   cooldown: 5
-  requiredRange: 3
+  requiredRange: 7
   priority: 0
   isRanged: 0
   canMoveAttack: 0
@@ -35,3 +35,6 @@ MonoBehaviour:
   projectileSpeed: 10
   projectileSize: 0.5
   projectileRange: 20
+  isDestructible: 1
+  lethalType: 2
+  destructionParticles: {fileID: 0}

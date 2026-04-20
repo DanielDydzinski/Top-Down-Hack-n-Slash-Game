@@ -11,7 +11,7 @@ public class TakeDoT : Effect
     public float damageDuration;
     public float damageRate;
 
-    public override IEnumerator ApplyEffect(GameObject target)
+    public override IEnumerator ApplyEffect(GameObject target, HitInfo info)
     {
         Health hp = target.GetComponent<Health>();
 

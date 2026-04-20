@@ -21,6 +21,8 @@ MonoBehaviour:
   description: 
   targetTag: Player
   friendTag: Enemy
+  myFaction: 1
+  damageType: 0
   attackState: 1
   cooldown: 1.5
   requiredRange: 1.5
@@ -28,6 +30,7 @@ MonoBehaviour:
   isRanged: 0
   canMoveAttack: 0
   spawnLocation: 0
+  spawnLocationOffset: {x: 0, y: 0, z: 0}
   attackParticles: {fileID: 0}
   length: 2
   halfExtents: {x: 0.5, y: 1, z: 0.5}

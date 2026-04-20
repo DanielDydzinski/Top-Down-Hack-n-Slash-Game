@@ -29,7 +29,7 @@ MonoBehaviour:
   requiredRange: 2
   priority: 1
   isRanged: 0
-  canMoveAttack: 0
+  canMoveAttack: 1
   spawnLocation: 2
   spawnLocationOffset: {x: 0, y: 0, z: 0}
   attackParticles: {fileID: 100000, guid: 876cb26c7c6ab42e49a9cace28b90b8b, type: 3}

@@ -21,6 +21,8 @@ MonoBehaviour:
   description: Bites dealing damage to target.
   targetTag: Player
   friendTag: Enemy
+  myFaction: 1
+  damageType: 0
   attackState: 1
   cooldown: 3
   requiredRange: 2
@@ -28,6 +30,7 @@ MonoBehaviour:
   isRanged: 0
   canMoveAttack: 1
   spawnLocation: 2
+  spawnLocationOffset: {x: 0, y: 0, z: 0}
   attackParticles: {fileID: 1141561905072846, guid: a96fd2b9de6f96f4e9d8352254935266,
     type: 3}
   length: 2

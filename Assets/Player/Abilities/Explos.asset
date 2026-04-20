@@ -17,8 +17,6 @@ MonoBehaviour:
   abilityEffects:
   - {fileID: 11400000, guid: feca4658d45ef844db0590a520cf912b, type: 2}
   - {fileID: 11400000, guid: 76d1d40779a71e4409201d783fcb7e85, type: 2}
-  - {fileID: 11400000, guid: a52fce72e25fd434b8c37cce0c18c310, type: 2}
-  - {fileID: 11400000, guid: 4566f8b0cd218f741969bc34407f5ec8, type: 2}
   abilityName: Explosion
   icon: {fileID: 0}
   description: explodes knocks back and dmg
@@ -37,4 +35,4 @@ MonoBehaviour:
   explosionParticles: {fileID: 6271241949191652176, guid: 739d19610906a434a8d67ca770434aca,
     type: 3}
   radius: 5
-  damageByDistance: 0
+  damageByDistance: 1

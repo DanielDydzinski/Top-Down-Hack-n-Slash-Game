@@ -7,7 +7,7 @@ public class TakeHeal : Effect {
 
 	public float healAmount;
 
-    public override IEnumerator ApplyEffect(GameObject target)
+    public override IEnumerator ApplyEffect(GameObject target, HitInfo info)
     {
         Health hp = target.GetComponent<Health>();
         if (hp != null)
