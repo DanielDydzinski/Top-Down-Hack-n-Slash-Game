@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad930e33505696e4b94c6501407643c9, type: 3}
+  m_Name: HeroPunch
+  m_EditorClassIdentifier: 
+  abilityPrefab: {fileID: 1423304968587218, guid: 348341daf378dcf44a9cc3fcb926178d,
+    type: 3}
+  abilityEffects:
+  - {fileID: 11400000, guid: 31570aa5b34f4be43b0315ddedeb3fe6, type: 2}
+  - {fileID: 11400000, guid: 25533163a51e8a444aacb869782fc055, type: 2}
+  abilityName: HeroPunch
+  icon: {fileID: 0}
+  description: 
+  myFaction: 0
+  damageType: 0
+  nextComboAbility: {fileID: 0}
+  comboWindow: 3.5
+  movementMultiplier: 1
+  canRotateDuringCast: 1
+  canMoveAttack: 0
+  attackState: 12
+  animLayer: 1
+  cooldown: 0
+  requiredRange: 0
+  priority: 0
+  isRanged: 0
+  track: 1
+  dashDirection: {x: 0, y: 0, z: 0}
+  dashPower: 6
+  dashStartTime: 0.021
+  dashEndTime: 0.702
+  abilityVisualPartyicles: {fileID: 0}
+  spawnLocation: 3
+  spawnLocationOffset: {x: 0, y: 0, z: 0}
+  spawnRotationOffset: {x: 0, y: 0, z: 0}
+  attackParticles: {fileID: 100000, guid: 876cb26c7c6ab42e49a9cace28b90b8b, type: 3}
+  length: 2
+  halfExtents: {x: 0.6, y: 0.6, z: 0}
+  TargetLayerMask:
+    serializedVersion: 2
+    m_Bits: 512
+  howManyEnemiesToHit: 3

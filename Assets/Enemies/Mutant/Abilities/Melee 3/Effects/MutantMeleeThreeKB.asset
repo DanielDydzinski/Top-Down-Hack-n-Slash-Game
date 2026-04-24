@@ -3,15 +3,17 @@
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 24e53851495f07545a066bd5853ed672, type: 3}
   m_Name: MutantMeleeThreeKB
   m_EditorClassIdentifier: 
-  effectParticles: {fileID: 0}
-  force: 1500
-  radius: 0.5
+  effectParticles: {fileID: 1470821830531986, guid: ca5955a8595bc37469fe9a3f252d8e69,
+    type: 3}
+  force: 50
+  radius: 5
   unconsciousDuration: 2

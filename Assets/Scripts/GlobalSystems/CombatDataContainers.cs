@@ -13,6 +13,7 @@ public struct HitInfo
     public GameObject attacker; // Handy if you want to know who shot you
     public Faction faction;
     public float multiplier;
+    public Vector3 forceDirection;
 }
 
 // The "Mail Slot" interface

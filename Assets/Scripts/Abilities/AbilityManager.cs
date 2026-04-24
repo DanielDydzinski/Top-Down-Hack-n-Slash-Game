@@ -22,17 +22,21 @@ public class AbilityManager : MonoBehaviour {
     private List<Ability> rangedAbilities = new List<Ability>();
 
     private bool IsCastingAbility = false;
-    private Ability activeAbility;
+    public Ability activeAbility;
     private Transform activeTarget; // The target for the current ability execution
     public event Action OnAbilityReady;
+
+    private EffectSpawnPossitions effectSpawnPossitions;
 
     // Use this for initialization
     void Start () {
 
-		if(this.tag == "Enemy")
-		{
-			spawnLocation = transform.GetChild (2).transform; // in the inspector make sure the spwnloaction is a 3rd child
-		}
+        effectSpawnPossitions = GetComponent<EffectSpawnPossitions>();
+
+		//if(this.tag == "Enemy")
+		//{
+		//	spawnLocation = transform.GetChild (2).transform; // in the inspector make sure the spwnloaction is a 3rd child
+		//}
 
 		if (GetComponent<Animator> ()) {
 			animator = GetComponent<Animator> ();
@@ -80,7 +84,11 @@ public class AbilityManager : MonoBehaviour {
 	{
 		return IsCastingAbility;
 	}
-
+    public bool IsPerformingAction()
+    {
+        // If the animator is anything other than -1, an ability is technically "active"
+        return animator.GetInteger(AttackStateHash) != -1;
+    }
     public void CancelAbility() // animations will have events at end of the animation to call this function - can also be used for interupts etc.
 	{
 		animator.SetInteger (AttackStateHash, -1); // note : animation must not have exit time or this won't work // -1 is no attack 
@@ -119,8 +127,16 @@ public class AbilityManager : MonoBehaviour {
                         spawnRot = Quaternion.identity;
                     }
                     break;
+                case abilitySpawnType.PlayerRoot:
+
+                    spawnPos = effectSpawnPossitions.abilitySpawnRootPos.position;
+                        spawnRot = this.transform.rotation;
+
+                    break;
 
                 case abilitySpawnType.SpecifiedPoint:
+
+                    spawnRot *= Quaternion.Euler(activeAbility.spawnRotationOffset);
                     // Handle third case here
                     break;
             }
@@ -131,7 +147,7 @@ public class AbilityManager : MonoBehaviour {
         }
         else
         {
-            Debug.LogWarning("Animation tried to cast, but no activeAbility was set!");
+            Debug.LogWarning("Animation tried to cast, but no activeAbility was set! from " +this.gameObject.name);
         }
     }
 
@@ -213,6 +229,11 @@ public class AbilityManager : MonoBehaviour {
             }
         }
         return bestAbility;
+    }
+
+    public void PlayVisuals()
+    {
+        if (activeAbility.abilityVisualPartyicles != null) Instantiate(activeAbility.abilityVisualPartyicles, transform.position, transform.rotation); 
     }
     public Ability GetHighestPriorityReady(bool wantRanged)
     {

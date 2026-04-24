@@ -16,7 +16,8 @@ public class AttackState : BaseAttackState
 
     public override void UpdateState()
     {
-
+        // If we are being shoved, don't calculate paths or try to move
+        if (_controller.stats.isPushed) return;
 
         // If we can move while attacking, keep pathing
         if (_activeAbility.canMoveAttack)

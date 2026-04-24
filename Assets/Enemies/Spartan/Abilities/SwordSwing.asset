@@ -19,18 +19,28 @@ MonoBehaviour:
   abilityName: SwordSwing
   icon: {fileID: 0}
   description: 
-  targetTag: Player
-  friendTag: Enemy
   myFaction: 1
   damageType: 0
+  nextComboAbility: {fileID: 0}
+  comboWindow: 1
+  movementMultiplier: 1
+  canRotateDuringCast: 0
+  canMoveAttack: 1
   attackState: 1
+  animLayer: 0
   cooldown: 1.5
-  requiredRange: 1.5
+  requiredRange: 2.5
   priority: 0
   isRanged: 0
-  canMoveAttack: 0
+  track: 0
+  dashDirection: {x: 0, y: 0, z: 0}
+  dashPower: 0
+  dashStartTime: 0
+  dashEndTime: 0
+  abilityVisualPartyicles: {fileID: 0}
   spawnLocation: 0
   spawnLocationOffset: {x: 0, y: 0, z: 0}
+  spawnRotationOffset: {x: 0, y: 0, z: 0}
   attackParticles: {fileID: 0}
   length: 2
   halfExtents: {x: 0.5, y: 1, z: 0.5}

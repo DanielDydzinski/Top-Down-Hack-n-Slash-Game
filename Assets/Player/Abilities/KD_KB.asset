@@ -16,4 +16,4 @@ MonoBehaviour:
     type: 3}
   force: 500
   radius: 2
-  unconsciousDuration: 10
+  unconsciousDuration: 1

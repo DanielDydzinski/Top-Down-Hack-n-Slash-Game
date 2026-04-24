@@ -9,9 +9,15 @@ public class EnemyAIController : MonoBehaviour
     public NavMeshObstacle obstacle;
     private bool _hasObstacle;
     public AbilityManager abilityManager;
+    public Stats stats;
     public Animator aiAnim;
     public Health hp;
     private static readonly int SpeedHash = Animator.StringToHash("speed");
+    public int emptyStateHash = Animator.StringToHash("Empty State"); // Ensure this state exists on your layers!
+    public readonly int BaseLayer = 0;
+    public readonly int GetHitLayer = 1;
+    public readonly int AttackLayer = 2;
+    public readonly int DeathLayer = 3;
 
     [Header("Settings")]
     public float engagedDistance = 10f;
@@ -23,6 +29,7 @@ public class EnemyAIController : MonoBehaviour
 
     [Header("combatSettings")]
     public float rangedDistance;
+    public float defaultChaseDist = 1f;
 
     private IState currentState;
 
@@ -32,14 +39,17 @@ public class EnemyAIController : MonoBehaviour
     public ChaseState chaseState;
     public StunState stunState { get; private set; }
 
+
     void Start()
     {
         target = GameObject.FindGameObjectWithTag("Player").transform;
+
         nav = GetComponent<NavMeshAgent>();
         obstacle = GetComponent<NavMeshObstacle>();
         aiAnim = GetComponent<Animator>();
         abilityManager = GetComponent<AbilityManager>();
         hp = GetComponent<Health>();
+        stats = GetComponent<Stats>();
 
         obstacle = GetComponent<NavMeshObstacle>();
 
@@ -73,8 +83,14 @@ public class EnemyAIController : MonoBehaviour
         if (currentState != null)
             currentState.UpdateState();
 
+        float currentSpeed =nav.velocity.magnitude / nav.speed;
+
+        // 2. Feed it to the animator with a 'DampTime'
+        // The 0.1f is the "smoothing" time. The higher this is, the slower the blend.
+        aiAnim.SetFloat(SpeedHash, currentSpeed, 0.1f, Time.deltaTime);
+
         // Update animator speed for all states
-        aiAnim.SetFloat(SpeedHash, nav.velocity.magnitude);
+        // aiAnim.SetFloat(SpeedHash, nav.velocity.magnitude);
     }
 
     public void ChangeState(IState newState)

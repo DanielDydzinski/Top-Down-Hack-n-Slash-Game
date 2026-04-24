@@ -16,22 +16,31 @@ MonoBehaviour:
     type: 3}
   abilityEffects:
   - {fileID: 11400000, guid: 76d1d40779a71e4409201d783fcb7e85, type: 2}
-  - {fileID: 11400000, guid: feca4658d45ef844db0590a520cf912b, type: 2}
+  - {fileID: 11400000, guid: 37c2a68615f122a44afa35b3e6d5664d, type: 2}
   abilityName: RoundKick
   icon: {fileID: 0}
   description: 
-  targetTag: Enemy
-  friendTag: Player
   myFaction: 0
   damageType: 0
+  nextComboAbility: {fileID: 0}
+  comboWindow: 5
+  movementMultiplier: 1
+  canRotateDuringCast: 0
+  canMoveAttack: 0
   attackState: 4
-  cooldown: 4
+  animLayer: 1
+  cooldown: 0
   requiredRange: 0
   priority: 0
   isRanged: 0
-  canMoveAttack: 0
+  track: 1
+  dashDirection: {x: 0, y: 0, z: 0}
+  dashPower: 5
+  dashStartTime: 0.186
+  dashEndTime: 0.543
   spawnLocation: 0
   spawnLocationOffset: {x: 0, y: 0, z: 0}
+  spawnRotationOffset: {x: 0, y: 0, z: 0}
   explosionParticles: {fileID: 0}
-  radius: 2
+  radius: 5
   damageByDistance: 1

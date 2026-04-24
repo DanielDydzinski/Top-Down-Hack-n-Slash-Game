@@ -14,9 +14,23 @@ public class Stats : MonoBehaviour
 	private float abilityPower;
 	[SerializeField]
 	private float physicalPower;
-	//public float damageReduction;
+    //public float damageReduction;
 
-	private Health health;
+    public float mass = 3f;
+	[SerializeField] private float dodgeAnimationSpeed= 1f;
+	public float dodgePower;
+
+
+    public float GetDodgeAnimationSpeed() => dodgeAnimationSpeed;
+    public void SetDodgeAnimationSpeed(float value) => dodgeAnimationSpeed = value;
+    public float GetMass() => mass;
+    public void SetMass(float value) => mass = value;
+
+    public bool isPushed = false;
+
+    private float effectSpeedMultiplier = 1f;
+
+    private Health health;
 	private Mover mover;
 	private NavMeshAgent navMeshAgent;
 
@@ -42,8 +56,28 @@ public class Stats : MonoBehaviour
 		
 	}
 
+    public void SetEffectMultiplier(float mult)
+    {
+        effectSpeedMultiplier = mult;
+        ApplyCurrentSpeed();
+    }
+    public float GetModifiedSpeed() => moveSpeed * effectSpeedMultiplier;
 
-	public void UpdateMaxHealth()
+    private void ApplyCurrentSpeed()
+    {
+        if (isPlayer)
+        {
+            // For players, the Mover calculates final speed in its Move() loop
+            // so we don't need to push anything here, but we could if needed.
+        }
+        else if (navMeshAgent != null)
+        {
+            // For AI, we have to push the slowed speed directly to the agent
+            navMeshAgent.speed = GetModifiedSpeed();
+        }
+    }
+
+    public void UpdateMaxHealth()
 	{
 		health.SetMaxHealth (maxHealth);
 	}

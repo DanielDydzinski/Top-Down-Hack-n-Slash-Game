@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ee5216dda1b6724881b98192c96922e, type: 3}
+  m_Name: FireBallAbility
+  m_EditorClassIdentifier: 
+  abilityPrefab: {fileID: 1547244944460502, guid: ff743712ab09a72419b3d8b513de23be,
+    type: 3}
+  abilityEffects:
+  - {fileID: 11400000, guid: a52fce72e25fd434b8c37cce0c18c310, type: 2}
+  abilityName: FireBall
+  icon: {fileID: 21300000, guid: 77327bb3e8d5f2d48bc505f348291a9e, type: 3}
+  description: a ball of fire
+  myFaction: 0
+  damageType: 0
+  nextComboAbility: {fileID: 0}
+  comboWindow: 2
+  movementMultiplier: 1
+  canRotateDuringCast: 1
+  canMoveAttack: 0
+  attackState: 2
+  animLayer: 0
+  cooldown: 0
+  requiredRange: 0
+  priority: 0
+  isRanged: 0
+  track: 2
+  dashDirection: {x: 0, y: 0, z: 0}
+  dashPower: 0
+  dashStartTime: 0
+  dashEndTime: 0
+  spawnLocation: 2
+  spawnLocationOffset: {x: 0, y: 0, z: 0}
+  spawnRotationOffset: {x: 0, y: 0, z: 0}
+  projectilePrefab: {fileID: 7493796544200936264, guid: 625a5893477f7b94da52aa0c2e1eb1d8,
+    type: 3}
+  explosionAbility: {fileID: 11400000, guid: 22b5ed6eccece714aa9df38f7fcef5b1, type: 2}
+  projectileSpeed: 10
+  projectileSize: 0.5
+  projectileRange: 30
+  isDestructible: 1
+  lethalType: 2
+  destructionParticles: {fileID: 0}

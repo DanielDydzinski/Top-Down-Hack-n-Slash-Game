@@ -19,13 +19,20 @@ public class PlayerRotate : MonoBehaviour {
 
 	private Quaternion rootRotation;									//to store the the angle to which the character will rotate to
 
-	enum FacingDirEnum {Forward, Backwards, Left, Right,
+	public enum FacingDirEnum {Forward, Backwards, Left, Right,
 						TopRight, TopLeft, BottomRight, BottomLeft}		//to know which way character is currently facing and use it as a trigger to start rotation when switching to new state
-	FacingDirEnum facingDir;
+	public FacingDirEnum facingDir;
+
+	public Vector3 facingDirVec3;
+
+    private Vector3 diagonalRight = new Vector3(0.5f, 0.0f, 0.5f);
+    private Vector3 diagonalLeft = new Vector3(-0.5f, 0.0f, 0.5f);
+    private Vector3 negDiagonalRight= new Vector3(0.5f, 0.0f, -0.5f);
+    private Vector3 negDiagonalLeft = new Vector3(-0.5f, 0.0f, -0.5f);
 
 
 
-	void Start()
+    void Start()
 	{	
 		//get these components attached to this object
 		playerToMouse = GetComponent<PlayerToMouse> ();
@@ -66,6 +73,7 @@ public class PlayerRotate : MonoBehaviour {
 					StopCoroutine ("Qlerp"); //stop any previous rotations that might conflict with new one 
 					StartCoroutine (Qlerp (transform.rotation, rootRotation, rotationTimeFracture)); //rotate the character to the correct  direction
 					facingDir = FacingDirEnum.Forward; // update the facing state so this will not be triggered again 
+                    facingDirVec3 = Vector3.forward;
 				}
 			} else if (dotP < 0.707f && dotP > -0.707f) { // if dot between angles 45 degrees and 135 degrees character needs face sideways, but which side?
 
@@ -77,7 +85,8 @@ public class PlayerRotate : MonoBehaviour {
 						StopCoroutine ("Qlerp");
 						StartCoroutine (Qlerp (transform.rotation, rootRotation, rotationTimeFracture));
 						facingDir = FacingDirEnum.Right;
-					}
+						facingDirVec3 = Vector3.right;
+                    }
 				} else {    //if player to mouse direction x is negative face left 
 				
 					if (facingDir != FacingDirEnum.Left) {
@@ -86,6 +95,7 @@ public class PlayerRotate : MonoBehaviour {
 						StopCoroutine ("Qlerp");
 						StartCoroutine (Qlerp (transform.rotation, rootRotation, rotationTimeFracture));
 						facingDir = FacingDirEnum.Left;
+						facingDirVec3 = Vector3.left;
 					}
 				}
 			}
@@ -98,6 +108,7 @@ public class PlayerRotate : MonoBehaviour {
 				StopCoroutine ("Qlerp");
 				StartCoroutine (Qlerp (transform.rotation, rootRotation, rotationTimeFracture));
 				facingDir = FacingDirEnum.Backwards;
+				facingDirVec3 =	Vector3.back;
 			}
 		}
 
@@ -114,7 +125,8 @@ public class PlayerRotate : MonoBehaviour {
 						StopCoroutine ("Qlerp");
 						StartCoroutine (Qlerp (transform.rotation, rootRotation, rotationTimeFracture));
 						facingDir = FacingDirEnum.TopRight;
-					}
+						facingDirVec3 = diagonalRight;
+                    }
 				} else { // if player to mouse dir x is negative face to the left
 					if (facingDir != FacingDirEnum.TopLeft) {
 
@@ -122,6 +134,7 @@ public class PlayerRotate : MonoBehaviour {
 						StopCoroutine ("Qlerp");
 						StartCoroutine (Qlerp (transform.rotation, rootRotation, rotationTimeFracture));
 						facingDir = FacingDirEnum.TopLeft;
+						facingDirVec3 = diagonalLeft;
 					}
 				}
 			} else if (dotP < 0) { // if anglee between player to mouse vector  and vector3.forward is > 90  degrees character is facing backwards
@@ -133,6 +146,7 @@ public class PlayerRotate : MonoBehaviour {
 						StopCoroutine ("Qlerp");
 						StartCoroutine (Qlerp (transform.rotation, rootRotation, rotationTimeFracture));
 						facingDir = FacingDirEnum.BottomRight;
+						facingDirVec3 = negDiagonalRight; 
 					}
 				} else {  // if player to mouse dir x is negative face to the left
 					if (facingDir != FacingDirEnum.BottomLeft) {
@@ -141,6 +155,7 @@ public class PlayerRotate : MonoBehaviour {
 						StopCoroutine ("Qlerp");
 						StartCoroutine (Qlerp (transform.rotation, rootRotation, rotationTimeFracture));
 						facingDir = FacingDirEnum.BottomLeft;
+						facingDirVec3 = negDiagonalLeft;
 					}
 
 				}
@@ -154,7 +169,9 @@ public class PlayerRotate : MonoBehaviour {
 						StopCoroutine ("Qlerp");
 						StartCoroutine (Qlerp (transform.rotation, rootRotation, rotationTimeFracture));
 						facingDir = FacingDirEnum.BottomRight;
-					}
+                        facingDirVec3 = negDiagonalRight;
+
+                    }
 				} else {
 					if (facingDir != FacingDirEnum.BottomLeft) {
 
@@ -162,7 +179,8 @@ public class PlayerRotate : MonoBehaviour {
 						StopCoroutine ("Qlerp");
 						StartCoroutine (Qlerp (transform.rotation, rootRotation, rotationTimeFracture));
 						facingDir = FacingDirEnum.BottomLeft;
-					}
+                        facingDirVec3 = negDiagonalLeft;
+                    }
 				}
 			} else if (dotP > 0) {
 				if (playerMouseDir.x > 0) {
@@ -172,6 +190,7 @@ public class PlayerRotate : MonoBehaviour {
 						StopCoroutine ("Qlerp");
 						StartCoroutine (Qlerp (transform.rotation, rootRotation, rotationTimeFracture));
 						facingDir = FacingDirEnum.TopRight;
+						facingDirVec3 = diagonalRight;
 					}
 				} else {
 					if (facingDir != FacingDirEnum.TopLeft) {
@@ -180,6 +199,7 @@ public class PlayerRotate : MonoBehaviour {
 						StopCoroutine ("Qlerp");
 						StartCoroutine (Qlerp (transform.rotation, rootRotation, rotationTimeFracture));
 						facingDir = FacingDirEnum.TopLeft;
+						facingDirVec3 = diagonalLeft;
 					}
 				}
 			}
@@ -249,5 +269,12 @@ public class PlayerRotate : MonoBehaviour {
 			yield return null;
 		}
 	}
+
+    public void StopAllRotation()
+    {
+        StopAllCoroutines();
+        // If you are using a specific reference like 'rotationRoutine', 
+        // use StopCoroutine(rotationRoutine) instead to be safer.
+    }
 }
 

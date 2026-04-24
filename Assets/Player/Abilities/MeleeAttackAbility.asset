@@ -3,8 +3,9 @@
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
@@ -12,18 +13,28 @@ MonoBehaviour:
   m_Name: MeleeAttackAbility
   m_EditorClassIdentifier: 
   abilityPrefab: {fileID: 1423304968587218, guid: 348341daf378dcf44a9cc3fcb926178d,
-    type: 2}
+    type: 3}
   abilityEffects:
   - {fileID: 11400000, guid: c7dcbe824c8a36a49a72d7ba9be384ce, type: 2}
   - {fileID: 11400000, guid: 20f28bf197d0aea42ae3d0e59664a1b6, type: 2}
   abilityName: Attack
   icon: {fileID: 0}
   description: whoop!
-  targetTag: Enemy
-  friendTag: Player
+  myFaction: 0
+  damageType: 0
+  nextComboAbility: {fileID: 0}
+  comboWindow: 2
+  movementMultiplier: 1
+  canRotateDuringCast: 1
+  canMoveAttack: 1
   attackState: 1
+  animLayer: 0
   cooldown: 0
+  requiredRange: 0
+  priority: 0
+  isRanged: 0
   spawnLocation: 2
+  spawnLocationOffset: {x: 0, y: 0, z: 0}
   attackParticles: {fileID: 0}
   length: 1.5
   halfExtents: {x: 0.2, y: 0.2, z: 0}

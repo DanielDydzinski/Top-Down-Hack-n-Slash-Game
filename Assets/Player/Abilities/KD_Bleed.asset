@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   effectParticles: {fileID: 1727430861035118, guid: ab16498bcb20a2940990cdea988a71e6,
     type: 3}
-  damageAmount: 70
+  damageAmount: 2
   damageDuration: 10
   damageRate: 2

@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f596d8d8b635ae40ac1d99373e0189b, type: 3}
+  m_Name: HeroAttackExplo
+  m_EditorClassIdentifier: 
+  abilityPrefab: {fileID: 1409139781103608, guid: 7fc41178a8c7bfa4d8f5f6420379f9f5,
+    type: 3}
+  abilityEffects:
+  - {fileID: 11400000, guid: 25533163a51e8a444aacb869782fc055, type: 2}
+  abilityName: HeroExplo
+  icon: {fileID: 0}
+  description: 
+  myFaction: 0
+  damageType: 0
+  nextComboAbility: {fileID: 0}
+  comboWindow: 5
+  movementMultiplier: 1
+  canRotateDuringCast: 1
+  canMoveAttack: 0
+  attackState: 12
+  animLayer: 0
+  cooldown: 0
+  requiredRange: 0
+  priority: 0
+  isRanged: 0
+  track: 1
+  dashDirection: {x: 0, y: 0, z: 0}
+  dashPower: 6
+  dashStartTime: 0.033
+  dashEndTime: 0.705
+  abilityVisualPartyicles: {fileID: 8359179042112864422, guid: a4346e8460a808d418ee52a56c6b4003,
+    type: 3}
+  spawnLocation: 3
+  spawnLocationOffset: {x: 0, y: 0, z: 0}
+  spawnRotationOffset: {x: 0, y: 0, z: 0}
+  explosionParticles: {fileID: 6271241949191652176, guid: 739d19610906a434a8d67ca770434aca,
+    type: 3}
+  radius: 1.5
+  damageByDistance: 0

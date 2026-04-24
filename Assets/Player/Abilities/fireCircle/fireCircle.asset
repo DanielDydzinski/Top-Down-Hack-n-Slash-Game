@@ -19,18 +19,27 @@ MonoBehaviour:
   abilityName: Fire Circle
   icon: {fileID: 0}
   description: 
-  targetTag: Enemy
-  friendTag: Player
   myFaction: 0
   damageType: 1
-  attackState: 4
+  nextComboAbility: {fileID: 0}
+  comboWindow: 5
+  movementMultiplier: 1
+  canRotateDuringCast: 0
+  canMoveAttack: 0
+  attackState: 5
+  animLayer: 0
   cooldown: 3
   requiredRange: 0
   priority: 0
   isRanged: 0
-  canMoveAttack: 0
+  track: 2
+  dashDirection: {x: 0, y: 0, z: 0}
+  dashPower: 0
+  dashStartTime: 0
+  dashEndTime: 0
   spawnLocation: 2
   spawnLocationOffset: {x: 0, y: 0, z: 0}
+  spawnRotationOffset: {x: 0, y: 0, z: 0}
   abilityParticles: {fileID: 1000010823978654, guid: 3228a22491941734bb83ad691d17fcb9,
     type: 3}
   radius: 2

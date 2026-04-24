@@ -14,6 +14,9 @@ public class EffectManager : MonoBehaviour
 	private Coroutine kbTimerCo;
 	public GameObject knockBackParticles{ set; get;}
 
+    private Coroutine pushCo;
+
+
 
 
     private DamageReceiver _receiver;
@@ -79,8 +82,14 @@ public class EffectManager : MonoBehaviour
 					if (kbTimerCo != null) StopCoroutine(kbTimerCo);
 					StartCoroutine(RunLastKnockBackTimer());
 				}
-			}
-			else
+               
+            }
+            else if (e is TakePush)
+            {
+                if (pushCo != null) StopCoroutine(pushCo);
+                pushCo = StartCoroutine(e.ApplyEffect(this.gameObject, info));
+            }
+            else
 			{
 				StartCoroutine (e.ApplyEffect (this.gameObject, info));
 			}

@@ -15,22 +15,32 @@ MonoBehaviour:
   abilityPrefab: {fileID: 1423304968587218, guid: 348341daf378dcf44a9cc3fcb926178d,
     type: 3}
   abilityEffects:
+  - {fileID: 11400000, guid: f66a2ceebf4ff0a40884bfd1f2ae6b7b, type: 2}
   - {fileID: 11400000, guid: 905b517c1a64e7f49a9b8c3e22074fa5, type: 2}
   abilityName: ZombieMeleeHit
   icon: {fileID: 0}
   description: 
-  targetTag: Player
-  friendTag: Enemy
   myFaction: 1
   damageType: 0
+  nextComboAbility: {fileID: 0}
+  comboWindow: 1
+  movementMultiplier: 1
+  canRotateDuringCast: 0
+  canMoveAttack: 1
   attackState: 1
+  animLayer: 0
   cooldown: 3
   requiredRange: 1
   priority: 0
   isRanged: 0
-  canMoveAttack: 1
+  track: 0
+  dashDirection: {x: 0, y: 0, z: 0}
+  dashPower: 0
+  dashStartTime: 0
+  dashEndTime: 0
   spawnLocation: 2
   spawnLocationOffset: {x: 0, y: 0, z: 0}
+  spawnRotationOffset: {x: 0, y: 0, z: 0}
   attackParticles: {fileID: 1727430861035118, guid: ab16498bcb20a2940990cdea988a71e6,
     type: 3}
   length: 1.5

@@ -6,7 +6,7 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour {
 
 	private Mover _Mover;
-	private Vector3 movingDirection;
+	public Vector3 movingDirection;
 	private Vector3 diagonalRight;
 	private Vector3 diagonalLeft;
 	private Vector3 negDiagonalRight;
