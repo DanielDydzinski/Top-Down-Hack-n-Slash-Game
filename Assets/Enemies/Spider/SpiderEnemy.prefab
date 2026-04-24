@@ -1128,7 +1128,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4317155146273618}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: AbilitySpawnLoaction
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2172,7 +2172,7 @@ GameObject:
   - component: {fileID: 90117731257876822}
   m_Layer: 9
   m_Name: SpiderEnemy
-  m_TagString: Enemy
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2196,9 +2196,6 @@ Transform:
   - {fileID: 2252801136995282490}
   - {fileID: 6596047996126918913}
   - {fileID: 701682774800059011}
-  - {fileID: 6728817168028722820}
-  - {fileID: 4995805639829857834}
-  - {fileID: 2917673455095810399}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &54743308641921748
@@ -2209,7 +2206,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1849966180446146}
   serializedVersion: 4
-  m_Mass: 1
+  m_Mass: 10
   m_Drag: 3
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -2227,7 +2224,7 @@ Rigidbody:
   m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 116
-  m_CollisionDetection: 0
+  m_CollisionDetection: 2
 --- !u!136 &136967323859100214
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -2235,7 +2232,7 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1849966180446146}
-  m_Material: {fileID: 13400000, guid: e61b8a66c8086574ba0b644f0fea964d, type: 2}
+  m_Material: {fileID: 13400000, guid: 123316a7609180b4eae495d851aba5f7, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -2318,7 +2315,7 @@ NavMeshAgent:
   m_Radius: 0.9
   m_Speed: 4
   m_Acceleration: 360
-  avoidancePriority: 60
+  avoidancePriority: 50
   m_AngularSpeed: 360
   m_StoppingDistance: 10
   m_AutoTraverseOffMeshLink: 1
@@ -2359,6 +2356,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 864f7a5bcb1587644baddcfb1ff37208, type: 2}
   - {fileID: 11400000, guid: 3800c2b5990662f4594d816ab343829c, type: 2}
   - {fileID: 11400000, guid: ad2367b1ab9fff745ae45c7f37ccfedf, type: 2}
+  activeAbility: {fileID: 0}
 --- !u!114 &5730610957194913011
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2375,6 +2373,10 @@ MonoBehaviour:
   moveSpeed: 4
   abilityPower: 0
   physicalPower: 0
+  mass: 3
+  dodgeAnimationSpeed: 1
+  dodgePower: 0
+  isPushed: 0
 --- !u!114 &5315869849921809516
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2391,13 +2393,16 @@ MonoBehaviour:
   nav: {fileID: 0}
   obstacle: {fileID: 0}
   abilityManager: {fileID: 0}
+  stats: {fileID: 0}
   aiAnim: {fileID: 0}
   hp: {fileID: 0}
+  emptyStateHash: -367768302
   engagedDistance: 10
   rotationSpeed: 5
   patrolRate: 5
   patrolDistance: 10
   rangedDistance: 0
+  defaultChaseDist: 2
 --- !u!114 &4388060837916109378
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2414,6 +2419,10 @@ MonoBehaviour:
   moveSpeed: 4
   abilityPower: 0
   physicalPower: 0
+  mass: 3
+  dodgeAnimationSpeed: 1
+  dodgePower: 0
+  isPushed: 0
 --- !u!114 &9216428788226169497
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2452,6 +2461,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   abilitySpawnPos: {fileID: 4317155146273618}
+  abilitySpawnRootPos: {fileID: 0}
   head: {fileID: 2252801136995282490}
   center: {fileID: 6596047996126918913}
   feet: {fileID: 701682774800059011}
@@ -2984,68 +2994,6 @@ Transform:
   - {fileID: 4270375490146510}
   m_Father: {fileID: 4472503225815096}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1483265569701788959
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 6728817168028722820}
-  m_Layer: 9
-  m_Name: EffectSpawnOverHead
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &6728817168028722820
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1483265569701788959}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.5, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 4132303375403852}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1801455603950750199
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2917673455095810399}
-  m_Layer: 9
-  m_Name: EffectSpawnFeet
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2917673455095810399
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1801455603950750199}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.3, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 4132303375403852}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2575676810403901828
 GameObject:
   m_ObjectHideFlags: 0
@@ -3055,7 +3003,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 701682774800059011}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: EffectSpawnFeet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3086,7 +3034,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2252801136995282490}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: EffectSpawnOverHead
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3117,7 +3065,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6596047996126918913}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: EffectSpawnCentre
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3131,37 +3079,6 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8181370342636055823}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.4, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 4132303375403852}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &8807488376087816926
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 4995805639829857834}
-  m_Layer: 9
-  m_Name: EffectSpawnCentre
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &4995805639829857834
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8807488376087816926}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0.4, z: 0}

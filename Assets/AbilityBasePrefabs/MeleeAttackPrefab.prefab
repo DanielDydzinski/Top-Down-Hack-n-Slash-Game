@@ -52,9 +52,10 @@ MonoBehaviour:
     m_Bits: 2048
   wallLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 1024
   myFaction: 0
   damageType: 0
   effects:
   - {fileID: 11400000, guid: c7dcbe824c8a36a49a72d7ba9be384ce, type: 2}
   - {fileID: 11400000, guid: 20f28bf197d0aea42ae3d0e59664a1b6, type: 2}
+  howManyEnemiesToHit: 1

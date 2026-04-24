@@ -23,6 +23,9 @@ public class PatrolState : IState
 
     public void UpdateState()
     {
+        // If we are being shoved, don't calculate paths or try to move
+        if (_controller.stats.isPushed) return;
+
         // Transition Condition: Player nearby?
         float distance = Vector3.Distance(_controller.transform.position, _controller.target.position);
         if (distance < _controller.engagedDistance)

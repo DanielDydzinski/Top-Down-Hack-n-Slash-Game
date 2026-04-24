@@ -10,6 +10,8 @@ public class MeleeAttackAbility : Ability {
 	public float length; // length of hit box
 	public Vector3 halfExtents;	
 	public LayerMask TargetLayerMask;
+	public int howManyEnemiesToHit = 1;
+
 
 	MeleeAttackBehavaiour meleeAttackBehavaiour;
 
@@ -22,7 +24,7 @@ public class MeleeAttackAbility : Ability {
 		meleeAttackBehavaiour = instance.GetComponent<MeleeAttackBehavaiour> ();
 		if(meleeAttackBehavaiour!=null)
 		{
-            meleeAttackBehavaiour.UpdateValues(this.myFaction, this.abilityEffects, length, halfExtents, attackParticles, this.damageType);
+            meleeAttackBehavaiour.UpdateValues(this.myFaction, this.abilityEffects, length, halfExtents, attackParticles, this.damageType, howManyEnemiesToHit,TargetLayerMask);
         }
 		 else 
 		{

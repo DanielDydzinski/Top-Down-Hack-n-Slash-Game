@@ -36,15 +36,21 @@ public class ChaseState : IState
         if (_nextAbility != null)
             _controller.nav.stoppingDistance = _nextAbility.requiredRange;
         else
-            _controller.nav.stoppingDistance = 2f; // Default "Get close" distance
+            _controller.nav.stoppingDistance = _controller.defaultChaseDist; // Default "Get close" distance
     }
 
     public void UpdateState()
     {
+        // If we are being shoved, don't calculate paths or try to move
+        if (_controller.stats.isPushed) return;
+
         float distance = Vector3.Distance(_controller.transform.position, _controller.target.position);
 
         // 1. Move
-        _controller.nav.SetDestination(_controller.target.position);
+        if (distance > _controller.nav.stoppingDistance + 0.2f)
+        {
+            _controller.nav.SetDestination(_controller.target.position);
+        }
         _controller.LookAtTarget();
 
         // 2. Transition to Attack

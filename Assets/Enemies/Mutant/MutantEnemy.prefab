@@ -666,7 +666,7 @@ GameObject:
   - component: {fileID: 3220390435586721019}
   m_Layer: 9
   m_Name: MutantEnemy
-  m_TagString: Enemy
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -754,7 +754,7 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1201061559704186}
-  m_Material: {fileID: 13400000, guid: e61b8a66c8086574ba0b644f0fea964d, type: 2}
+  m_Material: {fileID: 13400000, guid: 123316a7609180b4eae495d851aba5f7, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -780,9 +780,9 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.7
-  m_Speed: 3.5
+  m_Speed: 0
   m_Acceleration: 120
-  avoidancePriority: 1
+  avoidancePriority: 45
   m_AngularSpeed: 360
   m_StoppingDistance: 2
   m_AutoTraverseOffMeshLink: 1
@@ -818,7 +818,7 @@ Rigidbody:
   m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 116
-  m_CollisionDetection: 0
+  m_CollisionDetection: 2
 --- !u!114 &114281319635162820
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -848,10 +848,7 @@ MonoBehaviour:
   abilities:
   - {fileID: 11400000, guid: 63339f12950a9ef45ac295e54d8addff, type: 2}
   - {fileID: 11400000, guid: c8fc388629c2fa54591cb7df8c289171, type: 2}
-  - {fileID: 11400000, guid: 5299b0dcae636b945b9564abbbd7f995, type: 2}
-  - {fileID: 11400000, guid: 3fa4c2ef8511cad408b6b436760c4ee4, type: 2}
-  - {fileID: 11400000, guid: 6ca363157e35c894a9d39af33f78e5c4, type: 2}
-  - {fileID: 11400000, guid: 0c884bafef749fc4e935d3eb4bb78129, type: 2}
+  activeAbility: {fileID: 0}
 --- !u!114 &4472514632291939825
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -865,9 +862,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 500
-  moveSpeed: 3.5
+  moveSpeed: 0
   abilityPower: 0
   physicalPower: 0
+  mass: 3
+  dodgeAnimationSpeed: 1
+  dodgePower: 0
+  isPushed: 0
 --- !u!114 &7181025010779760237
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -884,13 +885,16 @@ MonoBehaviour:
   nav: {fileID: 0}
   obstacle: {fileID: 0}
   abilityManager: {fileID: 0}
+  stats: {fileID: 0}
   aiAnim: {fileID: 0}
   hp: {fileID: 0}
+  emptyStateHash: -367768302
   engagedDistance: 10
   rotationSpeed: 5
   patrolRate: 5
   patrolDistance: 10
   rangedDistance: 0
+  defaultChaseDist: 1
 --- !u!114 &8533695173713363553
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -929,6 +933,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   abilitySpawnPos: {fileID: 4625480919753400}
+  abilitySpawnRootPos: {fileID: 0}
   head: {fileID: 2823474558105239520}
   center: {fileID: 6956321479034939977}
   feet: {fileID: 1643329879608666403}
@@ -2490,7 +2495,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
+  m_PresetInfoIsWorld: 1
 --- !u!114 &114959684535001582
 MonoBehaviour:
   m_ObjectHideFlags: 0
