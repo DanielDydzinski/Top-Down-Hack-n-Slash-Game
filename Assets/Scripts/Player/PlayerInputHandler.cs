@@ -15,71 +15,52 @@ public class PlayerInputHandler : MonoBehaviour
     {
         HandleDodgeInput();
 
-        if (!psm.IsDodging()) // if we are not dodging we can attack
+        if (!psm.IsDodging())
         {
-            
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                // Only trigger if we aren't "Locked" or if your game allows queueing
-                comboController.OnAbilityInput(ref comboController.magicCombosIndex,comboController.magicCombos);
+                comboController.OnAbilityInput(ref comboController.magicCombosIndex, comboController.magicCombos);
             }
             if (Input.GetMouseButtonDown(0))
             {
-                // Only trigger if we aren't "Locked" or if your game allows queueing
                 comboController.OnAbilityInput(ref comboController.lightCombosIndex, comboController.lightCombos);
             }
             if (Input.GetMouseButtonDown(1))
-                {
-                // Only trigger if we aren't "Locked" or if your game allows queueing
+            {
                 comboController.OnAbilityInput(ref comboController.heavyCombosIndex, comboController.heavyCombos);
             }
-
         }
-        // You could add more here later:
-        // if (Input.GetKeyDown(KeyCode.Space)) spaceAbility.OnInput();
     }
 
     void HandleDodgeInput()
     {
         if (psm.IsDodging()) return;
-        if (Input.GetKeyDown(KeyCode.LeftShift))
+        if (!Input.GetKeyDown(KeyCode.LeftShift)) return;
+
+        if (psm.GetCurrentState() is PlayerStunState
+            || psm.GetCurrentState() is BackflipDodgeState
+            || psm.GetCurrentState() is RollDodgeState
+            || psm.GetCurrentState() is ActionState) return;
+
+        if (psm.IsStunned() || psm.IsDodging() || psm.GetCurrentState() is ActionState) return;
+
+        Vector3 moveDir = psm.playerMovement.movingDirection;
+        Vector3 faceDir = psm.rotator.facingDirVec3;
+
+        if (moveDir == Vector3.zero) return;
+
+        float dot = Vector3.Dot(moveDir.normalized, faceDir.normalized);
+        float cross = Vector3.Cross(faceDir.normalized, moveDir.normalized).y;
+
+        if (dot < -0.5f)
         {
-
-            if ((psm.GetCurrentState() is PlayerStunState || psm.GetCurrentState() is BackflipDodgeState || psm.GetCurrentState() is ActionState)) return;
-
-            // Get snapped 8-way vectors
-            Vector3 moveDir = psm.playerMovement.movingDirection;
-            Vector3 faceDir = psm.rotator.facingDirVec3;
-
-            // Get the WASD direction
-            float h = Input.GetAxisRaw("Horizontal");
-            float v = Input.GetAxisRaw("Vertical");
-            Vector3 moveInput = new Vector3(h, 0, v).normalized;
-
-
-
-            // If not moving, don't dodge (or do a stationary dodge)
-            if (moveDir == Vector3.zero) return;
-
-  
-
-            // Normalize and Compare
-            // We normalize because (0.5, 0, 0.5) has a different length than (1, 0, 0)
-            float dot = Vector3.Dot(moveDir.normalized, faceDir.normalized);
-
-            if (dot < -0.5f)
-            {
-                // MOVE IS OPPOSITE TO FACE -> BACKFLIP
-                // We pass moveDir so the backflip follows the movement keys
-                psm.SwitchState(new BackflipDodgeState(psm, moveDir));
-            }
-            else
-            {
-                // MOVE IS FORWARD/SIDEWAYS -> ROLL
-                // psm.SwitchState(new RollDodgeState(psm, moveDir));
-                Debug.Log("Forward or Side Dodge triggered!");
-            }
+            // Moving opposite to facing -> Backflip
+            psm.SwitchState(new BackflipDodgeState(psm, moveDir));
+        }
+        else
+        {
+            // Forward, left, or right -> Roll (character snaps to face moveDir in EnterState)
+            psm.SwitchState(new RollDodgeState(psm, moveDir));
         }
     }
-    
 }

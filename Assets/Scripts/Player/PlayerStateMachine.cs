@@ -14,6 +14,7 @@ public class PlayerStateMachine : MonoBehaviour
     [HideInInspector] public PlayerMovement playerMovement;
     [HideInInspector]public Stats stats;
     [HideInInspector] public AnimationClip backFlipDodgeAnimationClip;
+    [HideInInspector] public AnimationClip rollDodgeAnimationClip;
     [HideInInspector] public CharacterController characterController;
 
     public  readonly int CombatStanceStateHash = Animator.StringToHash("CombatStance");
@@ -21,6 +22,11 @@ public class PlayerStateMachine : MonoBehaviour
     public readonly int IsMovingHash = Animator.StringToHash("isMoving");
     public readonly int BackFlipDodgeHash = Animator.StringToHash("BackFlipDodge");
     public readonly int isDodgingHash = Animator.StringToHash("isDodging");
+    public readonly int rollDodgeHash = Animator.StringToHash("RollDodge");
+    public readonly int isRollDodgeHash = Animator.StringToHash("isRollDodge");
+
+
+
     public readonly int BaseLayer = 0;
     public readonly int AttackLayer = 1;
     public readonly int FullBodyLayer = 2;
@@ -45,11 +51,13 @@ public class PlayerStateMachine : MonoBehaviour
 
         dodgeAnimationSpeed = stats.GetDodgeAnimationSpeed();
 
+
         // 1. Initialize the dictionary
         InitializeAnimationCache();
 
         // 2. Grab the specific clip for your dodge if you need it as a reference
         backFlipDodgeAnimationClip = GetClipByName("BackFlipDodge");
+        rollDodgeAnimationClip = GetClipByName("RollDodge");
 
 
 
@@ -80,6 +88,7 @@ public class PlayerStateMachine : MonoBehaviour
             if (!AnimationLengths.ContainsKey(clip.name))
             {
                 AnimationLengths.Add(clip.name, clip.length);
+                Debug.Log("Initilized animationClip"+ clip.name);
             }
         }
     }
@@ -106,7 +115,7 @@ public class PlayerStateMachine : MonoBehaviour
     }
     public bool IsDodging()
     {
-        return currentState is BackflipDodgeState;
+        return currentState is BackflipDodgeState || currentState is RollDodgeState;
     }
     public IPlayerState GetCurrentState() => currentState;
 }

@@ -7282,7 +7282,7 @@ MonoBehaviour:
   abilityPower: 0
   physicalPower: 0
   mass: 3
-  dodgeAnimationSpeed: 2
+  dodgeAnimationSpeed: 1
   dodgePower: 6
   isPushed: 1
 --- !u!114 &1455771427
@@ -7404,6 +7404,7 @@ MonoBehaviour:
   playerMovement: {fileID: 0}
   stats: {fileID: 0}
   backFlipDodgeAnimationClip: {fileID: 0}
+  rollDodgeAnimationClip: {fileID: 0}
   characterController: {fileID: 0}
   dodgeAnimationSpeed: 1
   attackLayerIndex: 1

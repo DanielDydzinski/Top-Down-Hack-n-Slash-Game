@@ -65,8 +65,8 @@ public class BackflipDodgeState : IPlayerState
     {
         if (psm.playerMovement) psm.playerMovement.enabled = true;
         psm.rotator.enabled = true;
-        psm.anim.CrossFade(Animator.StringToHash("Transition"), psm.FullBodyLayer);
-        psm.anim.ResetTrigger(Animator.StringToHash("isDodging"));
+        psm.anim.CrossFade(psm.TransitionStateHash, psm.FullBodyLayer);
+        psm.anim.ResetTrigger(psm.isDodgingHash);
         // Revert to Player layer
         psm.gameObject.layer = LayerMask.NameToLayer("Player");
     }
