@@ -21,9 +21,7 @@ public class RollDodgeState : IPlayerState
 
 
 
-        // Snap character to face the dodge direction
-        if (_leapDirection != Vector3.zero)
-            psm.mover.transform.rotation = Quaternion.LookRotation(_leapDirection);
+
 
         psm.anim.Play(psm.TransitionStateHash, psm.AttackLayer);
         psm.anim.Play(psm.TransitionStateHash, psm.FullBodyLayer);
@@ -37,13 +35,18 @@ public class RollDodgeState : IPlayerState
 
         psm.playerMovement.enabled = false;
         psm.rotator.enabled = false;
+        psm.rotator.StopAllRotation();
 
         Debug.Log($"RollDodge | clip: {psm.rollDodgeAnimationClip?.name} | length: {psm.rollDodgeAnimationClip?.length} | speed: {playbackSpeed} | final duration: {_duration}");
+        // Snap character to face the dodge direction
+        if (_leapDirection != Vector3.zero)
+            psm.mover.transform.rotation = Quaternion.LookRotation(_leapDirection);
     }
 
     public void UpdateState()
     {
         _timer += Time.deltaTime;
+        psm.mover.transform.rotation = Quaternion.LookRotation(_leapDirection);
 
         if (_timer >= _duration * 0.1f && _timer <= _duration * 0.9f)
         {
@@ -60,6 +63,7 @@ public class RollDodgeState : IPlayerState
     {
         if (psm.playerMovement) psm.playerMovement.enabled = true;
         psm.rotator.enabled = true;
+        psm.rotator.UpdateOrientation();
         psm.anim.CrossFade(psm.TransitionStateHash, 0.1f, psm.FullBodyLayer);
         psm.anim.ResetTrigger(psm.isRollDodgeHash);
         psm.gameObject.layer = LayerMask.NameToLayer("Player");
