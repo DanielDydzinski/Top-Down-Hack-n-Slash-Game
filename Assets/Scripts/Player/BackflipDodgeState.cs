@@ -43,13 +43,14 @@ public class BackflipDodgeState : IPlayerState
         // 4. LOCKDOWN
         psm.playerMovement.enabled = false;
         psm.rotator.enabled = false;
+        psm.rotator.StopAllRotation();
     }
 
     public void UpdateState()
     {
         _timer += Time.deltaTime;
+        psm.mover.transform.rotation = Quaternion.LookRotation(_leapDirection * -1f);
 
-        
 
         if (_timer >= _duration * 0.2f && _timer <= _duration * 0.7f)
         {
@@ -65,6 +66,7 @@ public class BackflipDodgeState : IPlayerState
     {
         if (psm.playerMovement) psm.playerMovement.enabled = true;
         psm.rotator.enabled = true;
+        psm.rotator.UpdateOrientation();
         psm.anim.CrossFade(psm.TransitionStateHash, psm.FullBodyLayer);
         psm.anim.ResetTrigger(psm.isDodgingHash);
         // Revert to Player layer

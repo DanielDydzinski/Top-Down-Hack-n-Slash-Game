@@ -270,6 +270,55 @@ public class PlayerRotate : MonoBehaviour {
 		}
 	}
 
+    public void UpdateOrientation()
+    {
+        // Stop any existing lerps so they don't overwrite our dodge rotation
+        StopAllCoroutines();
+
+        // 1. Get current forward vector
+        Vector3 currentForward = transform.forward;
+        currentForward.y = 0;
+        currentForward.Normalize();
+
+        // 2. Snap the rootRotation to current for the next Qlerp start
+        rootRotation = transform.rotation;
+
+        // 3. Logic to map the current physical forward to your Enum
+        // We use the same thresholds (0.707 for 45 deg) as your Turning() function
+        float dotF = Vector3.Dot(Vector3.forward, currentForward);
+        float dotR = Vector3.Dot(Vector3.right, currentForward);
+
+        // Determine the closest Enum based on the current transform
+        if (dotF > 0.8f) facingDir = FacingDirEnum.Forward;
+        else if (dotF < -0.8f) facingDir = FacingDirEnum.Backwards;
+        else if (dotR > 0.8f) facingDir = FacingDirEnum.Right;
+        else if (dotR < -0.8f) facingDir = FacingDirEnum.Left;
+        // Diagonals
+        else if (dotF > 0.1f && dotR > 0.1f) facingDir = FacingDirEnum.TopRight;
+        else if (dotF > 0.1f && dotR < -0.1f) facingDir = FacingDirEnum.TopLeft;
+        else if (dotF < -0.1f && dotR > 0.1f) facingDir = FacingDirEnum.BottomRight;
+        else if (dotF < -0.1f && dotR < -0.1f) facingDir = FacingDirEnum.BottomLeft;
+
+        // 4. Sync the Vec3 helper
+        UpdateFacingVec3();
+    }
+
+    private void UpdateFacingVec3()
+    {
+        facingDirVec3 = facingDir switch
+        {
+            FacingDirEnum.Forward => Vector3.forward,
+            FacingDirEnum.Backwards => Vector3.back,
+            FacingDirEnum.Left => Vector3.left,
+            FacingDirEnum.Right => Vector3.right,
+            FacingDirEnum.TopRight => diagonalRight,
+            FacingDirEnum.TopLeft => diagonalLeft,
+            FacingDirEnum.BottomRight => negDiagonalRight,
+            FacingDirEnum.BottomLeft => negDiagonalLeft,
+            _ => Vector3.forward
+        };
+    }
+
     public void StopAllRotation()
     {
         StopAllCoroutines();

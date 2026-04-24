@@ -1,9 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using UnityEngine;
 
 public enum AnimationLayer { UpperBody, FullBody }
-public enum ComboTrack { Light, Heavy, Magic }
+public enum ComboTrack { Light, Heavy, Magic, Hidden }
 
 public abstract class Ability : ScriptableObject{
 
@@ -24,6 +25,9 @@ public abstract class Ability : ScriptableObject{
     [Header("State Control")]
     public float movementMultiplier = 1.0f; // Slow down during cast? (e.g. 0.5f)
     public bool canRotateDuringCast;
+
+    [Description("Lower the heavier turning during cast")]
+    public float rotationOomph = 100f;
     public bool canMoveAttack;
     public int attackState ; // animaton state transition condition value // calls an animation with this state //animation trigger CastAbility()
     public AnimationLayer animLayer;
@@ -40,7 +44,7 @@ public abstract class Ability : ScriptableObject{
     [Range(0f,1f)]
     public float dashEndTime;   // 0- 1 how far into animationtime to stop 0.9 = 90% of animation
 
-    public GameObject abilityVisualPartyicles; // visuals
+    public GameObject abilityVisualPartyicles; // visuals 
 
 
     public enum abilitySpawnType{Onself, OnTarget, SpecifiedPoint, PlayerRoot};

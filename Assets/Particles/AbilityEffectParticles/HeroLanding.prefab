@@ -24459,7 +24459,6 @@ GameObject:
   m_Component:
   - component: {fileID: 7204244012882257931}
   - component: {fileID: 8450852143634995582}
-  - component: {fileID: 3536945183313179262}
   m_Layer: 0
   m_Name: HeroLanding
   m_TagString: Untagged
@@ -24496,21 +24495,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   destroyTime: 1.5
---- !u!114 &3536945183313179262
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8359179042112864422}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 588a08fbd7cc6f64cbd1faa6039392b4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  shakeAmount: 0.12
-  doShakeOnStart: 1
-  shakeOnStartDelay: 0
 --- !u!1 &8897578766127457948
 GameObject:
   m_ObjectHideFlags: 0
