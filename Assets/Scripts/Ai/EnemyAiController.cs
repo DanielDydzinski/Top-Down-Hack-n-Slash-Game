@@ -189,20 +189,33 @@ public class EnemyAIController : MonoBehaviour
 
     private void HandleDeath()
     {
+        // Look for our new dedicated component
+        DeathHandler deathHandler = GetComponent<DeathHandler>();
 
-        Rigidbody rb = GetComponent<Rigidbody>();
-        if (nav.enabled || rb.isKinematic == false)
+        if (deathHandler != null)
         {
-            // 1. Shut down the effects first!
-            EffectManager em = GetComponent<EffectManager>();
-            if (em != null) em.CleanUpAllEffects();
+            // You can pass the position where the projectile hit if available. 
+            // Passing transform.position falls back to an explosion upward from its feet.
+            deathHandler.TriggerDeath(transform.position);
+        }
+        else
+        {
 
-            // 2. Shut down the AI
-            nav.enabled = false;
-            rb.isKinematic = true;
 
-            // 3. Play death anim or destroy
-            Destroy(gameObject, 3f); // Destroy almost instantly
+            Rigidbody rb = GetComponent<Rigidbody>();
+            if (nav.enabled || rb.isKinematic == false)
+            {
+                // 1. Shut down the effects first!
+                EffectManager em = GetComponent<EffectManager>();
+                if (em != null) em.CleanUpAllEffects();
+
+                // 2. Shut down the AI
+                nav.enabled = false;
+                rb.isKinematic = true;
+
+                // 3. Play death anim or destroy
+                Destroy(gameObject, 3f); // Destroy almost instantly
+            }
         }
     }
 

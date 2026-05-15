@@ -16,6 +16,10 @@ public class TakeDoT : Effect
         Health hp = target.GetComponent<Health>();
         AudioSource audioS = target.GetComponent<AudioSource>();
 
+        //account for multiplier 
+        float finalDamage = damageAmount * info.multiplier;
+        info.damage = finalDamage; // Update info so downstream scripts (like death handling) know the final amount
+
         if (hp == null)
         {
             Debug.Log(target.name + " doesn't have Health Component. Can't apply DoT Effect.");
@@ -28,7 +32,7 @@ public class TakeDoT : Effect
         while (elapsed < damageDuration)
         {
             // Apply damage
-            hp.Damage(damageAmount);
+            hp.Damage(finalDamage, info);
 
             // Handle Particles using your new anchor system
             if (effectParticles != null)

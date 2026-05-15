@@ -12,9 +12,13 @@ public class TakeDamage : Effect {
         Health hp = target.GetComponent<Health>();
         AudioSource audioS = target.GetComponent<AudioSource>();
 
+        //account for multiplier 
+        float finalDamage = damageAmount * info.multiplier;
+        info.damage = finalDamage; // Update info so downstream scripts (like death handling) know the final amount
+
         if (hp != null)
         {
-            hp.Damage(damageAmount * info.multiplier);
+            hp.Damage(finalDamage, info);
             // Note: You can now pass info.attacker to Health if you want to track who did the damage!
         }
         if (effectParticles != null)

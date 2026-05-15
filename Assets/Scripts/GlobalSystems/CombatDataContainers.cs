@@ -7,7 +7,8 @@ public enum DamageType { Physical, Fire, Frost, Poison, Magic }
 
 // The "Envelope" that carries hit data
 public struct HitInfo
-{
+{   
+    public float damage;
     public DamageType type;
     public List<Effect> effects;
     public GameObject attacker; // Handy if you want to know who shot you

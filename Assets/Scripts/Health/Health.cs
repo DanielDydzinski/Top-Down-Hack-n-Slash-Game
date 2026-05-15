@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -26,9 +27,11 @@ public class Health : MonoBehaviour {
 	private Image hpFillImage; // reference to hp sprite
 	private Animator animator;
 
+    public event Action<HitInfo> OnDeath;
 
-	// Use this for initialization
-	void Start () {
+
+    // Use this for initialization
+    void Start () {
 
        
          var receiver = GetComponent<DamageReceiver>();
@@ -75,11 +78,16 @@ public class Health : MonoBehaviour {
         // Damage(info.damage); // Health only cares about the number
 
         Debug.Log("we called HandleDamage from health script");
+        // Don't process damage if already dead
+        if (isDead) return;
+
+        // Process actual numerical damage
+        Damage(info.damage, info);
 
 
     }
 
-    public void Damage(float amount)
+    public void Damage(float amount, HitInfo dmgInfo)
     {
         if (amount < 0f)
         {
@@ -89,7 +97,8 @@ public class Health : MonoBehaviour {
         isDead = IsDead();
         if (isDead)
         {
-            animator.SetBool("isDead", true);
+            OnDeath?.Invoke(dmgInfo);
+           // animator.SetBool("isDead", true);
         }
         UpdateHealthBar();
 
