@@ -14,6 +14,7 @@ public class PatrolState : IState
 
     public void Enter()
     {
+        _controller.CleanUpSlot();
         _controller.nav.enabled = true;
         _controller.nav.isStopped = false;
         _controller.nav.stoppingDistance = 0;

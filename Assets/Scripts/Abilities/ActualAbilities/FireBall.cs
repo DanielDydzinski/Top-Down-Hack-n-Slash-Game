@@ -9,9 +9,11 @@ public class FireBall : Ability {
 	public GameObject projectilePrefab;
 	public Ability explosionAbility;
 
+	public bool isBeam;
 	public float projectileSpeed;
 	public float projectileSize;
 	public float projectileRange;
+	public AudioClip soundEffect;
 
 	public bool isDestructible = false;
 	public DamageType lethalType;
@@ -20,14 +22,14 @@ public class FireBall : Ability {
 
     FireBallBehaviour fbBehaviour;
 
-	public override GameObject Cast (Vector3 pos, Quaternion rot)
+	public override GameObject Cast (Vector3 pos, Quaternion rot, GameObject caster)
 	{
 		GameObject instance = Instantiate(abilityPrefab, pos, rot);
 
 		fbBehaviour = instance.GetComponent<FireBallBehaviour>();
 		if (fbBehaviour != null)
 		{
-            fbBehaviour.UpdateValues(this.abilityEffects, projectileSpeed, projectileSize, projectileRange, projectilePrefab, explosionAbility, this.myFaction, this.damageType);
+            fbBehaviour.UpdateValues(this.abilityEffects, projectileSpeed, projectileSize, projectileRange, projectilePrefab, explosionAbility, this.myFaction, this.damageType, soundEffect, isBeam, caster);
 
             if (isDestructible)
             {

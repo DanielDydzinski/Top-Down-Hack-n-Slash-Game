@@ -29,7 +29,20 @@ public class PlayerInputHandler : MonoBehaviour
             {
                 comboController.OnAbilityInput(ref comboController.heavyCombosIndex, comboController.heavyCombos);
             }
+            if (Input.GetKeyDown(KeyCode.F))
+                comboController.OnAbilityInput(ref comboController.fIndex, comboController.fAbilities);
+
         }
+
+        if (Input.GetKeyUp(KeyCode.F))
+        {
+            // Only cancel if we are currently in an ActionState
+            if (psm.abilityManager.IsPerformingAction())
+            {
+                psm.abilityManager.CancelAbilityButtonUp();
+            }
+        }
+
     }
 
     void HandleDodgeInput()

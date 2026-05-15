@@ -2170,6 +2170,9 @@ GameObject:
   - component: {fileID: 9216428788226169497}
   - component: {fileID: 2703082237088673733}
   - component: {fileID: 90117731257876822}
+  - component: {fileID: 6919207327830734977}
+  - component: {fileID: 7083129809001196429}
+  - component: {fileID: 7715072707473217220}
   m_Layer: 9
   m_Name: SpiderEnemy
   m_TagString: Untagged
@@ -2357,6 +2360,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 3800c2b5990662f4594d816ab343829c, type: 2}
   - {fileID: 11400000, guid: ad2367b1ab9fff745ae45c7f37ccfedf, type: 2}
   activeAbility: {fileID: 0}
+  VisualLeftHandAttachPoint: {fileID: 0}
+  VisualRightHandAttachPoint: {fileID: 0}
 --- !u!114 &5730610957194913011
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2397,12 +2402,24 @@ MonoBehaviour:
   aiAnim: {fileID: 0}
   hp: {fileID: 0}
   emptyStateHash: -367768302
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 512
   engagedDistance: 10
   rotationSpeed: 5
   patrolRate: 5
   patrolDistance: 10
   rangedDistance: 0
   defaultChaseDist: 2
+  slotManager: {fileID: 0}
+  MySlotIndex: -1
+  HasSlot: 0
+  SidestepDuration: 1
+  SidestepCooldown: 1
+  SidestepDistance: 2.2
+  BlockLookAhead: 1
+  BlockCastRadius: 0.35
+  SideClearRadius: 0.35
 --- !u!114 &4388060837916109378
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2465,6 +2482,137 @@ MonoBehaviour:
   head: {fileID: 2252801136995282490}
   center: {fileID: 6596047996126918913}
   feet: {fileID: 701682774800059011}
+--- !u!114 &6919207327830734977
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1849966180446146}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e81617e8734d5f44b8699a900f136f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitSounds:
+  - {fileID: 8300000, guid: e27506e88af156f4aae802eba7f71ed5, type: 3}
+  playChance: 0.5
+  pitchVariation: 0.1
+--- !u!82 &7083129809001196429
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1849966180446146}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 0.1
+  MaxDistance: 20
+  Pan2D: 0
+  rolloffMode: 1
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!114 &7715072707473217220
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1849966180446146}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 03135aec6499f9242bba7217b041e5dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pushableLayers:
+    serializedVersion: 2
+    m_Bits: 512
+  wallLayer:
+    serializedVersion: 2
+    m_Bits: 1024
 --- !u!1 &1851782130573292
 GameObject:
   m_ObjectHideFlags: 0

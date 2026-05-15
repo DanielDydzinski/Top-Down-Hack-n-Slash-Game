@@ -9,6 +9,7 @@ public class AoEoT : Ability {
 	public float radius;
 	public float duration;
 	public float rate;
+    
 
 	AoEoTBehaviour aoeotBehaviour;
 
@@ -19,14 +20,14 @@ public class AoEoT : Ability {
 
 
 
-    public override GameObject Cast(Vector3 pos, Quaternion rot)
+    public override GameObject Cast(Vector3 pos, Quaternion rot, GameObject caster)
     {
         //  Instantiate the "Blank" Prefab first
         GameObject instance = Instantiate(abilityPrefab, pos, rot);
 
         // Setup the Core Behaviour
         aoeotBehaviour  = instance.GetComponent<AoEoTBehaviour>();
-        aoeotBehaviour.UpdateValues(this.abilityEffects, duration, rate, radius, this.myFaction, abilityParticles, this.damageType);
+        aoeotBehaviour.UpdateValues(this.abilityEffects, duration, rate, radius, this.myFaction, abilityParticles, this.damageType, this.AudioClip, caster);
 
         // Trait Injection: Add the destructible script ONLY if this ability needs it
         if (isDestructible)

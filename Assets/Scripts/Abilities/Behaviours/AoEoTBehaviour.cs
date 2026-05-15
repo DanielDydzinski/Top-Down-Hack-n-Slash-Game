@@ -17,8 +17,14 @@ public class AoEoTBehaviour : MonoBehaviour
     private float tickTimer = 0f;
     private SphereCollider sc;
 
+    private AudioClip audioClip;
+    private AudioSource audioSource;
+
+    private GameObject caster;
+
     void Start()
     {
+        audioSource = GetComponent<AudioSource>();
         //give one frame for values to update
         StartCoroutine(DelayedStart());
     }
@@ -71,7 +77,7 @@ public class AoEoTBehaviour : MonoBehaviour
         }
     }
 
-    public void UpdateValues(List<Effect> aeffects, float aduration, float arate, float aradius, Faction faction, GameObject aparticles, DamageType dmgType)
+    public void UpdateValues(List<Effect> aeffects, float aduration, float arate, float aradius, Faction faction, GameObject aparticles, DamageType dmgType, AudioClip aclip, GameObject aCaster)
     {
         effects = aeffects;
         duration = aduration;
@@ -80,6 +86,8 @@ public class AoEoTBehaviour : MonoBehaviour
         myFaction = faction;
         particles = aparticles;
         damageType = dmgType;
+        audioClip = aclip;
+        caster = aCaster;
     }
 }
 

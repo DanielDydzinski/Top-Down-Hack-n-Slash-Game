@@ -75,37 +75,39 @@ public class Health : MonoBehaviour {
         // Damage(info.damage); // Health only cares about the number
 
         Debug.Log("we called HandleDamage from health script");
+
+
     }
 
     public void Damage(float amount)
     {
-		if (amount < 0f) 
-		{
-			return;
-		}
+        if (amount < 0f)
+        {
+            return;
+        }
         healthPoints -= amount;
         isDead = IsDead();
         if (isDead)
         {
             animator.SetBool("isDead", true);
         }
-		UpdateHealthBar ();
+        UpdateHealthBar();
 
-		if (timeCombatCo != null)
+        if (timeCombatCo != null)
         {
-			StopCoroutine(timeCombatCo);
+            StopCoroutine(timeCombatCo);
         }
 
-		timeCombatCo = StartCoroutine(TimeCombat());
+        timeCombatCo = StartCoroutine(TimeCombat());
 
-		if (this.tag == "Enemy")
-		{
-			if (GetHitCo != null)
-			{
-				StopCoroutine (SetGetHit ());
-			}
-			GetHitCo = StartCoroutine (SetGetHit ());
-		}
+
+
+        if (GetHitCo != null)
+        {
+            StopCoroutine(SetGetHit());
+        }
+        GetHitCo = StartCoroutine(SetGetHit());
+
 
     }
 

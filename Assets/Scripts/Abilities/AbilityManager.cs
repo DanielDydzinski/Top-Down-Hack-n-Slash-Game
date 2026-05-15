@@ -26,7 +26,11 @@ public class AbilityManager : MonoBehaviour {
     private Transform activeTarget; // The target for the current ability execution
     public event Action OnAbilityReady;
 
+
     private EffectSpawnPossitions effectSpawnPossitions;
+
+    public Transform VisualLeftHandAttachPoint, VisualRightHandAttachPoint;
+    private GameObject activeVisualEffect;
 
     // Use this for initialization
     void Start () {
@@ -90,14 +94,45 @@ public class AbilityManager : MonoBehaviour {
         return animator.GetInteger(AttackStateHash) != -1;
     }
     public void CancelAbility() // animations will have events at end of the animation to call this function - can also be used for interupts etc.
-	{
-		animator.SetInteger (AttackStateHash, -1); // note : animation must not have exit time or this won't work // -1 is no attack 
-		Debug.Log("Canceling ability");
-		CancelGetHitAnim();
+    {
+        animator.SetInteger(AttackStateHash, -1); // note : animation must not have exit time or this won't work // -1 is no attack 
+        Debug.Log("Canceling ability");
+        if (activeVisualEffect != null)
+        {
+            Destroy(activeVisualEffect);
+        }
+        CancelGetHitAnim();
         ClearActiveAbility();
     }
 
-	public void CancelGetHitAnim()
+    public void CancelAbilityButtonUp()
+    {
+        // 1. If we aren't doing anything, don't bother
+        if (activeAbility == null || !IsPerformingAction()) return;
+
+        PlayerStateMachine psm = GetComponent<PlayerStateMachine>();
+
+        // 2. Determine which animator layer we need to clear
+        int targetLayer = psm.BaseLayer; // Default
+
+        if (activeAbility.animLayer == AnimationLayer.UpperBody)
+        {
+            targetLayer = psm.AttackLayer; // Index 1
+        }
+        else if (activeAbility.animLayer == AnimationLayer.FullBody)
+        {
+            targetLayer = psm.FullBodyLayer; // Index 2
+        }
+
+        // 3. Force the crossfade to the empty "Transition" state on that specific layer
+        // 0.1f is the transition duration—it makes the stop feel smooth rather than a "pop"
+        animator.CrossFade(psm.TransitionStateHash, 0.1f, targetLayer);
+
+        // 4. Run your standard cleanup (resets AttackState to -1, clears activeAbility)
+        CancelAbility();
+    }
+
+    public void CancelGetHitAnim()
 	{
 		animator.SetBool ("GetHit", false);
 	}
@@ -142,7 +177,7 @@ public class AbilityManager : MonoBehaviour {
             }
 
             // We use the already cached activeAbility instead of looking it up by string
-            currentAbilityObject = activeAbility.Cast(spawnPos, spawnRot);
+            currentAbilityObject = activeAbility.Cast(spawnPos, spawnRot,this.gameObject);
            // Debug.Log($"Executed: {activeAbility.abilityName}");
         }
         else
@@ -160,6 +195,7 @@ public class AbilityManager : MonoBehaviour {
             //activeAbility = cooldowns[ab.name].ability;
             activeAbility = ab;
             animator.SetInteger (AttackStateHash, cooldowns [ab.abilityName].ability.attackState);
+            if(ab.AudioClip!=null) GetComponent<AudioSource>().PlayOneShot(ab.AudioClip);//play ability audio when casting
 			StartCoroutine (RunCoolDown (cooldowns [ab.abilityName]));
 		}
 	}
@@ -170,7 +206,7 @@ public class AbilityManager : MonoBehaviour {
 
     public void CastAbility (string name) // animation will have event set at certain frame to call this function with the ability name to triger
 	{
-			currentAbilityObject = cooldowns [name].TriggerAbility (spawnLocation.position, spawnLocation.rotation);
+			currentAbilityObject = cooldowns [name].TriggerAbility (spawnLocation.position, spawnLocation.rotation,this.gameObject);
 			//Debug.Log("Casting ability " + name);
 		//	StartCoroutine (RunCoolDown (cooldowns [name]));
 
@@ -233,8 +269,41 @@ public class AbilityManager : MonoBehaviour {
 
     public void PlayVisuals()
     {
-        if (activeAbility.abilityVisualPartyicles != null) Instantiate(activeAbility.abilityVisualPartyicles, transform.position, transform.rotation); 
+        // 1. Safety Check
+        if (activeAbility == null || activeAbility.abilityVisualPartyicles == null) return;
+
+        // 2. Identify the target parent based on your Enum
+        Transform targetParent = transform; // Default fallback to character root
+
+        if (activeAbility.attachPoint == VisualAttachPoint.RightHand)
+        {
+            if (VisualRightHandAttachPoint != null) targetParent = VisualRightHandAttachPoint;
+        }
+        else if (activeAbility.attachPoint == VisualAttachPoint.LeftHand)
+        {
+            if (VisualLeftHandAttachPoint != null) targetParent = VisualLeftHandAttachPoint;
+        }
+        // Root/Default case uses the 'transform' initialized above
+
+        // 3. Calculate Final Position/Rotation using the SO Offsets
+        Vector3 finalPos = targetParent.position + activeAbility.spawnLocationOffset;
+
+        // Combining the parent rotation with the SO's rotation offset
+        Quaternion finalRot = targetParent.rotation * Quaternion.Euler(activeAbility.spawnRotationOffset);
+
+        // 4. Instantiate and Parent
+        // This ensures the particle stays glued to the hand/head during animations
+            activeVisualEffect = Instantiate(
+            activeAbility.abilityVisualPartyicles,
+            finalPos,
+            finalRot,
+            targetParent
+        );
+
+        // Optional: If you want to auto-destroy visuals after a set time
+        // Destroy(vfx, 3.0f); 
     }
+
     public Ability GetHighestPriorityReady(bool wantRanged)
     {
         List<Ability> listToSearch = wantRanged ? rangedAbilities : meleeAbilities;

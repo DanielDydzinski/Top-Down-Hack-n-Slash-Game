@@ -7,6 +7,7 @@ using UnityEngine.AI;
 public abstract class Effect : ScriptableObject 
 {
 	public GameObject effectParticles;
+	public AudioClip soundEffect;
 	public abstract IEnumerator ApplyEffect (GameObject target, HitInfo info);
 }
 	

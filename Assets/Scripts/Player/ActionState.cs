@@ -53,59 +53,27 @@ public class ActionState : IPlayerState
     {
         startTime += Time.deltaTime;
 
-        if (ability.track == ComboTrack.Heavy)
+        // We need state info for both Dash Timing and Rotation length
+        AnimatorStateInfo stateInfo = psm.anim.GetCurrentAnimatorStateInfo(psm.FullBodyLayer);
+        float currentClipLength = stateInfo.length;
+
+        // --- 1. UNIVERSAL ROTATION (Respects the Boolean) ---
+        if (ability.canRotateDuringCast)
         {
-            AnimatorStateInfo stateInfo = psm.anim.GetCurrentAnimatorStateInfo(psm.FullBodyLayer);
-            float currentClipLength = stateInfo.length;
-
-            // 1. Update Target Goal
-            if (ability.canRotateDuringCast)
-            {
-                Vector3 currentMouseDir = psm.playerToMouse.playerToMouseDir;
-                if (currentMouseDir != Vector3.zero)
-                {
-                    currentMouseDir.y = 0;
-                    targetMouseRotation = Quaternion.LookRotation(currentMouseDir.normalized);
-                }
-            }
-
-            // 2. HEAVY STEERING 
-            // Since psm.rotator is disabled, this is the ONLY thing rotating the player.
-            float steeringSpeed = ability.rotationOomph; // Adjust this for the "Heavy" feel
-            psm.transform.rotation = Quaternion.RotateTowards(
-                psm.transform.rotation,
-                targetMouseRotation,
-                steeringSpeed * Time.deltaTime
-            );
-
-            // 3. MOVEMENT WINDOW
-            float dashStart = currentClipLength * ability.dashStartTime;
-            float dashEnd = currentClipLength * ability.dashEndTime;
-
-            if (startTime >= dashStart && startTime <= dashEnd)
-            {
-                // Detection & Mass Calculation
-                Collider[] hitEnemies = Physics.OverlapSphere(psm.transform.position + psm.transform.forward * 1f, 0.8f, enemyLayer);
-                float totalMass = 0f;
-                foreach (var col in hitEnemies)
-                {
-                    if (col.gameObject != psm.gameObject && col.TryGetComponent<Stats>(out var stats))
-                        totalMass += stats.GetMass();
-                }
-
-                float weightInfluence = 0.2f;
-                float adjustedSpeed = ability.dashPower / (1f + (totalMass * weightInfluence));
-
-                // Drive forward based on current body orientation
-                Vector3 dashDelta = psm.transform.forward * adjustedSpeed * Time.deltaTime;
-                dashDelta.y -= 9.81f * Time.deltaTime;
-
-                // Move everyone synchronously
-                MoveEntities(hitEnemies, dashDelta);
-                psm.characterController.Move(dashDelta);
-            }
+            UpdateTargetRotation();
+            ApplySteering();
         }
 
+        // --- 2. MOVEMENT WINDOW (Universal for all, but Drag is Heavy only) ---
+        float dashStart = currentClipLength * ability.dashStartTime;
+        float dashEnd = currentClipLength * ability.dashEndTime;
+
+        if (startTime >= dashStart && startTime <= dashEnd)
+        {
+            HandleDashMovement();
+        }
+
+        // --- 3. STATE EXIT ---
         if (startTime < GRACE_PERIOD) return;
         if (psm.anim.GetInteger(attackStateHash) == -1) psm.SwitchState(new LocomotionState(psm));
     }
@@ -124,6 +92,73 @@ public class ActionState : IPlayerState
                 col.transform.position += delta;
             }
         }
+    }
+
+    private void UpdateTargetRotation()
+    {
+        Vector3 currentMouseDir = psm.playerToMouse.playerToMouseDir;
+        if (currentMouseDir != Vector3.zero)
+        {
+            currentMouseDir.y = 0;
+            targetMouseRotation = Quaternion.LookRotation(currentMouseDir.normalized);
+        }
+    }
+    private void ApplySteering()
+    {
+        // Use the Oomph from the ability SO
+        psm.transform.rotation = Quaternion.RotateTowards(
+            psm.transform.rotation,
+            targetMouseRotation,
+            ability.rotationOomph * Time.deltaTime
+        );
+    }
+
+    private void HandleDashMovement()
+    {
+        Vector3 dashDelta = Vector3.zero;
+
+        if (ability.track == ComboTrack.Heavy)
+        {
+            // 1. Detection for the "Drag"
+            Collider[] hitEnemies = Physics.OverlapSphere(psm.transform.position + psm.transform.forward * 1f, 0.8f, enemyLayer);
+            float totalMass = 0f;
+
+            foreach (var col in hitEnemies)
+            {
+                if (col.gameObject != psm.gameObject && col.TryGetComponent<Stats>(out var stats))
+                    totalMass += stats.GetMass();
+            }
+
+            // 2. Heavy Speed Calculation (Weight Influence)
+            float weightInfluence = 0.2f;
+            float adjustedSpeed = ability.dashPower / (1f + (totalMass * weightInfluence));
+            dashDelta = psm.transform.forward * adjustedSpeed * Time.deltaTime;
+
+            // 3. Drag the enemies
+            MoveEntities(hitEnemies, dashDelta);
+        }
+        else
+        {
+            // --- LIGHT / MAGIC DASH STOP LOGIC ---
+            float dashDistance = ability.dashPower * Time.deltaTime;
+
+            // SphereCast: Think of this as throwing a ball forward to see if it hits a wall/enemy
+            // Radius 0.4f roughly matches the Player's width
+            if (Physics.SphereCast(psm.transform.position + Vector3.up, 0.4f, psm.transform.forward, out RaycastHit hit, dashDistance, enemyLayer))
+            {
+                // We hit an enemy! 
+                // Calculate a smaller delta so we stop right in front of them instead of clipping through
+                dashDelta = psm.transform.forward * hit.distance;
+            }
+            else
+            {
+                // Path is clear
+                dashDelta = psm.transform.forward * dashDistance;
+            }
+        }
+
+        // Move the Player (Applies to all types)
+        psm.characterController.Move(dashDelta);
     }
 
     public void ExitState()

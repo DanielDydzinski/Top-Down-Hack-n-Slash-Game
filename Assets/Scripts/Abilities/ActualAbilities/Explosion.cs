@@ -8,19 +8,20 @@ public class Explosion : Ability {
 	public GameObject explosionParticles;
 	public float radius;
 	public bool damageByDistance;
+	public AudioClip soundEffect;
 
 
 	ExplosionBehaviour explosionBehaviour;
 
 	
-	public override GameObject Cast (Vector3 pos, Quaternion rot)
+	public override GameObject Cast (Vector3 pos, Quaternion rot, GameObject caster)
 	{
 		GameObject instance = Instantiate(abilityPrefab, pos, rot);
 
 		explosionBehaviour = instance.GetComponent<ExplosionBehaviour>();
 		if (explosionBehaviour != null)
 		{
-			explosionBehaviour.UpdateValues(this.abilityEffects, explosionParticles, radius, this.myFaction, this.damageType, damageByDistance);
+			explosionBehaviour.UpdateValues(this.abilityEffects, explosionParticles, radius, this.myFaction, this.damageType, damageByDistance, soundEffect, caster);
 		}
 		else
 		{

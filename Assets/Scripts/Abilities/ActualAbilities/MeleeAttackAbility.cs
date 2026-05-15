@@ -11,11 +11,12 @@ public class MeleeAttackAbility : Ability {
 	public Vector3 halfExtents;	
 	public LayerMask TargetLayerMask;
 	public int howManyEnemiesToHit = 1;
+	public AudioClip missHitAudio;
 
 
 	MeleeAttackBehavaiour meleeAttackBehavaiour;
 
-	public override GameObject Cast (Vector3 pos, Quaternion rot)
+	public override GameObject Cast (Vector3 pos, Quaternion rot, GameObject caster)
 	{
         GameObject instance = Instantiate(abilityPrefab, pos, rot);
 
@@ -24,7 +25,7 @@ public class MeleeAttackAbility : Ability {
 		meleeAttackBehavaiour = instance.GetComponent<MeleeAttackBehavaiour> ();
 		if(meleeAttackBehavaiour!=null)
 		{
-            meleeAttackBehavaiour.UpdateValues(this.myFaction, this.abilityEffects, length, halfExtents, attackParticles, this.damageType, howManyEnemiesToHit,TargetLayerMask);
+            meleeAttackBehavaiour.UpdateValues(this.myFaction, this.abilityEffects, length, halfExtents, attackParticles, this.damageType, howManyEnemiesToHit,TargetLayerMask,missHitAudio, caster);
         }
 		 else 
 		{

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Security.Principal;
 using UnityEngine;
+using System.Linq; // Added for Sorting
 
 public class MeleeAttackBehavaiour : MonoBehaviour
 {
@@ -14,13 +15,19 @@ public class MeleeAttackBehavaiour : MonoBehaviour
     public DamageType damageType;
     public List<Effect> effects = new List<Effect>();
     public int howManyEnemiesToHit = 1;
+    private AudioClip missHitAudio;
+    private GameObject caster; //who casted this ability
+
+    private AudioClip audioClip;
+    private AudioSource audioSource;
+    
 
     void Start()
     {
         StartCoroutine(DelayedStart());
     }
 
-    public void UpdateValues(Faction faction, List<Effect> aeffect, float alength, Vector3 ahalfExtents, GameObject aparticles, DamageType dmgType, int howManyHits, LayerMask targetLayer)
+    public void UpdateValues(Faction faction, List<Effect> aeffect, float alength, Vector3 ahalfExtents, GameObject aparticles, DamageType dmgType, int howManyHits, LayerMask targetLayer, AudioClip aClip, GameObject aCaster)
     {
         myFaction = faction;
         effects = aeffect;
@@ -30,6 +37,8 @@ public class MeleeAttackBehavaiour : MonoBehaviour
         damageType = dmgType;
         howManyEnemiesToHit = howManyHits;
         layerMask = targetLayer;
+        missHitAudio = aClip;
+        caster = aCaster;
     }
 
     private IEnumerator DelayedStart()
@@ -56,9 +65,13 @@ public class MeleeAttackBehavaiour : MonoBehaviour
             if (!allColliders.Contains(h.collider))
                 allColliders.Add(h.collider);
 
+        var sortedColliders = allColliders
+        .OrderBy(c => Vector3.Distance(transform.position, c.transform.position))
+        .ToList();
+
         int hitCount = 0;
 
-        foreach (Collider col in allColliders)
+        foreach (Collider col in sortedColliders)
         {
             if (hitCount >= howManyEnemiesToHit) break;
             EntityIdentity identity = col.GetComponent<EntityIdentity>();
@@ -94,10 +107,20 @@ public class MeleeAttackBehavaiour : MonoBehaviour
 
             }
         }
-    
 
-    // Visual feedback for debugging: Green if something was hit, Red if not.
-    DrawDebugBox(transform.position, halfExtents, transform.rotation, transform.forward, length, hitCount > 0 ? Color.green : Color.red, 2.0f);
+        if (hitCount <  1) // we missed play woosh sound
+        {
+            audioSource = caster.GetComponent<AudioSource>();
+            if (missHitAudio != null && audioSource != null)
+            {
+                audioSource.PlayOneShot(missHitAudio);
+                Debug.Log("MissHitAudio = " + missHitAudio.name);
+
+            }
+        }
+
+        // Visual feedback for debugging: Green if something was hit, Red if not.
+        DrawDebugBox(transform.position, halfExtents, transform.rotation, transform.forward, length, hitCount > 0 ? Color.green : Color.red, 2.0f);
 
         Destroy(gameObject);
     }

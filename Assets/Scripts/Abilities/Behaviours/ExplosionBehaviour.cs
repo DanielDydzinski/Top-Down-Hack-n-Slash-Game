@@ -13,14 +13,19 @@ public class ExplosionBehaviour : MonoBehaviour
 
     public List<Effect> effects = new List<Effect>();
 
+    private AudioClip audioClip;
+    private AudioSource audioSource;
+    private GameObject caster;
+
     void Start()
     {
+        audioSource = GetComponent<AudioSource>();
         //waity one frame for values to update
         StartCoroutine(DelayedExplode());
         
     }
 
-    public void UpdateValues(List<Effect> aeffects, GameObject aexploPrefab, float aRadius, Faction faction, DamageType dmgType, bool dmgByDist)
+    public void UpdateValues(List<Effect> aeffects, GameObject aexploPrefab, float aRadius, Faction faction, DamageType dmgType, bool dmgByDist,AudioClip aclip, GameObject aCaster)
     {
         effects = aeffects;
         explosionParticles = aexploPrefab;
@@ -28,7 +33,8 @@ public class ExplosionBehaviour : MonoBehaviour
         myFaction = faction;
         damageType = dmgType;
         damageByDistance = dmgByDist;
-
+        audioClip = aclip;
+        caster = aCaster;
         //Explode();
     }
 
@@ -37,6 +43,10 @@ public class ExplosionBehaviour : MonoBehaviour
         if (explosionParticles != null)
         {
             Instantiate(explosionParticles, transform.position, Quaternion.identity);
+        }
+        if(audioClip != null)
+        {
+            AudioSource.PlayClipAtPoint(audioClip, transform.position);
         }
 
         yield return null; // Wait exactly one frame
@@ -85,6 +95,12 @@ public class ExplosionBehaviour : MonoBehaviour
                     attacker = this.gameObject,
                     multiplier = falloff
                 };
+
+                if (c.TryGetComponent<PushPropagator>(out var propagator))
+                {
+                    float force = 5f * falloff; // Example force
+                    propagator.PropagatePush(dir * force * Time.deltaTime, this.gameObject);
+                }
 
                 // Logic for falloff: We don't modify the SO, we just tell the receiver!
                 // If you want scaling, you'd handle it inside the specific Effect. 

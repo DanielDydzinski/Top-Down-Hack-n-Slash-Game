@@ -18,6 +18,8 @@ public class EnemyAIController : MonoBehaviour
     public readonly int GetHitLayer = 1;
     public readonly int AttackLayer = 2;
     public readonly int DeathLayer = 3;
+    [SerializeField] public LayerMask enemyLayer;
+
 
     [Header("Settings")]
     public float engagedDistance = 10f;
@@ -31,6 +33,21 @@ public class EnemyAIController : MonoBehaviour
     public float rangedDistance;
     public float defaultChaseDist = 1f;
 
+    [Header("player crowding")]
+    // Inside EnemyAIController.cs, add:
+    public PlayerSlotManager slotManager; // Assign via Inspector or FindFirstObjectByType in Awake
+    [HideInInspector] public int MySlotIndex = -1;
+    [HideInInspector] public bool HasSlot = false;
+    [Header("enemy Side Stepping")]
+    // -- Side Stepping enemy Collisions --
+    public float SidestepDuration = 1.0f;  // How long the "sideways burst" lasts.
+    public float SidestepCooldown = 0.8f;  // Prevents the AI from jittering back and forth constantly.
+    public float SidestepDistance = 2.2f;  // How far to the side the AI tries to move.
+    public float BlockLookAhead = 0.8f;  // How far in front the AI checks for other enemies.
+    public float BlockCastRadius = 0.5f; // Size of the "detection beam." Keep this smaller than the AI's width to avoid self-hits.
+    public float SideClearRadius = 0.5f;  // The size of the "safety bubble" checked at the destination.
+
+
     private IState currentState;
 
     // We initialize states here
@@ -43,6 +60,7 @@ public class EnemyAIController : MonoBehaviour
     void Start()
     {
         target = GameObject.FindGameObjectWithTag("Player").transform;
+        slotManager = target.GetComponent<PlayerSlotManager>();
 
         nav = GetComponent<NavMeshAgent>();
         obstacle = GetComponent<NavMeshObstacle>();
@@ -93,6 +111,16 @@ public class EnemyAIController : MonoBehaviour
         // aiAnim.SetFloat(SpeedHash, nav.velocity.magnitude);
     }
 
+    public void CleanUpSlot()
+    {
+        if (HasSlot && slotManager != null)
+        {
+            slotManager.ReleaseSlot(MySlotIndex);
+            HasSlot = false;
+            MySlotIndex = -1;
+        }
+    }
+
     public void ChangeState(IState newState)
     {
         if (currentState != null)
@@ -119,21 +147,21 @@ public class EnemyAIController : MonoBehaviour
             ChangeState(stunState);
         }
     }
-    public void TogglePhysicsMode(bool usePhysics)
-    {
-        nav.enabled = !usePhysics;
-        GetComponent<Rigidbody>().isKinematic = !usePhysics;
+    //public void TogglePhysicsMode(bool usePhysics)
+    //{
+    //    nav.enabled = !usePhysics;
+    //    GetComponent<Rigidbody>().isKinematic = !usePhysics;
 
-        // If we are turning navigation back on, "snap" to the nearest navmesh point
-        if (!usePhysics)
-        {
-            NavMeshHit hit;
-            if (NavMesh.SamplePosition(transform.position, out hit, 2.0f, NavMesh.AllAreas))
-            {
-                transform.position = hit.position;
-            }
-        }
-    }
+    //    // If we are turning navigation back on, "snap" to the nearest navmesh point
+    //    if (!usePhysics)
+    //    {
+    //        NavMeshHit hit;
+    //        if (NavMesh.SamplePosition(transform.position, out hit, 2.0f, NavMesh.AllAreas))
+    //        {
+    //            transform.position = hit.position;
+    //        }
+    //    }
+    //}
     public void SetObstacleMode(bool isObstacle)
     {
         if (_hasObstacle)
@@ -175,6 +203,23 @@ public class EnemyAIController : MonoBehaviour
 
             // 3. Play death anim or destroy
             Destroy(gameObject, 3f); // Destroy almost instantly
+        }
+    }
+
+    private void OnDrawGizmos() // Changed from OnDrawGizmosSelected for constant viewing
+    {
+        // 1. Safety check
+        if (currentState == null) return;
+
+        // 2. Check if the current state is ChaseState
+        if (currentState is ChaseState chase)
+        {
+            // Draw a temporary yellow marker above the enemy to prove the state is active
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireCube(transform.position + Vector3.up * 2.5f, new Vector3(0.5f, 0.5f, 0.5f));
+
+            // 3. Call the state's gizmo logic
+            chase.DrawGizmos();
         }
     }
 }

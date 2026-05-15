@@ -10,6 +10,8 @@ public class TakeDamage : Effect {
     public override IEnumerator ApplyEffect(GameObject target, HitInfo info)
     {
         Health hp = target.GetComponent<Health>();
+        AudioSource audioS = target.GetComponent<AudioSource>();
+
         if (hp != null)
         {
             hp.Damage(damageAmount * info.multiplier);
@@ -23,7 +25,10 @@ public class TakeDamage : Effect {
                 Instantiate(effectParticles, effectSpawnLocations.center); // 4th child set up to centre. 3rd to over head. 5th to feet.
             }
         }
-
+        if (audioS != null && this.soundEffect!=null)
+        {
+            audioS.PlayOneShot(soundEffect);
+        }
             yield break;
     }
 

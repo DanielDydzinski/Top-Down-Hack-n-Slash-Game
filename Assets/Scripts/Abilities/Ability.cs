@@ -6,6 +6,8 @@ using UnityEngine;
 public enum AnimationLayer { UpperBody, FullBody }
 public enum ComboTrack { Light, Heavy, Magic, Hidden }
 
+public enum VisualAttachPoint { Root, LeftHand, RightHand, Head, Weapon }
+
 public abstract class Ability : ScriptableObject{
 
     [Header("Main Ability Prefab")]
@@ -45,6 +47,9 @@ public abstract class Ability : ScriptableObject{
     public float dashEndTime;   // 0- 1 how far into animationtime to stop 0.9 = 90% of animation
 
     public GameObject abilityVisualPartyicles; // visuals 
+    public VisualAttachPoint attachPoint; // Instead of public Transform
+    public AudioClip AudioClip;
+    public AudioClip visualEffectAudio;
 
 
     public enum abilitySpawnType{Onself, OnTarget, SpecifiedPoint, PlayerRoot};
@@ -53,6 +58,6 @@ public abstract class Ability : ScriptableObject{
 	public Vector3 spawnLocationOffset;
     public Vector3 spawnRotationOffset;
 
-	public abstract GameObject Cast (Vector3 pos, Quaternion rot);
+	public abstract GameObject Cast (Vector3 pos, Quaternion rot, GameObject caster);
 
 }

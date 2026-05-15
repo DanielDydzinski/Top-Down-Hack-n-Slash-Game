@@ -9,12 +9,14 @@ public class TakePush : Effect
 
     public override IEnumerator ApplyEffect(GameObject target, HitInfo info)
     {
+        // 1. Setup Direction (Ignore Y to prevent "flying" zombies)
         Vector3 dir = info.forceDirection.normalized;
         dir.y = 0;
 
+        // 2. Get Components
         Stats stats = target.GetComponent<Stats>();
-        Mover mover = target.GetComponent<Mover>();
         UnityEngine.AI.NavMeshAgent agent = target.GetComponent<UnityEngine.AI.NavMeshAgent>();
+        PushPropagator propagator = target.GetComponent<PushPropagator>();
 
         if (stats != null) stats.isPushed = true;
 
@@ -22,7 +24,7 @@ public class TakePush : Effect
         bool wasStoppedBeforePush = false;
         if (agent != null && agent.isActiveAndEnabled && agent.isOnNavMesh)
         {
-            wasStoppedBeforePush = agent.isStopped; // Remember if they were already stunned
+            wasStoppedBeforePush = agent.isStopped;
             agent.isStopped = true;
             agent.velocity = Vector3.zero;
         }
@@ -33,29 +35,27 @@ public class TakePush : Effect
         while (elapsed < pushDuration)
         {
             float percentage = elapsed / pushDuration;
+            // Damping: Starts at pushForce, ends at 0
             float currentForce = Mathf.Lerp(pushForce, 0, percentage);
-            // The heavier the mass, the smaller the moveAmount
-            float mass = stats != null ? stats.mass : 1f;
-            Vector3 moveAmount = (dir * currentForce * Time.deltaTime) / mass; ;
 
-            if (agent != null)
+            // Mass resistance for THIS specific target
+            float mass = stats != null ? stats.mass : 1f;
+            Vector3 moveAmount = (dir * currentForce * Time.deltaTime) / mass;
+
+            // --- THE CHAIN REACTION TRIGGER ---
+            if (propagator != null)
             {
-                // CRITICAL FIX: Only call Move if the agent is active AND on the mesh
-                if (agent.isActiveAndEnabled && agent.isOnNavMesh)
-                {
-                    agent.Move(moveAmount);
-                }
-                else
-                {
-                    // FALLBACK: If the agent is disabled or off-mesh, move transform directly
-                    target.transform.position += moveAmount;
-                }
+                // We tell the propagator to move us. 
+                // It will automatically check for enemies behind us and push them too!
+                propagator.PropagatePush(moveAmount, null);
             }
-            else if (mover != null)
+            else
             {
-                // For the player (CharacterController)
-                var cc = mover.GetComponent<CharacterController>();
-                if (cc.enabled) cc.Move(moveAmount);
+                // Fallback: If for some reason there is no Propagator, move manually
+                if (agent != null && agent.isActiveAndEnabled && agent.isOnNavMesh)
+                    agent.Move(moveAmount);
+                else
+                    target.transform.position += moveAmount;
             }
 
             elapsed += Time.deltaTime;
@@ -65,14 +65,7 @@ public class TakePush : Effect
         // --- CLEANUP ---
         if (agent != null && agent.isActiveAndEnabled)
         {
-            // Only resume moving if they WEREN'T stopped before the push (e.g., they aren't stunned)
-            // If they are in StunState, the StunState will handle agent.isStopped = false later.
-            if (!wasStoppedBeforePush)
-            {
-                agent.isStopped = false;
-            }
-
-            // Safety: Re-sync agent to NavMesh in case transform movement nudged them off
+            if (!wasStoppedBeforePush) agent.isStopped = false;
             if (agent.isOnNavMesh) agent.velocity = Vector3.zero;
         }
 

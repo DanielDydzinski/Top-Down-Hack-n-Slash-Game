@@ -8,6 +8,10 @@ public class ComboController : MonoBehaviour
    public int lightCombosIndex = 0;
    public  int heavyCombosIndex = 0;
    public  int magicCombosIndex = 0;
+    public int qIndex = 0;
+    public int eIndex = 0;
+    public int rIndex = 0;
+    public int fIndex = 0;
     private float lastInputTime;
     private PlayerStateMachine psm;
 
@@ -17,6 +21,12 @@ public class ComboController : MonoBehaviour
     public List<Ability> lightCombos = new();
     public List<Ability> heavyCombos = new();
     public List<Ability> magicCombos = new();
+
+    [Header("Slotted Abilities (Manual Assignment)")]
+    public List<Ability> qAbilities = new();
+    public List<Ability> eAbilities = new();
+    public List<Ability> rAbilities = new();
+    public List<Ability> fAbilities = new();
 
     private void Start()
     {

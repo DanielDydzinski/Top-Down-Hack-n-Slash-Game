@@ -30,7 +30,7 @@ public class StunState : IState
             
         }
         _ctrl.abilityManager.CancelAbility();
-       // _ctrl.TogglePhysicsMode(true);
+       //_ctrl.TogglePhysicsMode(true);
         _ctrl.aiAnim.Play(_ctrl.emptyStateHash, _ctrl.AttackLayer); // Attack Layer
 
         // 2. Play Stun Animation
@@ -56,6 +56,6 @@ public class StunState : IState
             _ctrl.nav.isStopped = false;
       
 
-        _ctrl.TogglePhysicsMode(false);
+       // _ctrl.TogglePhysicsMode(false);
     }
 }

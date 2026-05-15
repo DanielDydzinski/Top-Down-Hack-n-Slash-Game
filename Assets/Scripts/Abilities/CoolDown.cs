@@ -18,9 +18,9 @@ public class CoolDown  {
 		coolDownReady = true;
 	}
 
-	public GameObject TriggerAbility(Vector3 pos, Quaternion rot)
+	public GameObject TriggerAbility(Vector3 pos, Quaternion rot, GameObject aCaster)
 	{
-		return ability.Cast (pos, rot);
+		return ability.Cast (pos, rot, aCaster);
 	}
 
 }

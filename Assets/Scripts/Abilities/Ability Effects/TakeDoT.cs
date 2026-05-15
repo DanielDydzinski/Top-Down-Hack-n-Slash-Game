@@ -14,6 +14,7 @@ public class TakeDoT : Effect
     public override IEnumerator ApplyEffect(GameObject target, HitInfo info)
     {
         Health hp = target.GetComponent<Health>();
+        AudioSource audioS = target.GetComponent<AudioSource>();
 
         if (hp == null)
         {
@@ -37,6 +38,11 @@ public class TakeDoT : Effect
                 {
                     Instantiate(effectParticles, anchors.center.position, Quaternion.identity, anchors.center);
                 }
+            }
+
+            if (audioS != null && this.soundEffect != null)
+            {
+                audioS.PlayOneShot(soundEffect);
             }
 
             // Wait for the next tick
