@@ -122,6 +122,10 @@ public class EnemyAIController : MonoBehaviour
     {
         // Unsubscribe to protect your game from memory leaks!
         if (hp != null) hp.OnDeath -= HandleAIOnDeath;
+
+       
+        // what line of code or system event forced this script to turn off!
+       // Debug.Log($"[MYSTERY DEBUG] {gameObject.name} was disabled by: {System.Environment.StackTrace}");
     }
 
     // This runs exactly ONE TIME when the zombie dies
@@ -150,6 +154,8 @@ public class EnemyAIController : MonoBehaviour
         currentState.Enter();
     }
 
+    public bool IsCurrentlyStunned => currentState == stunState;
+
     public void ApplyStun(float duration)
     {
         // If we are already stunned, only refresh if the NEW duration is longer 
@@ -167,6 +173,8 @@ public class EnemyAIController : MonoBehaviour
             ChangeState(stunState);
         }
     }
+
+
     //public void TogglePhysicsMode(bool usePhysics)
     //{
     //    nav.enabled = !usePhysics;
