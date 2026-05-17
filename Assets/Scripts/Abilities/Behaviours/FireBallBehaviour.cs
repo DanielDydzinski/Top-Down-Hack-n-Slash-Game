@@ -145,7 +145,9 @@ public class FireBallBehaviour : MonoBehaviour
                         multiplier = 1.0f,
                         type = damageType,
                         effects = this.effects,
-                        attacker = this.gameObject
+                        attacker = this.gameObject,
+                        isExplosion = false
+                        
                     };
                     damageable.TakeDamage(info);
                 }

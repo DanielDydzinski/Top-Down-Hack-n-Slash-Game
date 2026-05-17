@@ -100,7 +100,9 @@ public class MeleeAttackBehavaiour : MonoBehaviour
                     effects = effects,
                     attacker = this.gameObject,
                     multiplier = 1.0f,
-                    forceDirection = transform.forward
+                    forceDirection = transform.forward,
+                    isExplosion = false
+                    
                 };
 
                 damageable.TakeDamage(info);

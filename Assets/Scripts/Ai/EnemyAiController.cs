@@ -92,11 +92,11 @@ public class EnemyAIController : MonoBehaviour
 
     void Update()
     {
-        if (hp != null && hp.GetisDead())
-        {
-            HandleDeath();
-            return;
-        }
+        //if (hp != null && hp.GetisDead())
+        //{
+        //    HandleDeath();
+        //    return;
+        //}
 
         if (currentState != null)
             currentState.UpdateState();
@@ -109,6 +109,26 @@ public class EnemyAIController : MonoBehaviour
 
         // Update animator speed for all states
         // aiAnim.SetFloat(SpeedHash, nav.velocity.magnitude);
+    }
+
+    void OnEnable()
+    {
+        // Make sure we hook into the death event as soon as the AI is active
+        if (hp == null) hp = GetComponent<Health>();
+        if (hp != null) hp.OnDeath += HandleAIOnDeath;
+    }
+
+    void OnDisable()
+    {
+        // Unsubscribe to protect your game from memory leaks!
+        if (hp != null) hp.OnDeath -= HandleAIOnDeath;
+    }
+
+    // This runs exactly ONE TIME when the zombie dies
+    private void HandleAIOnDeath(HitInfo info)
+    {
+        CleanUpSlot();
+        this.enabled = false; // Turn off this AI script instantly
     }
 
     public void CleanUpSlot()
@@ -192,14 +212,13 @@ public class EnemyAIController : MonoBehaviour
         // Look for our new dedicated component
         DeathHandler deathHandler = GetComponent<DeathHandler>();
 
-        if (deathHandler != null)
-        {
-            // You can pass the position where the projectile hit if available. 
-            // Passing transform.position falls back to an explosion upward from its feet.
-            deathHandler.TriggerDeath(transform.position);
-        }
-        else
-        {
+        //if (deathHandler != null)
+        //{
+        //    // You can pass the position where the projectile hit if available. 
+        //    // Passing transform.position falls back to an explosion upward from its feet.
+        //    deathHandler.TriggerDeath(transform.position);
+        //}
+       
 
 
             Rigidbody rb = GetComponent<Rigidbody>();
@@ -216,7 +235,7 @@ public class EnemyAIController : MonoBehaviour
                 // 3. Play death anim or destroy
                 Destroy(gameObject, 3f); // Destroy almost instantly
             }
-        }
+        
     }
 
     private void OnDrawGizmos() // Changed from OnDrawGizmosSelected for constant viewing

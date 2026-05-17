@@ -172,6 +172,12 @@ public class Health : MonoBehaviour {
 
 	}
 
+    public float Gethealth()
+    {
+        return healthPoints;
+    }
+
+
     void OnEnable()
     {
         if (_receiver != null)

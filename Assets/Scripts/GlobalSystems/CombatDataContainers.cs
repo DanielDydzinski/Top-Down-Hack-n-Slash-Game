@@ -15,6 +15,9 @@ public struct HitInfo
     public Faction faction;
     public float multiplier;
     public Vector3 forceDirection;
+    // Allows projectiles or spells to override the target's default death type
+    public DeathHandler.DeathType? overrideDeathType;
+    public bool isExplosion;
 }
 
 // The "Mail Slot" interface

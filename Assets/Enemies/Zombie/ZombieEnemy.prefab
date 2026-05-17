@@ -827,6 +827,7 @@ GameObject:
   - component: {fileID: 3300077883192923426}
   - component: {fileID: 5651794190200324524}
   - component: {fileID: 7358773778902568352}
+  - component: {fileID: 2795580847515416543}
   m_Layer: 9
   m_Name: ZombieEnemy
   m_TagString: Untagged
@@ -884,7 +885,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 100
   healthPoints: 50
-  canRegen: 1
+  canRegen: 0
   regenRate: 0.2
   regenAmount: 2
   outCombatTime: 8
@@ -1270,6 +1271,42 @@ MonoBehaviour:
   wallLayer:
     serializedVersion: 2
     m_Bits: 1024
+--- !u!114 &2795580847515416543
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1272996731057236}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2ba6ec418b81d442b344c7a1a04e755, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  defaultDeathStyle: 2
+  mediumIntensityThreshold: 20
+  highIntensityThreshold: 60
+  animationChance: 50
+  explodingChance: 100
+  ragdollPrefab: {fileID: 6195872117262740494, guid: b65fc03b16c17f846b09b0447a6aad02,
+    type: 3}
+  partsExploSound:
+  - {fileID: 8300000, guid: e21813588667a1e44b73b11304818ef1, type: 3}
+  - {fileID: 8300000, guid: 493cec6d161d6994d8bb05a79ba7affb, type: 3}
+  - {fileID: 8300000, guid: 772244e7c1ba34c4e82bcea2b0d1d214, type: 3}
+  - {fileID: 8300000, guid: 25932f4e05e89d842b7d006ec38fe730, type: 3}
+  - {fileID: 8300000, guid: b33d7e2e777ad3e4dbcb31bfacdd6b51, type: 3}
+  - {fileID: 8300000, guid: a31dd82d8d9e74246b8a28e03beef790, type: 3}
+  healthBar: {fileID: 1722612802557646}
+  standardPunchForce: 5
+  explosionBlastForce: 5
+  explosionRadius: 0.1
+  upwardModifier: 0.1
+  explodingPartsPrefab: {fileID: 4453159007717504736, guid: 9415d12ea95c2db47aa53cf911cbe1e1,
+    type: 3}
+  ragdollLifespan: 10
+  audioCleanupDelay: 3
+  animationDeathLifespan: 4
 --- !u!1 &1286924470810096
 GameObject:
   m_ObjectHideFlags: 0
