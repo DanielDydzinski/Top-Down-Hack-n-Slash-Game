@@ -742,9 +742,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12e74bd42700da2479623aa80f1468ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 300
-  healthPoints: 200
-  canRegen: 1
+  maxHealth: 100
+  healthPoints: 100
+  canRegen: 0
   regenRate: 0.5
   regenAmount: 5
   outCombatTime: 5
@@ -1099,13 +1099,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   defaultDeathStyle: 0
-  ragdollPrefab: {fileID: 0}
+  mediumIntensityThreshold: 20
+  highIntensityThreshold: 60
+  animationChance: 0
+  explodingChance: 70
+  ragdollPrefab: {fileID: 5639734505226517267, guid: 473dc1be1926b1240aa7303f33888b60,
+    type: 3}
+  partsExploSound: []
   healthBar: {fileID: 1779269026205980}
-  punchForceDamper: 0.3
-  explosionBlastForce: 500
-  explosionPunchForce: 25
-  explosionRadius: 3
-  upwardModifier: 0.5
+  standardPunchForce: 5
+  explosionBlastForce: 5
+  explosionRadius: 0.1
+  upwardModifier: 1
+  explodingPartsPrefab: {fileID: 0}
   ragdollLifespan: 10
   audioCleanupDelay: 3
   animationDeathLifespan: 4
