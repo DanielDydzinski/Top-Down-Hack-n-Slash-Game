@@ -2437,6 +2437,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4098737207347784}
+  - component: {fileID: 2948666461415973385}
+  - component: {fileID: 4858029787735537284}
   m_Layer: 0
   m_Name: R_foot
   m_TagString: Untagged
@@ -2460,6 +2462,65 @@ Transform:
   - {fileID: 4899091614016112}
   m_Father: {fileID: 4321126302680180}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &2948666461415973385
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1725270077752346}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.23, y: 0.21, z: 0.49}
+  m_Center: {x: 0, y: 0.08, z: 0}
+--- !u!114 &4858029787735537284
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1725270077752346}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d882f791d4b3d94a85e8ce8409cc7d3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  smallCarcassEffects:
+    particlePrefab: {fileID: 346118486486412248, guid: dadc6b2eabcee164b91985172706d7b5,
+      type: 3}
+    sounds:
+    - {fileID: 8300000, guid: b33d7e2e777ad3e4dbcb31bfacdd6b51, type: 3}
+    - {fileID: 8300000, guid: a31dd82d8d9e74246b8a28e03beef790, type: 3}
+    - {fileID: 8300000, guid: 25932f4e05e89d842b7d006ec38fe730, type: 3}
+    - {fileID: 8300000, guid: 772244e7c1ba34c4e82bcea2b0d1d214, type: 3}
+    - {fileID: 8300000, guid: 493cec6d161d6994d8bb05a79ba7affb, type: 3}
+    - {fileID: 8300000, guid: e21813588667a1e44b73b11304818ef1, type: 3}
+    - {fileID: 8300000, guid: 41b3db18e389a464da57cc13049e290f, type: 3}
+    - {fileID: 8300000, guid: 5072a94fa6887024985a35d9cf66c949, type: 3}
+  largeCarcassEffects:
+    particlePrefab: {fileID: 8042722266352500479, guid: 306cb532c733b884a903fe1b746b0022,
+      type: 3}
+    sounds:
+    - {fileID: 8300000, guid: b33d7e2e777ad3e4dbcb31bfacdd6b51, type: 3}
+    - {fileID: 8300000, guid: a31dd82d8d9e74246b8a28e03beef790, type: 3}
+    - {fileID: 8300000, guid: 25932f4e05e89d842b7d006ec38fe730, type: 3}
+    - {fileID: 8300000, guid: 772244e7c1ba34c4e82bcea2b0d1d214, type: 3}
+    - {fileID: 8300000, guid: 493cec6d161d6994d8bb05a79ba7affb, type: 3}
+    - {fileID: 8300000, guid: e21813588667a1e44b73b11304818ef1, type: 3}
+    - {fileID: 8300000, guid: 41b3db18e389a464da57cc13049e290f, type: 3}
+    - {fileID: 8300000, guid: 5072a94fa6887024985a35d9cf66c949, type: 3}
+  ragdollLayerName: Ragdoll
+  floorLayerName: Floor
 --- !u!1 &1755208715642438
 GameObject:
   m_ObjectHideFlags: 0
@@ -2938,6 +2999,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4256191529788102}
+  - component: {fileID: 1442598640173713125}
+  - component: {fileID: 192446896925821847}
   m_Layer: 0
   m_Name: L_foot
   m_TagString: Untagged
@@ -2961,6 +3024,65 @@ Transform:
   - {fileID: 4276557084770962}
   m_Father: {fileID: 4398590701678300}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &1442598640173713125
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1935985448699958}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.23, y: 0.21, z: 0.49}
+  m_Center: {x: 0, y: 0.08, z: 0}
+--- !u!114 &192446896925821847
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1935985448699958}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d882f791d4b3d94a85e8ce8409cc7d3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  smallCarcassEffects:
+    particlePrefab: {fileID: 346118486486412248, guid: dadc6b2eabcee164b91985172706d7b5,
+      type: 3}
+    sounds:
+    - {fileID: 8300000, guid: b33d7e2e777ad3e4dbcb31bfacdd6b51, type: 3}
+    - {fileID: 8300000, guid: a31dd82d8d9e74246b8a28e03beef790, type: 3}
+    - {fileID: 8300000, guid: 25932f4e05e89d842b7d006ec38fe730, type: 3}
+    - {fileID: 8300000, guid: 772244e7c1ba34c4e82bcea2b0d1d214, type: 3}
+    - {fileID: 8300000, guid: 493cec6d161d6994d8bb05a79ba7affb, type: 3}
+    - {fileID: 8300000, guid: e21813588667a1e44b73b11304818ef1, type: 3}
+    - {fileID: 8300000, guid: 41b3db18e389a464da57cc13049e290f, type: 3}
+    - {fileID: 8300000, guid: 5072a94fa6887024985a35d9cf66c949, type: 3}
+  largeCarcassEffects:
+    particlePrefab: {fileID: 8042722266352500479, guid: 306cb532c733b884a903fe1b746b0022,
+      type: 3}
+    sounds:
+    - {fileID: 8300000, guid: b33d7e2e777ad3e4dbcb31bfacdd6b51, type: 3}
+    - {fileID: 8300000, guid: a31dd82d8d9e74246b8a28e03beef790, type: 3}
+    - {fileID: 8300000, guid: 25932f4e05e89d842b7d006ec38fe730, type: 3}
+    - {fileID: 8300000, guid: 772244e7c1ba34c4e82bcea2b0d1d214, type: 3}
+    - {fileID: 8300000, guid: 493cec6d161d6994d8bb05a79ba7affb, type: 3}
+    - {fileID: 8300000, guid: e21813588667a1e44b73b11304818ef1, type: 3}
+    - {fileID: 8300000, guid: 41b3db18e389a464da57cc13049e290f, type: 3}
+    - {fileID: 8300000, guid: 5072a94fa6887024985a35d9cf66c949, type: 3}
+  ragdollLayerName: Ragdoll
+  floorLayerName: Floor
 --- !u!1 &1951432231884888
 GameObject:
   m_ObjectHideFlags: 0

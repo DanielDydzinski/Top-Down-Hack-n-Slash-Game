@@ -1286,8 +1286,8 @@ MonoBehaviour:
   defaultDeathStyle: 2
   mediumIntensityThreshold: 20
   highIntensityThreshold: 60
-  animationChance: 50
-  explodingChance: 100
+  animationChance: 19.6
+  explodingChance: 30.4
   ragdollPrefab: {fileID: 6195872117262740494, guid: b65fc03b16c17f846b09b0447a6aad02,
     type: 3}
   partsExploSound:
