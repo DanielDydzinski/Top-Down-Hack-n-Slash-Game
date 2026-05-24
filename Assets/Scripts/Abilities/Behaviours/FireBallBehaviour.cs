@@ -93,11 +93,13 @@ public class FireBallBehaviour : MonoBehaviour
     void OnTriggerEnter(Collider col)
     {
 
+
         if (col.gameObject.layer == LayerMask.NameToLayer("Enviroment"))
         {
-            if (explosionAbility != null)
+            if (explosionAbility != null && howManyExplosions < 1)
             {
                 explosionAbility.Cast(transform.position, Quaternion.identity, caster);
+                howManyExplosions++;
             }
             ReleaseAllCaptured();
 
@@ -119,6 +121,7 @@ public class FireBallBehaviour : MonoBehaviour
             }
             else if (howManyExplosions < 1) // Original single fireball logic
             {
+
                 IDamageable damageable = col.GetComponent<IDamageable>();
                 if (damageable != null)
                 {
@@ -136,13 +139,18 @@ public class FireBallBehaviour : MonoBehaviour
 
                 if (explosionAbility != null)
                 {
-                    explosionAbility.Cast(transform.position, Quaternion.identity, caster);
+                    explosionAbility.Cast(transform.position, Quaternion.identity, caster);                    
                 }
 
                 howManyExplosions++;
                 Destroy(this.gameObject);
             }
         }
+    }
+
+    private void DealDamage()
+    {
+
     }
 
     void OnTriggerStay(Collider col)
@@ -231,9 +239,10 @@ public class FireBallBehaviour : MonoBehaviour
     {
         if (Vector3.Distance(spawnPos, transform.position) > projectileRange)
         {
-            if (isBeam && explosionAbility != null)
+            if (explosionAbility != null && howManyExplosions < 1)
             {
                 explosionAbility.Cast(transform.position, Quaternion.identity, caster);
+                howManyExplosions++;
             }
             ReleaseAllCaptured();
             Destroy(this.gameObject);
@@ -250,10 +259,12 @@ public class FireBallBehaviour : MonoBehaviour
 
         if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, checkDistance, 1 << LayerMask.NameToLayer("Enviroment")))
         {
+
             // Hit a wall ahead! Detonate right now before pushing enemies through it
-            if (explosionAbility != null)
+            if (explosionAbility != null && howManyExplosions <1)
             {
                 explosionAbility.Cast(transform.position, Quaternion.identity, caster);
+                howManyExplosions++;
             }
 
             ReleaseAllCaptured();

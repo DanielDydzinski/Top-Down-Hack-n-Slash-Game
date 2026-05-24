@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.UIElements;
 
 [CreateAssetMenu(menuName = "Effects/Push", fileName = "new Push Effect")]
 public class TakePush : Effect
@@ -12,6 +13,10 @@ public class TakePush : Effect
         // 1. Setup Direction (Ignore Y to prevent "flying" zombies)
         Vector3 dir = info.forceDirection.normalized;
         dir.y = 0;
+
+        //SCALE PUSH FORCE WITH FALLOFF MULTIPLIER
+        // This scales your base 15f force down depending on distance from shockwave center!
+        float calculatedPushForce = pushForce * info.multiplier;
 
         // 2. Get Components
         Stats stats = target.GetComponent<Stats>();
@@ -36,7 +41,7 @@ public class TakePush : Effect
         {
             float percentage = elapsed / pushDuration;
             // Damping: Starts at pushForce, ends at 0
-            float currentForce = Mathf.Lerp(pushForce, 0, percentage);
+            float currentForce = Mathf.Lerp(calculatedPushForce, 0, percentage);
 
             // Mass resistance for THIS specific target
             float mass = stats != null ? stats.mass : 1f;

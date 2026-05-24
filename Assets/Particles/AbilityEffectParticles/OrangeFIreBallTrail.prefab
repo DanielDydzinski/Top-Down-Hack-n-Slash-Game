@@ -4914,6 +4914,7 @@ GameObject:
   - component: {fileID: 4297038853767822363}
   - component: {fileID: -89414700725580047}
   - component: {fileID: -2563407774081925362}
+  - component: {fileID: 4677450649296052540}
   m_Layer: 0
   m_Name: OrangeFIreBallTrail
   m_TagString: Untagged
@@ -5030,6 +5031,28 @@ MonoBehaviour:
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
   m_SoftShadowQuality: 0
+--- !u!114 &4677450649296052540
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1435226658205606982}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1175c52e4a4aad5429c297ff6f0ebd3e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fadeFlash: 0
+  flicker: 1
+  fadeDuration: 2
+  targetIntensity: 0
+  targetColor: {r: 0, g: 0, b: 0, a: 1}
+  minIntensity: 3
+  maxIntensity: 5
+  flickerColorA: {r: 0.8113208, g: 0.6704221, b: 0.35590956, a: 1}
+  flickerColorB: {r: 1, g: 0.51307476, b: 0.015686274, a: 1}
+  flickerSpeed: 0.05
 --- !u!1 &2105716301518571237
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,0 +1,107 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3652324377866273534
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7714481003165858507}
+  - component: {fileID: 2530499725460434296}
+  - component: {fileID: -2624865601839091727}
+  - component: {fileID: 7044176577811463868}
+  m_Layer: 12
+  m_Name: ShockWavePrefab
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7714481003165858507
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3652324377866273534}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -19.80138, y: 4.3633533, z: 14.869118}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!135 &2530499725460434296
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3652324377866273534}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.1
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &-2624865601839091727
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3652324377866273534}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c145834b33795cc46b1ad2708c75387c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxRadius: 10
+  expansionSpeed: 20
+  myFaction: 0
+  damageType: 0
+  effects: []
+  caster: {fileID: 0}
+--- !u!114 &7044176577811463868
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3652324377866273534}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d882f791d4b3d94a85e8ce8409cc7d3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  smallHealthPotionPrefab: {fileID: 1853923159977811795, guid: 918d6dd8b172a7d448c59c29b83f9501,
+    type: 3}
+  largeHealthPotionPrefab: {fileID: 1853923159977811795, guid: d81871609c6987246a9ddb71bbdbedb4,
+    type: 3}
+  smallPotionDropChance: 25
+  largePotionDropChance: 75
+  crunchSounds:
+  - {fileID: 8300000, guid: a876179e000ff4ff09b30761b1a88595, type: 3}
+  - {fileID: 8300000, guid: 7b8f7cd6c1ac44425bef51e36781b251, type: 3}
+  - {fileID: 8300000, guid: 85ab22c5a2fc24a6cbc2497bfb42c8de, type: 3}
+  - {fileID: 8300000, guid: e21813588667a1e44b73b11304818ef1, type: 3}
+  - {fileID: 8300000, guid: 493cec6d161d6994d8bb05a79ba7affb, type: 3}
+  - {fileID: 8300000, guid: 772244e7c1ba34c4e82bcea2b0d1d214, type: 3}
+  - {fileID: 8300000, guid: 25932f4e05e89d842b7d006ec38fe730, type: 3}
+  - {fileID: 8300000, guid: b33d7e2e777ad3e4dbcb31bfacdd6b51, type: 3}
+  - {fileID: 8300000, guid: a31dd82d8d9e74246b8a28e03beef790, type: 3}
+  - {fileID: 8300000, guid: 41b3db18e389a464da57cc13049e290f, type: 3}
+  - {fileID: 8300000, guid: 13ab71b1338584b4b8031373d7fdeacf, type: 3}
+  ragdollLayerName: Ragdoll
+  floorLayerName: Floor

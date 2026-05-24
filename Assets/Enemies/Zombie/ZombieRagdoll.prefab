@@ -1359,6 +1359,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   size: 1
+  customDebrisPrefab: {fileID: 8042722266352500479, guid: 0ef9cb89bf1a770438e7710cabb5e862,
+    type: 3}
 --- !u!1 &3223947964370297692
 GameObject:
   m_ObjectHideFlags: 0

@@ -54089,9 +54089,9 @@ Light:
   m_Enabled: 1
   serializedVersion: 11
   m_Type: 2
-  m_Color: {r: 0.9716981, g: 0.113765344, b: 0, a: 1}
+  m_Color: {r: 0.9150943, g: 0.44130838, b: 0.21150766, a: 1}
   m_Intensity: 10
-  m_Range: 15
+  m_Range: 30
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
@@ -54184,8 +54184,8 @@ MonoBehaviour:
   fadeDuration: 1
   targetIntensity: 0
   targetColor: {r: 1, g: 0.23243243, b: 0, a: 1}
-  minIntensity: 0.5
-  maxIntensity: 1.5
+  minIntensity: 5
+  maxIntensity: 10
   flickerColorA: {r: 1, g: 1, b: 1, a: 1}
   flickerColorB: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   flickerSpeed: 0.05

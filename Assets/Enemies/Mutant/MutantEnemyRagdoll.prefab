@@ -11070,7 +11070,8 @@ GameObject:
   - component: {fileID: 7209688874758253552}
   - component: {fileID: 8981379759764211981}
   - component: {fileID: 6199763651557265323}
-  m_Layer: 0
+  - component: {fileID: 3611508978124784850}
+  m_Layer: 13
   m_Name: hips
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11146,6 +11147,21 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.3310264, y: 0.33875543, z: 0.25331065}
   m_Center: {x: 0.0026484772, y: -0.0019554384, z: -0.060738467}
+--- !u!114 &3611508978124784850
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2721048206382069536}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 400b105c5fa338f4285c4d507ffa7b2c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  size: 1
+  customDebrisPrefab: {fileID: 346118486486412248, guid: 18f7757ef6780a243b5eb9e4578f6564,
+    type: 3}
 --- !u!1 &3136762572784060314
 GameObject:
   m_ObjectHideFlags: 0

@@ -668,6 +668,7 @@ GameObject:
   - component: {fileID: 1940336036425967239}
   - component: {fileID: 55344551503948237}
   - component: {fileID: 1945930904852797425}
+  - component: {fileID: 1931977958001920301}
   m_Layer: 9
   m_Name: MutantEnemy
   m_TagString: Untagged
@@ -1101,20 +1102,39 @@ MonoBehaviour:
   defaultDeathStyle: 0
   mediumIntensityThreshold: 20
   highIntensityThreshold: 60
-  animationChance: 0
+  animationChance: 25.8
   explodingChance: 70
-  ragdollPrefab: {fileID: 5639734505226517267, guid: 473dc1be1926b1240aa7303f33888b60,
+  ragdollPrefabs:
+  - {fileID: 5639734505226517267, guid: 473dc1be1926b1240aa7303f33888b60, type: 3}
+  animationSawpRagdollPrefab: {fileID: 5639734505226517267, guid: 473dc1be1926b1240aa7303f33888b60,
     type: 3}
   partsExploSound: []
   healthBar: {fileID: 1779269026205980}
-  standardPunchForce: 5
-  explosionBlastForce: 5
+  maxPunchForce: 120
+  explosionBlastForce: 200
   explosionRadius: 0.1
-  upwardModifier: 1
+  upwardModifier: 2
   explodingPartsPrefab: {fileID: 0}
+  completeExplodeBlastForce: 750
   ragdollLifespan: 10
   audioCleanupDelay: 3
-  animationDeathLifespan: 4
+  randomizeAnimationLifespan: 1
+  minAnimationLifespan: 0.4
+  maxAnimationLifespan: 0.8
+  animationDeathLifespan: 0.6
+--- !u!114 &1931977958001920301
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1201061559704186}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 400b105c5fa338f4285c4d507ffa7b2c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  size: 0
 --- !u!1 &1201692136702784
 GameObject:
   m_ObjectHideFlags: 0
@@ -2508,7 +2528,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 41b3db18e389a464da57cc13049e290f, type: 3}
     - {fileID: 8300000, guid: 5072a94fa6887024985a35d9cf66c949, type: 3}
   largeCarcassEffects:
-    particlePrefab: {fileID: 8042722266352500479, guid: 306cb532c733b884a903fe1b746b0022,
+    particlePrefab: {fileID: 8042722266352500479, guid: 0ef9cb89bf1a770438e7710cabb5e862,
       type: 3}
     sounds:
     - {fileID: 8300000, guid: b33d7e2e777ad3e4dbcb31bfacdd6b51, type: 3}
@@ -3070,7 +3090,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 41b3db18e389a464da57cc13049e290f, type: 3}
     - {fileID: 8300000, guid: 5072a94fa6887024985a35d9cf66c949, type: 3}
   largeCarcassEffects:
-    particlePrefab: {fileID: 8042722266352500479, guid: 306cb532c733b884a903fe1b746b0022,
+    particlePrefab: {fileID: 8042722266352500479, guid: 0ef9cb89bf1a770438e7710cabb5e862,
       type: 3}
     sounds:
     - {fileID: 8300000, guid: b33d7e2e777ad3e4dbcb31bfacdd6b51, type: 3}

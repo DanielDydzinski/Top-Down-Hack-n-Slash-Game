@@ -270,7 +270,7 @@ public class AbilityManager : MonoBehaviour {
     public void PlayVisuals()
     {
         // 1. Safety Check
-        if (activeAbility == null || activeAbility.abilityVisualPartyicles == null) return;
+        if (activeAbility == null ) return;
 
         // 2. Identify the target parent based on your Enum
         Transform targetParent = transform; // Default fallback to character root
@@ -291,15 +291,21 @@ public class AbilityManager : MonoBehaviour {
         // Combining the parent rotation with the SO's rotation offset
         Quaternion finalRot = targetParent.rotation * Quaternion.Euler(activeAbility.spawnRotationOffset);
 
-        // 4. Instantiate and Parent
-        // This ensures the particle stays glued to the hand/head during animations
-            activeVisualEffect = Instantiate(
-            activeAbility.abilityVisualPartyicles,
-            finalPos,
-            finalRot,
-            targetParent
-        );
-
+        if (activeAbility.abilityVisualPartyicles != null)
+        {
+                // 4. Instantiate and Parent
+                // This ensures the particle stays glued to the hand/head during animations
+                activeVisualEffect = Instantiate(
+                activeAbility.abilityVisualPartyicles,
+                finalPos,
+                finalRot,
+                targetParent
+            );
+        }
+        if (activeAbility.visualEffectAudio != null)
+        {
+            AudioSource.PlayClipAtPoint(activeAbility.visualEffectAudio, transform.position);
+        }
         // Optional: If you want to auto-destroy visuals after a set time
         // Destroy(vfx, 3.0f); 
     }

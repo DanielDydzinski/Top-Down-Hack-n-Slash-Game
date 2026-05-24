@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 3650604317519723997}
   - component: {fileID: 3741845145069146831}
   - component: {fileID: 7701382692110839189}
+  - component: {fileID: 8449213736838589371}
   m_Layer: 13
   m_Name: ZombieParts (14)
   m_TagString: Untagged
@@ -137,6 +138,20 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 2
+--- !u!114 &8449213736838589371
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 179342886185339197}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 400b105c5fa338f4285c4d507ffa7b2c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  size: 0
+  customDebrisPrefab: {fileID: 7064327688492268964}
 --- !u!1 &1725897936900977169
 GameObject:
   m_ObjectHideFlags: 0
@@ -150,6 +165,7 @@ GameObject:
   - component: {fileID: 2449949492798369296}
   - component: {fileID: 3432629206454256486}
   - component: {fileID: 5636041807526108241}
+  - component: {fileID: 5712310106260699361}
   m_Layer: 13
   m_Name: ZombieParts (13)
   m_TagString: Untagged
@@ -275,6 +291,20 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 2
+--- !u!114 &5712310106260699361
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1725897936900977169}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 400b105c5fa338f4285c4d507ffa7b2c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  size: 0
+  customDebrisPrefab: {fileID: 7064327688492268964}
 --- !u!1 &2849215739731590806
 GameObject:
   m_ObjectHideFlags: 0
@@ -288,6 +318,7 @@ GameObject:
   - component: {fileID: 2568991403117735866}
   - component: {fileID: 248483398723971434}
   - component: {fileID: 4437406996852035216}
+  - component: {fileID: 5096970724158025169}
   m_Layer: 13
   m_Name: ZombieParts (7)
   m_TagString: Untagged
@@ -412,6 +443,20 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 2
+--- !u!114 &5096970724158025169
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2849215739731590806}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 400b105c5fa338f4285c4d507ffa7b2c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  size: 0
+  customDebrisPrefab: {fileID: 7064327688492268964}
 --- !u!1 &2852468368749721135
 GameObject:
   m_ObjectHideFlags: 0
@@ -425,6 +470,7 @@ GameObject:
   - component: {fileID: 6299347418747637524}
   - component: {fileID: 8911736356210910958}
   - component: {fileID: 7690176323145240179}
+  - component: {fileID: 830505323974373857}
   m_Layer: 13
   m_Name: ZombieParts (5)
   m_TagString: Untagged
@@ -549,6 +595,20 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 2
+--- !u!114 &830505323974373857
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2852468368749721135}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 400b105c5fa338f4285c4d507ffa7b2c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  size: 0
+  customDebrisPrefab: {fileID: 7064327688492268964}
 --- !u!1 &3233516733785513409
 GameObject:
   m_ObjectHideFlags: 0
@@ -562,6 +622,7 @@ GameObject:
   - component: {fileID: 2440840667734598982}
   - component: {fileID: 1020762546882848731}
   - component: {fileID: 1415853217811486695}
+  - component: {fileID: 5950131928543907152}
   m_Layer: 13
   m_Name: ZombieParts (9)
   m_TagString: Untagged
@@ -686,6 +747,20 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 2
+--- !u!114 &5950131928543907152
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3233516733785513409}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 400b105c5fa338f4285c4d507ffa7b2c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  size: 0
+  customDebrisPrefab: {fileID: 7064327688492268964}
 --- !u!1 &3352802109565315586
 GameObject:
   m_ObjectHideFlags: 0
@@ -699,6 +774,7 @@ GameObject:
   - component: {fileID: 9184871068473267956}
   - component: {fileID: 3973973566245854416}
   - component: {fileID: 895435368334271990}
+  - component: {fileID: 3085961987991519961}
   m_Layer: 13
   m_Name: ZombieParts (8)
   m_TagString: Untagged
@@ -823,6 +899,20 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 2
+--- !u!114 &3085961987991519961
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3352802109565315586}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 400b105c5fa338f4285c4d507ffa7b2c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  size: 0
+  customDebrisPrefab: {fileID: 7064327688492268964}
 --- !u!1 &3471352690690743608
 GameObject:
   m_ObjectHideFlags: 0
@@ -836,6 +926,7 @@ GameObject:
   - component: {fileID: 8269666741951893586}
   - component: {fileID: 6126045230910391259}
   - component: {fileID: 5070041576811600490}
+  - component: {fileID: 4298594862856511763}
   m_Layer: 13
   m_Name: ZombieParts (2)
   m_TagString: Untagged
@@ -960,6 +1051,20 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 2
+--- !u!114 &4298594862856511763
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3471352690690743608}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 400b105c5fa338f4285c4d507ffa7b2c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  size: 0
+  customDebrisPrefab: {fileID: 7064327688492268964}
 --- !u!1 &3635192536499621570
 GameObject:
   m_ObjectHideFlags: 0
@@ -973,6 +1078,7 @@ GameObject:
   - component: {fileID: 7607495100457104175}
   - component: {fileID: 7859060828981709638}
   - component: {fileID: 2325953003274101378}
+  - component: {fileID: 9129360014698057704}
   m_Layer: 13
   m_Name: ZombieParts
   m_TagString: Untagged
@@ -1098,6 +1204,20 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 2
+--- !u!114 &9129360014698057704
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3635192536499621570}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 400b105c5fa338f4285c4d507ffa7b2c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  size: 0
+  customDebrisPrefab: {fileID: 7064327688492268964}
 --- !u!1 &3921683816835652951
 GameObject:
   m_ObjectHideFlags: 0
@@ -1111,6 +1231,7 @@ GameObject:
   - component: {fileID: 7509180528803522965}
   - component: {fileID: 7184064008925456966}
   - component: {fileID: 8711906284901476243}
+  - component: {fileID: 2844148390185374207}
   m_Layer: 13
   m_Name: ZombieParts (1)
   m_TagString: Untagged
@@ -1235,6 +1356,20 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 2
+--- !u!114 &2844148390185374207
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3921683816835652951}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 400b105c5fa338f4285c4d507ffa7b2c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  size: 0
+  customDebrisPrefab: {fileID: 7064327688492268964}
 --- !u!1 &4343512429978993978
 GameObject:
   m_ObjectHideFlags: 0
@@ -1248,6 +1383,7 @@ GameObject:
   - component: {fileID: 8033177733776936477}
   - component: {fileID: 270259647019230524}
   - component: {fileID: 2510981885681009688}
+  - component: {fileID: 6260883046147620823}
   m_Layer: 13
   m_Name: ZombieParts (6)
   m_TagString: Untagged
@@ -1373,6 +1509,20 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 2
+--- !u!114 &6260883046147620823
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4343512429978993978}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 400b105c5fa338f4285c4d507ffa7b2c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  size: 0
+  customDebrisPrefab: {fileID: 7064327688492268964}
 --- !u!1 &4453159007717504736
 GameObject:
   m_ObjectHideFlags: 0
@@ -1382,6 +1532,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4790780457010697472}
+  - component: {fileID: 1985686397237913480}
   m_Layer: 0
   m_Name: ZombieExplodingParts
   m_TagString: Untagged
@@ -1422,6 +1573,19 @@ Transform:
   - {fileID: 6158441947876813335}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1985686397237913480
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4453159007717504736}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e7e0266bb810f24ab5c0a59a127e678, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pieceLifespan: 10
 --- !u!1 &6384369288892741053
 GameObject:
   m_ObjectHideFlags: 0
@@ -1435,6 +1599,7 @@ GameObject:
   - component: {fileID: 6343076690719144726}
   - component: {fileID: 3686318270301130443}
   - component: {fileID: 8622085030018682382}
+  - component: {fileID: 658734612241961300}
   m_Layer: 13
   m_Name: ZombieParts (10)
   m_TagString: Untagged
@@ -1559,6 +1724,20 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 2
+--- !u!114 &658734612241961300
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6384369288892741053}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 400b105c5fa338f4285c4d507ffa7b2c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  size: 0
+  customDebrisPrefab: {fileID: 7064327688492268964}
 --- !u!1 &6597143897519210202
 GameObject:
   m_ObjectHideFlags: 0
@@ -1572,6 +1751,7 @@ GameObject:
   - component: {fileID: 5214481863402507499}
   - component: {fileID: 7300480224307605848}
   - component: {fileID: 4547172191831780248}
+  - component: {fileID: 6769491447607165618}
   m_Layer: 13
   m_Name: ZombieParts (3)
   m_TagString: Untagged
@@ -1696,6 +1876,20 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 2
+--- !u!114 &6769491447607165618
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6597143897519210202}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 400b105c5fa338f4285c4d507ffa7b2c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  size: 0
+  customDebrisPrefab: {fileID: 7064327688492268964}
 --- !u!1 &6610071440983531114
 GameObject:
   m_ObjectHideFlags: 0
@@ -1709,6 +1903,7 @@ GameObject:
   - component: {fileID: 297023138583915041}
   - component: {fileID: 5990523723964369473}
   - component: {fileID: 321797829957779302}
+  - component: {fileID: 8241865263780016812}
   m_Layer: 13
   m_Name: ZombieParts (4)
   m_TagString: Untagged
@@ -1833,6 +2028,20 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 2
+--- !u!114 &8241865263780016812
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6610071440983531114}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 400b105c5fa338f4285c4d507ffa7b2c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  size: 0
+  customDebrisPrefab: {fileID: 7064327688492268964}
 --- !u!1 &6725354566105693615
 GameObject:
   m_ObjectHideFlags: 0
@@ -1846,6 +2055,7 @@ GameObject:
   - component: {fileID: 4526070377549726269}
   - component: {fileID: 5762817920379474307}
   - component: {fileID: 7592732826048949690}
+  - component: {fileID: 710756144990632916}
   m_Layer: 13
   m_Name: ZombieParts (11)
   m_TagString: Untagged
@@ -1970,6 +2180,20 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 2
+--- !u!114 &710756144990632916
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6725354566105693615}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 400b105c5fa338f4285c4d507ffa7b2c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  size: 0
+  customDebrisPrefab: {fileID: 7064327688492268964}
 --- !u!1 &7244877343661724795
 GameObject:
   m_ObjectHideFlags: 0
@@ -1983,6 +2207,7 @@ GameObject:
   - component: {fileID: 1800948504616008528}
   - component: {fileID: 377158655694466753}
   - component: {fileID: 8844422552912197007}
+  - component: {fileID: 5313023313498018475}
   m_Layer: 13
   m_Name: ZombieParts (15)
   m_TagString: Untagged
@@ -2107,6 +2332,20 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 2
+--- !u!114 &5313023313498018475
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7244877343661724795}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 400b105c5fa338f4285c4d507ffa7b2c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  size: 0
+  customDebrisPrefab: {fileID: 7064327688492268964}
 --- !u!1 &7482493790899340712
 GameObject:
   m_ObjectHideFlags: 0
@@ -2120,6 +2359,7 @@ GameObject:
   - component: {fileID: 6108583485641653535}
   - component: {fileID: 6534837729869285098}
   - component: {fileID: 3850001552690934708}
+  - component: {fileID: 3227941449821029684}
   m_Layer: 13
   m_Name: ZombieParts (16)
   m_TagString: Untagged
@@ -2244,6 +2484,20 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 2
+--- !u!114 &3227941449821029684
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7482493790899340712}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 400b105c5fa338f4285c4d507ffa7b2c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  size: 0
+  customDebrisPrefab: {fileID: 7064327688492268964}
 --- !u!1 &8737517399682012714
 GameObject:
   m_ObjectHideFlags: 0
@@ -2257,6 +2511,7 @@ GameObject:
   - component: {fileID: 5372208937404266341}
   - component: {fileID: 8233318652120128363}
   - component: {fileID: 811602680285378948}
+  - component: {fileID: 1424692357820682363}
   m_Layer: 13
   m_Name: ZombieParts (12)
   m_TagString: Untagged
@@ -2381,6 +2636,20 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 2
+--- !u!114 &1424692357820682363
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8737517399682012714}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 400b105c5fa338f4285c4d507ffa7b2c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  size: 0
+  customDebrisPrefab: {fileID: 7064327688492268964}
 --- !u!1001 &1136148760746015450
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2674,6 +2943,12 @@ PrefabInstance:
 --- !u!4 &6158441947876813335 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3725336872829959275, guid: dadc6b2eabcee164b91985172706d7b5,
+    type: 3}
+  m_PrefabInstance: {fileID: 7405079384064677500}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &7064327688492268964 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 346118486486412248, guid: dadc6b2eabcee164b91985172706d7b5,
     type: 3}
   m_PrefabInstance: {fileID: 7405079384064677500}
   m_PrefabAsset: {fileID: 0}

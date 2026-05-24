@@ -1,17 +1,17 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class CarcassCruncher : MonoBehaviour
 {
-    [System.Serializable]
-    public struct CrunchEffects
-    {
-        public GameObject particlePrefab;
-        public AudioClip[] sounds;
-    }
+    [Header("Health Potion Prefabs")]
+    [SerializeField] private GameObject smallHealthPotionPrefab;
+    [SerializeField] private GameObject largeHealthPotionPrefab;
 
-    [Header("Carcass Size Effects")]
-    [SerializeField] private CrunchEffects smallCarcassEffects;
-    [SerializeField] private CrunchEffects largeCarcassEffects;
+    [Header("Drop Chances (0 to 100)")]
+    [Range(0f, 100f)][SerializeField] private float smallPotionDropChance = 50f;
+    [Range(0f, 100f)][SerializeField] private float largePotionDropChance = 25f;
+
+    [Header("Global Fallback Sounds")]
+    [SerializeField] private AudioClip[] crunchSounds;
 
     [Header("Layer Names")]
     [SerializeField] private string ragdollLayerName = "Ragdoll";
@@ -21,14 +21,12 @@ public class CarcassCruncher : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        // 1. Check if the foot has touched the floor
         if (other.gameObject.layer == LayerMask.NameToLayer(floorLayerName))
         {
             isGrounded = true;
         }
 
-        // 2. Check if we stepped on a carcass AND the foot is on the floor
-        if (/*isGrounded && */other.gameObject.layer == LayerMask.NameToLayer(ragdollLayerName))
+        if (other.gameObject.layer == LayerMask.NameToLayer(ragdollLayerName))
         {
             CrunchCarcass(other.gameObject);
         }
@@ -36,7 +34,6 @@ public class CarcassCruncher : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        // Reset the floor check when the foot lifts up
         if (other.gameObject.layer == LayerMask.NameToLayer(floorLayerName))
         {
             isGrounded = false;
@@ -45,34 +42,59 @@ public class CarcassCruncher : MonoBehaviour
 
     private void CrunchCarcass(GameObject carcassWindow)
     {
-        Vector3 spawnPosition = transform.position;
+        // ─── PIVOT FIX: CHOOSE GEOMETRIC CENTER ───
+        Vector3 spawnPosition = carcassWindow.transform.position;
+
+        if (carcassWindow.TryGetComponent<Renderer>(out Renderer meshRenderer))
+        {
+            spawnPosition = meshRenderer.bounds.center;
+        }
+        else if (carcassWindow.TryGetComponent<Collider>(out Collider col))
+        {
+            spawnPosition = col.bounds.center;
+        }
 
         // Look for the CarcassData component on the object we hit, or its parent
         CarcassData carcassData = carcassWindow.GetComponentInParent<CarcassData>();
 
-        // Default to small if no component is found, otherwise use the selected size
-        CarcassData.CarcassSize size = (carcassData != null) ? carcassData.size : CarcassData.CarcassSize.Small;
-
-        // Choose effects based on the size
-        CrunchEffects effectsToUse = (size == CarcassData.CarcassSize.Large) ? largeCarcassEffects : smallCarcassEffects;
-
-        // Spawn the correct particle effect
-        if (effectsToUse.particlePrefab != null)
+        // ─── STEP 1: SPAWN CUSTOM DEBRIS ───
+        if (carcassData != null && carcassData.customDebrisPrefab != null)
         {
-            Instantiate(effectsToUse.particlePrefab, spawnPosition, Quaternion.identity);
+            // Instantiates respecting the prefab's exact native layout/rotation completely
+            Instantiate(carcassData.customDebrisPrefab, spawnPosition, carcassData.customDebrisPrefab.transform.rotation);
         }
 
-        // Play a random sound from the correct sound array
-        PlayRandomCrunchSound(effectsToUse.sounds, spawnPosition);
-
-        // Destroy the carcass (Deletes the whole ragdoll structure if CarcassData is at the root)
+        // ─── STEP 2: ROLL FOR POTION DROPS BASED ON SIZE ───
         if (carcassData != null)
         {
-            Destroy(carcassData.gameObject);
+            float randomRoll = Random.Range(0f, 100f);
+
+            if (carcassData.size == CarcassData.CarcassSize.Large)
+            {
+                if (randomRoll <= largePotionDropChance && largeHealthPotionPrefab != null)
+                {
+                    Instantiate(largeHealthPotionPrefab, spawnPosition+Vector3.up, Quaternion.identity);
+                }
+            }
+            else if (carcassData.size == CarcassData.CarcassSize.Small)
+            {
+                if (randomRoll <= smallPotionDropChance && smallHealthPotionPrefab != null)
+                {
+                    Instantiate(smallHealthPotionPrefab, spawnPosition+Vector3.up, Quaternion.identity);
+                }
+            }
+        }
+
+        PlayRandomCrunchSound(crunchSounds, spawnPosition);
+
+        // ─── STEP 3: CLEANUP OLD CORPSE ───
+        if (carcassData != null)
+        {
+            Destroy(carcassData.transform.root.gameObject);
         }
         else
         {
-            Destroy(carcassWindow);
+            Destroy(carcassWindow.transform.root.gameObject);
         }
     }
 

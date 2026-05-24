@@ -21,16 +21,31 @@ public class PlayerInputHandler : MonoBehaviour
             {
                 comboController.OnAbilityInput(ref comboController.magicCombosIndex, comboController.magicCombos);
             }
-            if (Input.GetMouseButtonDown(0))
+             else if (Input.GetMouseButtonDown(0))
             {
                 comboController.OnAbilityInput(ref comboController.lightCombosIndex, comboController.lightCombos);
             }
-            if (Input.GetMouseButtonDown(1))
+            else if (Input.GetMouseButtonDown(1))
             {
                 comboController.OnAbilityInput(ref comboController.heavyCombosIndex, comboController.heavyCombos);
             }
-            if (Input.GetKeyDown(KeyCode.F))
+            else if (Input.GetKeyDown(KeyCode.F))
+            {
                 comboController.OnAbilityInput(ref comboController.fIndex, comboController.fAbilities);
+            }
+
+            else if (Input.GetKeyDown(KeyCode.Q))
+            {
+                comboController.OnAbilityInput(ref comboController.qIndex, comboController.qAbilities);
+            }
+            else if (Input.GetKeyDown(KeyCode.E))
+            {
+                comboController.OnAbilityInput(ref comboController.eIndex, comboController.eAbilities);
+            }
+            else if (Input.GetKeyDown(KeyCode.R))
+            {
+                comboController.OnAbilityInput(ref comboController.rIndex, comboController.rAbilities);
+            }
 
         }
 

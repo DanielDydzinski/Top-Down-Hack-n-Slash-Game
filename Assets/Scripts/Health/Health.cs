@@ -176,7 +176,10 @@ public class Health : MonoBehaviour {
     {
         return healthPoints;
     }
-
+    public float GetMaxHealth()
+    {
+        return maxHealth;
+    }
 
     void OnEnable()
     {
