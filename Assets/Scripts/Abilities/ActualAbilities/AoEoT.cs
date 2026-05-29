@@ -3,40 +3,48 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Abilities/AoEoT", fileName = "new Ability")]
-public class AoEoT : Ability {
+public class AoEoT : Ability
+{
+    [Header("Standard Area Settings")]
+    public GameObject abilityParticles;
+    public float radius;
+    public float duration;
+    public float rate;
 
-	public GameObject abilityParticles;
-	public float radius;
-	public float duration;
-	public float rate;
-    
-
-	AoEoTBehaviour aoeotBehaviour;
+    [Header("Partial Strike Configuration")]
+    public bool isPartial;
+    public float strikeRadius;
+    public GameObject strikeParticles;
+    [Tooltip("Offset applied to visual prefab spawn. Use Y value if you want objects to spawn above ground level (e.g., Meteors).")]
+    public Vector3 spawnPositionOffset;
+    public AudioClip strikeSound;
 
     [Header("Destruction Trait")]
     public bool isDestructible;
     public DamageType lethalType;
     public GameObject destructionParticles;
 
-
+    AoEoTBehaviour aoeotBehaviour;
 
     public override GameObject Cast(Vector3 pos, Quaternion rot, GameObject caster)
     {
-        //  Instantiate the "Blank" Prefab first
         GameObject instance = Instantiate(abilityPrefab, pos, rot);
 
-        // Setup the Core Behaviour
-        aoeotBehaviour  = instance.GetComponent<AoEoTBehaviour>();
-        aoeotBehaviour.UpdateValues(this.abilityEffects, duration, rate, radius, this.myFaction, abilityParticles, this.damageType, this.AudioClip, caster);
+        aoeotBehaviour = instance.GetComponent<AoEoTBehaviour>();
 
-        // Trait Injection: Add the destructible script ONLY if this ability needs it
+        // Pass everything smoothly to the runtime behaviour engine
+        aoeotBehaviour.UpdateValues(
+            this.abilityEffects, duration, rate, radius, this.myFaction,
+            abilityParticles, this.damageType, this.AudioClip, caster,
+            isPartial, strikeRadius, strikeParticles, spawnPositionOffset, strikeSound
+        );
+
         if (isDestructible)
         {
             var dest = instance.AddComponent<DestructibleEnvironment>();
             dest.lethalType = this.lethalType;
             dest.destructionParticles = this.destructionParticles;
 
-            // Ensure the object has an identity so it can recognize "Friends"
             var identity = instance.GetComponent<EntityIdentity>();
             if (identity == null) identity = instance.AddComponent<EntityIdentity>();
             identity.faction = this.myFaction;
@@ -44,23 +52,4 @@ public class AoEoT : Ability {
 
         return instance;
     }
-
-
-
- //   public override GameObject Cast (Vector3 pos, Quaternion rot)
-	//{
-	//	if (abilityPrefab.GetComponent<AoEoTBehaviour> () != null)
-	//	{
-	//		aoeotBehaviour = abilityPrefab.GetComponent<AoEoTBehaviour> ();
-	//	} else 
-	//	{
-	//		Debug.Log("AoEoT needs AoEoTBehaviour");
-	//		return null;
-	//	}
-
-	//	aoeotBehaviour.UpdateValues (this.abilityEffects, duration, rate, radius,this.myFaction, abilityParticles,this.damageType);
-
-	//	return Instantiate(abilityPrefab,pos,rot);
-	//}
-
 }

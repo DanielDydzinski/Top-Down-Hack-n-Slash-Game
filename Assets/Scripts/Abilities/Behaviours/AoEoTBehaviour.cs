@@ -1,10 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Diagnostics;
 
 public class AoEoTBehaviour : MonoBehaviour
 {
+    [Header("Core Settings")]
     public GameObject particles;
     public float duration;
     public float rate;
@@ -13,19 +13,29 @@ public class AoEoTBehaviour : MonoBehaviour
     public DamageType damageType;
     public List<Effect> effects = new List<Effect>();
 
+    [Header("Partial / Random Strike Settings")]
+    public bool isPartial;
+    public float strikeRadius;
+    public GameObject strikeParticles;
+    public Vector3 spawnPositionOffset; // Controls visual spawn adjustment (e.g., height)
+    public AudioClip strikeSound;       // Audio clip played per localized strike
+
     private float lifeTimer = 0f;
     private float tickTimer = 0f;
     private SphereCollider sc;
 
-    private AudioClip audioClip;
+    private AudioClip audioClip; // Core looping/ambient storm sound
     private AudioSource audioSource;
-
     private GameObject caster;
 
     void Start()
     {
         audioSource = GetComponent<AudioSource>();
-        //give one frame for values to update
+        if (audioSource == null)
+        {
+            // Fallback to guarantee audio won't crash if an AudioSource isn't on the prefab base
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
         StartCoroutine(DelayedStart());
     }
 
@@ -45,16 +55,68 @@ public class AoEoTBehaviour : MonoBehaviour
 
     private IEnumerator DelayedStart()
     {
-        yield return null; // Wait exactly one frame
+        yield return null;
         sc = GetComponent<SphereCollider>();
-        sc.radius = radius;
+        if (sc != null) sc.radius = radius;
 
         if (particles != null) Instantiate(particles, transform);
+
+        // Play core ambient sound if provided
+        if (audioClip != null && audioSource != null)
+        {
+            audioSource.clip = audioClip;
+            audioSource.loop = true;
+            audioSource.Play();
+        }
     }
 
     private void Tick()
     {
+        if (isPartial)
+        {
+            PerformRandomStrike();
+        }
+        else
+        {
+            PerformFullAreaTick();
+        }
+    }
+
+    private void PerformRandomStrike()
+    {
+        // 1. Determine ground target point within the circle area
+        Vector2 randomCirclePoint = Random.insideUnitCircle * radius;
+        Vector3 groundStrikePosition = transform.position + new Vector3(randomCirclePoint.x, 0f, randomCirclePoint.y);
+
+        // 2. Compute visual creation point by applying your custom offset vector
+        Vector3 visualSpawnPosition = groundStrikePosition + spawnPositionOffset;
+        visualSpawnPosition.y = 0f;
+
+        // 3. Spawn the localized projectile/impact effect
+        if (strikeParticles != null)
+        {
+            Instantiate(strikeParticles, visualSpawnPosition, Quaternion.identity);
+        }
+
+        // 4. Play the localized sound element directly at the target location
+        if (strikeSound != null)
+        {
+            AudioSource.PlayClipAtPoint(strikeSound, groundStrikePosition);
+        }
+
+        // 5. Query physics collision overlap from the flat impact ground zero
+        Collider[] targets = Physics.OverlapSphere(groundStrikePosition, strikeRadius);
+        ApplyDamageToTargets(targets, groundStrikePosition);
+    }
+
+    private void PerformFullAreaTick()
+    {
         Collider[] targets = Physics.OverlapSphere(transform.position, radius);
+        ApplyDamageToTargets(targets, transform.position);
+    }
+
+    private void ApplyDamageToTargets(Collider[] targets, Vector3 originCenter)
+    {
         foreach (Collider c in targets)
         {
             EntityIdentity identity = c.GetComponent<EntityIdentity>();
@@ -63,21 +125,31 @@ public class AoEoTBehaviour : MonoBehaviour
             IDamageable damageable = c.GetComponent<IDamageable>();
             if (damageable != null)
             {
+                // Calculate explosion push vector away from impact center (ignoring Y height changes)
+                Vector3 pushDirection = c.transform.position - originCenter;
+                pushDirection.y = 0f;
+
                 HitInfo info = new HitInfo
                 {
                     multiplier = 1.0f,
                     type = damageType,
                     effects = this.effects,
-                    attacker = this.gameObject,
-                    faction = this.myFaction
-                    
+                    attacker = caster != null ? caster : this.gameObject,
+                    faction = this.myFaction,
+                    forceDirection = pushDirection.normalized, // Dynamic radial vector out from the blast
+                    isExplosion = true
                 };
+
                 damageable.TakeDamage(info);
             }
         }
     }
 
-    public void UpdateValues(List<Effect> aeffects, float aduration, float arate, float aradius, Faction faction, GameObject aparticles, DamageType dmgType, AudioClip aclip, GameObject aCaster)
+    public void UpdateValues(List<Effect> aeffects, float aduration, float arate, float aradius,
+                             Faction faction, GameObject aparticles, DamageType dmgType,
+                             AudioClip aclip, GameObject aCaster, bool aisPartial,
+                             float astrikeRadius, GameObject astrikeParticles,
+                             Vector3 aspawnOffset, AudioClip astrikeSound)
     {
         effects = aeffects;
         duration = aduration;
@@ -88,92 +160,11 @@ public class AoEoTBehaviour : MonoBehaviour
         damageType = dmgType;
         audioClip = aclip;
         caster = aCaster;
+
+        isPartial = aisPartial;
+        strikeRadius = astrikeRadius;
+        strikeParticles = astrikeParticles;
+        spawnPositionOffset = aspawnOffset;
+        strikeSound = astrikeSound;
     }
 }
-
-//public class AoEoTBehaviour : MonoBehaviour {
-
-//	public GameObject particles;
-
-//	public float duration;
-//	public float rate;
-//	public float radius;
-//	public string targetTag;
-
-//	public List<Effect> effects = new List<Effect> ();
-
-//	Stopwatch timer;
-//	Stopwatch tickTImer;
-//	SphereCollider sc;
-
-//	// Use this for initialization
-//	void Start () 
-//	{
-
-//		sc = GetComponent<SphereCollider> ();
-//		sc.radius = radius;
-//		timer = new Stopwatch ();
-//		tickTImer = new Stopwatch ();
-//		timer.Start ();
-//		tickTImer.Start ();
-
-//		if (particles != null) {
-//			Instantiate (particles, this.gameObject.transform);
-//		}
-//	}
-
-//	// Update is called once per frame
-//	void Update ()
-//	{
-//		ScanForTargets (sc);
-//	}
-
-//	public void UpdateValues(List<Effect> aeffects, float aduration, float arate,float aradius,string atargetTag, GameObject aparticles)
-//	{
-//		effects = aeffects;
-//		duration = aduration;
-//		rate = arate;
-//		radius = aradius;
-//		targetTag = atargetTag;
-//		particles = aparticles;
-//	}
-
-//	void ScanForTargets(SphereCollider sphereCol)
-//	{
-//		Vector3 center = sphereCol.transform.position + sphereCol.center;
-//		float radius = sphereCol.radius;
-
-//		if (tickTImer.Elapsed.TotalSeconds >= rate)
-//		{
-//			Collider[] allOverlappingColliders = Physics.OverlapSphere (center, radius);
-
-//			foreach (Collider c in allOverlappingColliders) 
-//			{
-//				if (c.gameObject.tag == targetTag) 
-//				{
-//					ApplyAllEffects (c);
-//				}
-//			}
-
-//			tickTImer.Stop ();
-//			tickTImer.Reset ();
-//			tickTImer.Start ();
-//		}
-
-//		if (timer.Elapsed.TotalSeconds >= duration) 
-//		{
-//			Destroy (this.gameObject);
-//		}
-//	}
-
-//	private void ApplyAllEffects(Collider col)
-//	{
-
-//		EffectManager em = col.gameObject.GetComponent<EffectManager> ();
-
-//		em.aEffects = effects;
-//		em.ApplyEffects ();
-
-
-//	}
-//}

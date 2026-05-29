@@ -89,8 +89,8 @@ MonoBehaviour:
     type: 3}
   largeHealthPotionPrefab: {fileID: 1853923159977811795, guid: d81871609c6987246a9ddb71bbdbedb4,
     type: 3}
-  smallPotionDropChance: 25
-  largePotionDropChance: 75
+  smallPotionDropChance: 5
+  largePotionDropChance: 5
   crunchSounds:
   - {fileID: 8300000, guid: a876179e000ff4ff09b30761b1a88595, type: 3}
   - {fileID: 8300000, guid: 7b8f7cd6c1ac44425bef51e36781b251, type: 3}

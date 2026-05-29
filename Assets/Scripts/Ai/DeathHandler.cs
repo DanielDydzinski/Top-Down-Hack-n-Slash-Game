@@ -114,10 +114,10 @@ public class DeathHandler : MonoBehaviour
         if (_hasDied) return;
         _hasDied = true;
 
-        if (TimeManager.Instance != null)
-        {
-            TimeManager.Instance.TriggerSlowMotion();
-        }
+        //if (TimeManager.Instance != null)
+        //{
+        //    TimeManager.Instance.TriggerSlowMotion();
+        //}
 
         if (enemyController != null)
         {
@@ -155,6 +155,12 @@ public class DeathHandler : MonoBehaviour
                 break;
 
             case DeathType.ExplodingRagdoll:
+
+                if (TimeManager.Instance != null)
+                {
+                    TimeManager.Instance.TriggerSlowMotion();
+                }
+                  
                 DisableLivingComponents(disableAnimatorContext: true);
                 ExecuteRagdollSwap(info, completelyExplode: true);
 
