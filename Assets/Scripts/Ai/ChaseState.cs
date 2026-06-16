@@ -57,7 +57,14 @@ public class ChaseState : IState
     {
         if (_controller.stats.isPushed) return;
 
+       
+
         float distance = Vector3.Distance(_controller.transform.position, _controller.target.position);
+
+        if(distance > _controller.engagedDistance)
+        {
+            _controller.ChangeState(_controller.patrolState); //go back to patrol when too far away
+        }
 
         if (_sidestepCooldown > 0f)
             _sidestepCooldown -= Time.deltaTime;

@@ -15645,6 +15645,8 @@ GameObject:
   - component: {fileID: 1989901493127459039}
   - component: {fileID: 1081739270499044275}
   - component: {fileID: 7647965111612224876}
+  - component: {fileID: 4597370199343691663}
+  - component: {fileID: 5295846697671851937}
   m_Layer: 0
   m_Name: BloodSplatEffect
   m_TagString: Untagged
@@ -20413,6 +20415,31 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
+--- !u!114 &4597370199343691663
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2466799130492035289}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e813c2cd31c846e419db1caa5d360a68, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &5295846697671851937
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2466799130492035289}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 83d354433035fb44ca1436010e6839c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  destroyTime: 6
 --- !u!1 &2534680310988737977
 GameObject:
   m_ObjectHideFlags: 0
