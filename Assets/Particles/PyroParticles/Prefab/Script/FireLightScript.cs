@@ -17,6 +17,9 @@ namespace DigitalRuby.PyroParticles
         [SingleLine("Min and max intensity range.")]
         public RangeOfFloats IntensityMaxRange = new RangeOfFloats { Minimum = 0.0f, Maximum = 8.0f };
 
+        [Tooltip("Fire Movement")]
+        public bool addMovement = false;
+
         private Light firePointLight;
         private float lightIntensity;
         private float seed;
@@ -71,11 +74,14 @@ namespace DigitalRuby.PyroParticles
                     firePointLight.intensity = intensity;
                 }
 
-                // random movement with perlin noise
-                float x = Mathf.PerlinNoise(seed + 0 + Time.time * 2, seed + 1 + Time.time * 2) - 0.5f;
-                float y = baseY + Mathf.PerlinNoise(seed + 2 + Time.time * 2, seed + 3 + Time.time * 2) - 0.5f;
-                float z = Mathf.PerlinNoise(seed + 4 + Time.time * 2, seed + 5 + Time.time * 2) - 0.5f;
-                firePointLight.gameObject.transform.localPosition = Vector3.up + new Vector3(x, y, z);
+                if (addMovement)
+                {
+                    // random movement with perlin noise
+                    float x = Mathf.PerlinNoise(seed + 0 + Time.time * 2, seed + 1 + Time.time * 2) - 0.5f;
+                    float y = baseY + Mathf.PerlinNoise(seed + 2 + Time.time * 2, seed + 3 + Time.time * 2) - 0.5f;
+                    float z = Mathf.PerlinNoise(seed + 4 + Time.time * 2, seed + 5 + Time.time * 2) - 0.5f;
+                    firePointLight.gameObject.transform.localPosition = Vector3.up + new Vector3(x, y, z);
+                }
             }
             else if (fireBaseScript.Stopping)
             {

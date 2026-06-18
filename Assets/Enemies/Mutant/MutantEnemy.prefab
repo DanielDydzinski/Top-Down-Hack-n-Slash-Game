@@ -1135,6 +1135,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   size: 0
+  customDebrisPrefab: {fileID: 0}
 --- !u!1 &1201692136702784
 GameObject:
   m_ObjectHideFlags: 0
@@ -2515,30 +2516,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d882f791d4b3d94a85e8ce8409cc7d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  smallCarcassEffects:
-    particlePrefab: {fileID: 346118486486412248, guid: dadc6b2eabcee164b91985172706d7b5,
-      type: 3}
-    sounds:
-    - {fileID: 8300000, guid: b33d7e2e777ad3e4dbcb31bfacdd6b51, type: 3}
-    - {fileID: 8300000, guid: a31dd82d8d9e74246b8a28e03beef790, type: 3}
-    - {fileID: 8300000, guid: 25932f4e05e89d842b7d006ec38fe730, type: 3}
-    - {fileID: 8300000, guid: 772244e7c1ba34c4e82bcea2b0d1d214, type: 3}
-    - {fileID: 8300000, guid: 493cec6d161d6994d8bb05a79ba7affb, type: 3}
-    - {fileID: 8300000, guid: e21813588667a1e44b73b11304818ef1, type: 3}
-    - {fileID: 8300000, guid: 41b3db18e389a464da57cc13049e290f, type: 3}
-    - {fileID: 8300000, guid: 5072a94fa6887024985a35d9cf66c949, type: 3}
-  largeCarcassEffects:
-    particlePrefab: {fileID: 8042722266352500479, guid: 0ef9cb89bf1a770438e7710cabb5e862,
-      type: 3}
-    sounds:
-    - {fileID: 8300000, guid: b33d7e2e777ad3e4dbcb31bfacdd6b51, type: 3}
-    - {fileID: 8300000, guid: a31dd82d8d9e74246b8a28e03beef790, type: 3}
-    - {fileID: 8300000, guid: 25932f4e05e89d842b7d006ec38fe730, type: 3}
-    - {fileID: 8300000, guid: 772244e7c1ba34c4e82bcea2b0d1d214, type: 3}
-    - {fileID: 8300000, guid: 493cec6d161d6994d8bb05a79ba7affb, type: 3}
-    - {fileID: 8300000, guid: e21813588667a1e44b73b11304818ef1, type: 3}
-    - {fileID: 8300000, guid: 41b3db18e389a464da57cc13049e290f, type: 3}
-    - {fileID: 8300000, guid: 5072a94fa6887024985a35d9cf66c949, type: 3}
+  smallHealthPotionPrefab: {fileID: 0}
+  largeHealthPotionPrefab: {fileID: 0}
+  smallPotionDropChance: 50
+  largePotionDropChance: 25
+  crunchSounds:
+  - {fileID: 8300000, guid: e21813588667a1e44b73b11304818ef1, type: 3}
+  - {fileID: 8300000, guid: 493cec6d161d6994d8bb05a79ba7affb, type: 3}
+  - {fileID: 8300000, guid: 772244e7c1ba34c4e82bcea2b0d1d214, type: 3}
+  - {fileID: 8300000, guid: 25932f4e05e89d842b7d006ec38fe730, type: 3}
+  - {fileID: 8300000, guid: b33d7e2e777ad3e4dbcb31bfacdd6b51, type: 3}
   ragdollLayerName: Ragdoll
   floorLayerName: Floor
 --- !u!1 &1755208715642438
@@ -3077,30 +3064,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d882f791d4b3d94a85e8ce8409cc7d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  smallCarcassEffects:
-    particlePrefab: {fileID: 346118486486412248, guid: dadc6b2eabcee164b91985172706d7b5,
-      type: 3}
-    sounds:
-    - {fileID: 8300000, guid: b33d7e2e777ad3e4dbcb31bfacdd6b51, type: 3}
-    - {fileID: 8300000, guid: a31dd82d8d9e74246b8a28e03beef790, type: 3}
-    - {fileID: 8300000, guid: 25932f4e05e89d842b7d006ec38fe730, type: 3}
-    - {fileID: 8300000, guid: 772244e7c1ba34c4e82bcea2b0d1d214, type: 3}
-    - {fileID: 8300000, guid: 493cec6d161d6994d8bb05a79ba7affb, type: 3}
-    - {fileID: 8300000, guid: e21813588667a1e44b73b11304818ef1, type: 3}
-    - {fileID: 8300000, guid: 41b3db18e389a464da57cc13049e290f, type: 3}
-    - {fileID: 8300000, guid: 5072a94fa6887024985a35d9cf66c949, type: 3}
-  largeCarcassEffects:
-    particlePrefab: {fileID: 8042722266352500479, guid: 0ef9cb89bf1a770438e7710cabb5e862,
-      type: 3}
-    sounds:
-    - {fileID: 8300000, guid: b33d7e2e777ad3e4dbcb31bfacdd6b51, type: 3}
-    - {fileID: 8300000, guid: a31dd82d8d9e74246b8a28e03beef790, type: 3}
-    - {fileID: 8300000, guid: 25932f4e05e89d842b7d006ec38fe730, type: 3}
-    - {fileID: 8300000, guid: 772244e7c1ba34c4e82bcea2b0d1d214, type: 3}
-    - {fileID: 8300000, guid: 493cec6d161d6994d8bb05a79ba7affb, type: 3}
-    - {fileID: 8300000, guid: e21813588667a1e44b73b11304818ef1, type: 3}
-    - {fileID: 8300000, guid: 41b3db18e389a464da57cc13049e290f, type: 3}
-    - {fileID: 8300000, guid: 5072a94fa6887024985a35d9cf66c949, type: 3}
+  smallHealthPotionPrefab: {fileID: 0}
+  largeHealthPotionPrefab: {fileID: 0}
+  smallPotionDropChance: 50
+  largePotionDropChance: 25
+  crunchSounds:
+  - {fileID: 8300000, guid: e21813588667a1e44b73b11304818ef1, type: 3}
+  - {fileID: 8300000, guid: 493cec6d161d6994d8bb05a79ba7affb, type: 3}
+  - {fileID: 8300000, guid: 772244e7c1ba34c4e82bcea2b0d1d214, type: 3}
+  - {fileID: 8300000, guid: 25932f4e05e89d842b7d006ec38fe730, type: 3}
+  - {fileID: 8300000, guid: b33d7e2e777ad3e4dbcb31bfacdd6b51, type: 3}
+  - {fileID: 8300000, guid: a31dd82d8d9e74246b8a28e03beef790, type: 3}
   ragdollLayerName: Ragdoll
   floorLayerName: Floor
 --- !u!1 &1951432231884888

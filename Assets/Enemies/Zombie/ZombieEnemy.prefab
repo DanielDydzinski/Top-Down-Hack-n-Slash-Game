@@ -1310,7 +1310,7 @@ MonoBehaviour:
   explodingPartsPrefab: {fileID: 4453159007717504736, guid: 9415d12ea95c2db47aa53cf911cbe1e1,
     type: 3}
   completeExplodeBlastForce: 750
-  ragdollLifespan: 10
+  ragdollLifespan: 60
   audioCleanupDelay: 3
   randomizeAnimationLifespan: 1
   minAnimationLifespan: 0.4
@@ -1329,6 +1329,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   size: 1
+  customDebrisPrefab: {fileID: 0}
 --- !u!1 &1286924470810096
 GameObject:
   m_ObjectHideFlags: 0

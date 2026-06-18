@@ -151,7 +151,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   size: 0
-  customDebrisPrefab: {fileID: 7064327688492268964}
+  customDebrisPrefab: {fileID: 346118486486412248, guid: dadc6b2eabcee164b91985172706d7b5,
+    type: 3}
 --- !u!1 &1725897936900977169
 GameObject:
   m_ObjectHideFlags: 0
@@ -304,7 +305,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   size: 0
-  customDebrisPrefab: {fileID: 7064327688492268964}
+  customDebrisPrefab: {fileID: 346118486486412248, guid: dadc6b2eabcee164b91985172706d7b5,
+    type: 3}
 --- !u!1 &2849215739731590806
 GameObject:
   m_ObjectHideFlags: 0
@@ -456,7 +458,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   size: 0
-  customDebrisPrefab: {fileID: 7064327688492268964}
+  customDebrisPrefab: {fileID: 346118486486412248, guid: dadc6b2eabcee164b91985172706d7b5,
+    type: 3}
 --- !u!1 &2852468368749721135
 GameObject:
   m_ObjectHideFlags: 0
@@ -608,7 +611,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   size: 0
-  customDebrisPrefab: {fileID: 7064327688492268964}
+  customDebrisPrefab: {fileID: 346118486486412248, guid: dadc6b2eabcee164b91985172706d7b5,
+    type: 3}
 --- !u!1 &3233516733785513409
 GameObject:
   m_ObjectHideFlags: 0
@@ -760,7 +764,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   size: 0
-  customDebrisPrefab: {fileID: 7064327688492268964}
+  customDebrisPrefab: {fileID: 346118486486412248, guid: dadc6b2eabcee164b91985172706d7b5,
+    type: 3}
 --- !u!1 &3352802109565315586
 GameObject:
   m_ObjectHideFlags: 0
@@ -912,7 +917,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   size: 0
-  customDebrisPrefab: {fileID: 7064327688492268964}
+  customDebrisPrefab: {fileID: 346118486486412248, guid: dadc6b2eabcee164b91985172706d7b5,
+    type: 3}
 --- !u!1 &3471352690690743608
 GameObject:
   m_ObjectHideFlags: 0
@@ -1064,7 +1070,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   size: 0
-  customDebrisPrefab: {fileID: 7064327688492268964}
+  customDebrisPrefab: {fileID: 346118486486412248, guid: dadc6b2eabcee164b91985172706d7b5,
+    type: 3}
 --- !u!1 &3635192536499621570
 GameObject:
   m_ObjectHideFlags: 0
@@ -1217,7 +1224,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   size: 0
-  customDebrisPrefab: {fileID: 7064327688492268964}
+  customDebrisPrefab: {fileID: 346118486486412248, guid: dadc6b2eabcee164b91985172706d7b5,
+    type: 3}
 --- !u!1 &3921683816835652951
 GameObject:
   m_ObjectHideFlags: 0
@@ -1369,7 +1377,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   size: 0
-  customDebrisPrefab: {fileID: 7064327688492268964}
+  customDebrisPrefab: {fileID: 346118486486412248, guid: dadc6b2eabcee164b91985172706d7b5,
+    type: 3}
 --- !u!1 &4343512429978993978
 GameObject:
   m_ObjectHideFlags: 0
@@ -1522,7 +1531,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   size: 0
-  customDebrisPrefab: {fileID: 7064327688492268964}
+  customDebrisPrefab: {fileID: 346118486486412248, guid: dadc6b2eabcee164b91985172706d7b5,
+    type: 3}
 --- !u!1 &4453159007717504736
 GameObject:
   m_ObjectHideFlags: 0
@@ -1585,7 +1595,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e7e0266bb810f24ab5c0a59a127e678, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pieceLifespan: 10
+  pieceLifespan: 60
 --- !u!1 &6384369288892741053
 GameObject:
   m_ObjectHideFlags: 0
@@ -1737,7 +1747,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   size: 0
-  customDebrisPrefab: {fileID: 7064327688492268964}
+  customDebrisPrefab: {fileID: 346118486486412248, guid: dadc6b2eabcee164b91985172706d7b5,
+    type: 3}
 --- !u!1 &6597143897519210202
 GameObject:
   m_ObjectHideFlags: 0
@@ -1889,7 +1900,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   size: 0
-  customDebrisPrefab: {fileID: 7064327688492268964}
+  customDebrisPrefab: {fileID: 346118486486412248, guid: dadc6b2eabcee164b91985172706d7b5,
+    type: 3}
 --- !u!1 &6610071440983531114
 GameObject:
   m_ObjectHideFlags: 0
@@ -2041,7 +2053,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   size: 0
-  customDebrisPrefab: {fileID: 7064327688492268964}
+  customDebrisPrefab: {fileID: 346118486486412248, guid: dadc6b2eabcee164b91985172706d7b5,
+    type: 3}
 --- !u!1 &6725354566105693615
 GameObject:
   m_ObjectHideFlags: 0
@@ -2193,7 +2206,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   size: 0
-  customDebrisPrefab: {fileID: 7064327688492268964}
+  customDebrisPrefab: {fileID: 346118486486412248, guid: dadc6b2eabcee164b91985172706d7b5,
+    type: 3}
 --- !u!1 &7244877343661724795
 GameObject:
   m_ObjectHideFlags: 0
@@ -2345,7 +2359,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   size: 0
-  customDebrisPrefab: {fileID: 7064327688492268964}
+  customDebrisPrefab: {fileID: 346118486486412248, guid: dadc6b2eabcee164b91985172706d7b5,
+    type: 3}
 --- !u!1 &7482493790899340712
 GameObject:
   m_ObjectHideFlags: 0
@@ -2497,7 +2512,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   size: 0
-  customDebrisPrefab: {fileID: 7064327688492268964}
+  customDebrisPrefab: {fileID: 346118486486412248, guid: dadc6b2eabcee164b91985172706d7b5,
+    type: 3}
 --- !u!1 &8737517399682012714
 GameObject:
   m_ObjectHideFlags: 0
@@ -2649,7 +2665,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   size: 0
-  customDebrisPrefab: {fileID: 7064327688492268964}
+  customDebrisPrefab: {fileID: 346118486486412248, guid: dadc6b2eabcee164b91985172706d7b5,
+    type: 3}
 --- !u!1001 &1136148760746015450
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2943,12 +2960,6 @@ PrefabInstance:
 --- !u!4 &6158441947876813335 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3725336872829959275, guid: dadc6b2eabcee164b91985172706d7b5,
-    type: 3}
-  m_PrefabInstance: {fileID: 7405079384064677500}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &7064327688492268964 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 346118486486412248, guid: dadc6b2eabcee164b91985172706d7b5,
     type: 3}
   m_PrefabInstance: {fileID: 7405079384064677500}
   m_PrefabAsset: {fileID: 0}
