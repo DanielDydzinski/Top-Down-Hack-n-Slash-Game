@@ -20,6 +20,12 @@ public class EnemyAIController : MonoBehaviour
     public readonly int DeathLayer = 3;
     [SerializeField] public LayerMask enemyLayer;
 
+    [Header("Spawn / Wake Up Settings")]
+    [Tooltip("If true, the enemy will play a wake-up animation before it can act.")]
+    public bool requiresWakeUp = false;
+    [Tooltip("How long (in seconds) the wake up animation takes before the FSM starts taking over.")]
+    public float wakeUpDuration = 2.5f;
+
 
     [Header("Settings")]
     public float engagedDistance = 10f;
@@ -54,6 +60,7 @@ public class EnemyAIController : MonoBehaviour
     public PatrolState patrolState;
     public AttackState attackState;
     public ChaseState chaseState;
+    public WakeUpState wakeUpState;
     public StunState stunState { get; private set; }
 
 
@@ -85,9 +92,17 @@ public class EnemyAIController : MonoBehaviour
         attackState = new AttackState(this);
         stunState = new StunState(this);
         chaseState = new ChaseState(this);
+        wakeUpState = new WakeUpState(this, wakeUpDuration);
 
-        // Start in Patrol
-        ChangeState(patrolState);
+        // Start in Patrol or wake up state
+        if (requiresWakeUp)
+        {
+            ChangeState(wakeUpState);
+        }
+        else
+        {
+            ChangeState(patrolState);
+        }
     }
 
     void Update()
