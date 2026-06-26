@@ -11,6 +11,9 @@ GameObject:
   - component: {fileID: 4851045463318014}
   - component: {fileID: 114323216668477022}
   - component: {fileID: 135181765347289198}
+  - component: {fileID: -3276377079481354250}
+  - component: {fileID: -8920537041327013184}
+  - component: {fileID: 5979360081236297694}
   m_Layer: 12
   m_Name: AoEoTPrefab
   m_TagString: Untagged
@@ -45,8 +48,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e13156219399314d9ab683413f080ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  particles: {fileID: 4005515110034528584, guid: 57318686551c7eb41844e0b8f8b90780,
-    type: 3}
+  particles: {fileID: 4005515110034528584, guid: 57318686551c7eb41844e0b8f8b90780, type: 3}
   duration: 10
   rate: 0.5
   radius: 2
@@ -54,6 +56,11 @@ MonoBehaviour:
   damageType: 0
   effects:
   - {fileID: 11400000, guid: e92554653ee973d459a155f71b856c74, type: 2}
+  isPartial: 0
+  strikeRadius: 0
+  strikeParticles: {fileID: 0}
+  spawnPositionOffset: {x: 0, y: 0, z: 0}
+  strikeSound: {fileID: 0}
 --- !u!135 &135181765347289198
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -75,3 +82,70 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &-3276377079481354250
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1660451438789930}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45f9cd0adb173814691b0e2f1b54d4e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lethalType: 1
+  ignoreFriendlyFire: 1
+  destructionParticles: {fileID: 0}
+  OnDestroyed:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: -8920537041327013184}
+        m_TargetAssemblyTypeName: ShrinkReaction, Assembly-CSharp
+        m_MethodName: TriggerShrink
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 5979360081236297694}
+        m_TargetAssemblyTypeName: AbilityDestructionReaction, Assembly-CSharp
+        m_MethodName: HandleAbilityFizzle
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!114 &-8920537041327013184
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1660451438789930}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11332a1952adb24449dd288176c50cb9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shrinkDuration: 0.5
+--- !u!114 &5979360081236297694
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1660451438789930}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f969b4fed426b543913dbdeacba7ebf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

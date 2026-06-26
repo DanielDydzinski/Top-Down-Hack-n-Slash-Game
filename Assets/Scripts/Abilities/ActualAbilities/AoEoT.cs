@@ -32,22 +32,34 @@ public class AoEoT : Ability
 
         aoeotBehaviour = instance.GetComponent<AoEoTBehaviour>();
 
-        // Pass everything smoothly to the runtime behaviour engine
+        // 1. Pass standard behaviour values
         aoeotBehaviour.UpdateValues(
             this.abilityEffects, duration, rate, radius, this.myFaction,
             abilityParticles, this.damageType, this.AudioClip, caster,
-            isPartial, strikeRadius, strikeParticles, spawnPositionOffset, strikeSound
+            isPartial, strikeRadius, strikeParticles, spawnPositionOffset, strikeSound, this.targetLayer,this.wallLayer
         );
 
-        if (isDestructible)
+        // 2. Safely configure the Destructible trait if it exists on the prefab
+        if (instance.TryGetComponent<DestructibleEnvironment>(out var dest))
         {
-            var dest = instance.AddComponent<DestructibleEnvironment>();
-            dest.lethalType = this.lethalType;
-            dest.destructionParticles = this.destructionParticles;
+            if (isDestructible)
+            {
+                dest.enabled = true;
+                dest.lethalType = this.lethalType;
+                dest.destructionParticles = this.destructionParticles;
 
-            var identity = instance.GetComponent<EntityIdentity>();
-            if (identity == null) identity = instance.AddComponent<EntityIdentity>();
-            identity.faction = this.myFaction;
+                // Manage identity safely without hidden AddComponent if possible
+                if (!instance.TryGetComponent<EntityIdentity>(out var identity))
+                {
+                    identity = instance.AddComponent<EntityIdentity>();
+                }
+                identity.faction = this.myFaction;
+            }
+            else
+            {
+                // If this specific ability shouldn't be breakable, kill the script!
+                dest.enabled = false;
+            }
         }
 
         return instance;

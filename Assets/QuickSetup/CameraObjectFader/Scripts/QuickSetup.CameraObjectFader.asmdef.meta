@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 96573d78ac8c8b64584634655f24d6b8
+AssemblyDefinitionImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 351804
+  packageName: Camera Object Fader
+  packageVersion: 1.0
+  assetPath: Assets/QuickSetup/CameraObjectFader/Scripts/QuickSetup.CameraObjectFader.asmdef
+  uploadId: 859226

@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 3ec5ab5d6520f644b804a2d6b7095100
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 351804
+  packageName: Camera Object Fader
+  packageVersion: 1.0
+  assetPath: Assets/QuickSetup/CameraObjectFader/Documentation/READ_FIRST.md
+  uploadId: 859226

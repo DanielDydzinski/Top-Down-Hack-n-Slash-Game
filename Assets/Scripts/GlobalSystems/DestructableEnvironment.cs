@@ -1,20 +1,30 @@
 using UnityEngine;
-using System.Collections;
+using UnityEngine.Events;
+
 public class DestructibleEnvironment : MonoBehaviour, IDamageable
 {
-
+    [Header("Vulnerability Settings")]
     public DamageType lethalType = DamageType.Fire;
-    public GameObject destructionParticles;
     public bool ignoreFriendlyFire = true;
-    private float deathDuration = 0.5f;
+
+    [Header("Effects")]
+    public GameObject destructionParticles;
+
+    [Header("Events")]
+    // This allows you to hook up ANY custom logic in the Unity Inspector!
+    public UnityEvent<HitInfo> OnDestroyed;
+
+    private bool _hasBeenDestroyed = false;
 
     public void TakeDamage(HitInfo info)
     {
+        // Prevent the object from taking damage multiple times in one frame
+        if (_hasBeenDestroyed) return;
+
         // 1. Faction Check
         if (ignoreFriendlyFire)
         {
             EntityIdentity myIdentity = GetComponent<EntityIdentity>();
-            // If the person hitting me is on my team, do nothing
             if (myIdentity != null && info.faction == myIdentity.faction)
             {
                 return;
@@ -24,31 +34,19 @@ public class DestructibleEnvironment : MonoBehaviour, IDamageable
         // 2. Type Check
         if (info.type == lethalType)
         {
-            StartCoroutine(Shrink());
-            Break();
+            _hasBeenDestroyed = true;
+            Break(info);
         }
     }
 
-    private void Break()
+    private void Break(HitInfo info)
     {
         if (destructionParticles != null)
         {
             Instantiate(destructionParticles, transform.position, Quaternion.identity);
         }
-        Destroy(gameObject,deathDuration + 0.01f);
-    }
 
-    IEnumerator Shrink()
-    {
-        Vector3 startScale = transform.localScale;
-        deathDuration = 0.5f;
-        float time = 0;
-        while (time < deathDuration)
-        {
-            transform.localScale = Vector3.Lerp(startScale, Vector3.zero, time / deathDuration);
-            time += Time.deltaTime;
-            yield return null;
-        }
-        transform.localScale = Vector3.zero;
+        // Fire the event, passing the hit info to whatever is listening!
+        OnDestroyed?.Invoke(info);
     }
 }

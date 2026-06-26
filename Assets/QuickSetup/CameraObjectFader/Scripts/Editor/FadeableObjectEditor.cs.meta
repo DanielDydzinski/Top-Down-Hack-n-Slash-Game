@@ -1,0 +1,9 @@
+fileFormatVersion: 2
+guid: 68f2adc77977af64ba281559e108ac7a
+AssetOrigin:
+  serializedVersion: 1
+  productId: 351804
+  packageName: Camera Object Fader
+  packageVersion: 1.0
+  assetPath: Assets/QuickSetup/CameraObjectFader/Scripts/Editor/FadeableObjectEditor.cs
+  uploadId: 859226

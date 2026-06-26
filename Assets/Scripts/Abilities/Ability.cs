@@ -12,18 +12,27 @@ public abstract class Ability : ScriptableObject{
 
     [Header("Main Ability Prefab")]
     public GameObject abilityPrefab;
+
     [Header("List of Effects")]
     public List<Effect> abilityEffects;
+
     [Header("Ability Info")]
     public string abilityName ;
 	public Sprite icon ;
 	public string description ;
+
     [Header("Identity")]
     public Faction myFaction; // for Identity Checks
 	public DamageType damageType;
+
+    [Header("Physics Filtering")]
+    public LayerMask targetLayer; // What this ability can target/damage
+    public LayerMask wallLayer ;   // What blocks this ability's line-of-sight
+
     [Header("Combo Settings")]
     public Ability nextComboAbility; // If null, combo ends
     public float comboWindow = 1.0f; // Time to press button again
+
     [Header("State Control")]
     public float movementMultiplier = 1.0f; // Slow down during cast? (e.g. 0.5f)
     public bool canRotateDuringCast;
@@ -58,6 +67,23 @@ public abstract class Ability : ScriptableObject{
 	public Vector3 spawnLocationOffset;
     public Vector3 spawnRotationOffset;
 
-	public abstract GameObject Cast (Vector3 pos, Quaternion rot, GameObject caster);
+    // --- THE AUTOMATED INSPECTOR SHORTCUT ---
+    protected virtual void OnEnable()
+    {
+        // If the layer mask is unassigned (Nothing), automatically inject your game's defaults!
+        // This ensures all your existing assets get updated with zero manual work.
+        if (targetLayer == 0)
+        {
+            targetLayer = LayerMask.GetMask( "Player");
+        }
+
+        if (wallLayer == 0)
+        {
+            // Matching your exact project spelling "Enviroment" from your layer window
+            wallLayer = LayerMask.GetMask("Enviroment", "InteractableEnvironment");
+        }
+    }
+
+    public abstract GameObject Cast (Vector3 pos, Quaternion rot, GameObject caster);
 
 }

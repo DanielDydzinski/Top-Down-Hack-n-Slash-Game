@@ -7,6 +7,7 @@ public class ShockWave : Ability
     public GameObject shockWaveVisualPrefab;
     public float maxRadius = 10f;
     public float expansionSpeed = 20f;
+    public bool useLOS = true; // use line of sight?
 
     public override GameObject Cast(Vector3 position, Quaternion rotation, GameObject caster)
     {
@@ -16,7 +17,7 @@ public class ShockWave : Ability
         if (behaviour != null)
         { 
             // Using the requested UpdateValues pattern
-            behaviour.UpdateValues(this.abilityEffects, maxRadius, expansionSpeed, this.myFaction, this.damageType, caster, shockWaveVisualPrefab);
+            behaviour.UpdateValues(this.abilityEffects, maxRadius, expansionSpeed, this.myFaction, this.damageType, caster, shockWaveVisualPrefab, this.targetLayer,this.wallLayer, useLOS);
         }
 
         return instance;

@@ -21,7 +21,8 @@ public class Explosion : Ability {
 		explosionBehaviour = instance.GetComponent<ExplosionBehaviour>();
 		if (explosionBehaviour != null)
 		{
-			explosionBehaviour.UpdateValues(this.abilityEffects, explosionParticles, radius, this.myFaction, this.damageType, damageByDistance, soundEffect, caster);
+			explosionBehaviour.UpdateValues(this.abilityEffects, explosionParticles, radius, this.myFaction, 
+				this.damageType, damageByDistance, soundEffect, caster, this.targetLayer,this.wallLayer);
 		}
 		else
 		{

@@ -14,6 +14,11 @@ public class ShockWaveBehaviour : MonoBehaviour
     private GameObject visualParticles;
     private GameObject activeVisual;
 
+    [Header("Physics Filtering & Occlusion")]
+    public LayerMask targetLayer;     // Leverages unified targets from Ability.cs
+    public LayerMask wallLayer;       // Leverages unified environment walls from Ability.cs
+    public bool useLineOfSight = true; // Toggle this per ability prefab to make LOS completely optional!
+
     private SphereCollider sc;
     private float currentRadius = 0f;
     private HashSet<IDamageable> hitTargets = new HashSet<IDamageable>();
@@ -79,7 +84,9 @@ public class ShockWaveBehaviour : MonoBehaviour
         }
     }
 
-    public void UpdateValues(List<Effect> aeffects, float aMaxRadius, float aExpansionSpeed, Faction faction, DamageType dmgType, GameObject whoCasted, GameObject visualWave)
+    // UPDATED: Extended signature to cleanly ingest unified layers and your LOS configuration toggle
+    public void UpdateValues(List<Effect> aeffects, float aMaxRadius, float aExpansionSpeed, Faction faction, DamageType dmgType,
+                             GameObject whoCasted, GameObject visualWave, LayerMask aTargetLayer, LayerMask aWallLayer, bool aUseLineOfSight)
     {
         effects = aeffects;
         maxRadius = aMaxRadius;
@@ -88,10 +95,17 @@ public class ShockWaveBehaviour : MonoBehaviour
         damageType = dmgType;
         caster = whoCasted;
         visualParticles = visualWave;
+
+        targetLayer = aTargetLayer;
+        wallLayer = aWallLayer;
+        useLineOfSight = aUseLineOfSight;
     }
 
     void OnTriggerEnter(Collider col)
     {
+        // REFACTORED: Immediate bitmask check to drop out early if the object isn't on our target layer
+        if (((1 << col.gameObject.layer) & targetLayer) == 0) return;
+
         IDamageable damageable = col.GetComponent<IDamageable>();
         if (damageable == null || hitTargets.Contains(damageable)) return;
 
@@ -99,35 +113,46 @@ public class ShockWaveBehaviour : MonoBehaviour
         if (victimIdentity != null && victimIdentity.faction == myFaction) return;
 
         Vector3 dir = col.transform.position - transform.position;
+        float distance = dir.magnitude;
+
+        // --- ADDED: OPTIONAL LINE OF SIGHT CHECK ---
+        if (useLineOfSight && distance > 0.01f)
+        {
+            Vector3 targetPoint = col.bounds.center;
+            Vector3 rayDir = targetPoint - transform.position;
+
+            // Trace a ray from the shockwave center to the target checking only for environmental walls
+            if (Physics.Raycast(transform.position, rayDir.normalized, out RaycastHit wallHit, distance, wallLayer))
+            {
+                // If it hit a wall asset before reaching the actual entity collider, safely clip the shockwave damage!
+                if (wallHit.collider != col)
+                {
+                    return;
+                }
+            }
+        }
+        // --------------------------------------------
+
         hitTargets.Add(damageable);
 
         // --- FALLOFF MULTIPLIER CALCULATION ---
-        // Calculate actual distance to the target
-        float distance = dir.magnitude;
-
         // Normalize it between 0.0 (center) and 1.0 (max edge)
-        // Mathf.Clamp01 ensures we don't get weird numbers if a collider bounds check behaves oddly
         float normalizedDistance = Mathf.Clamp01(distance / maxRadius);
 
         // Linear Falloff: 1.0 at the center, dropping down toward 0.0 at max radius
         float falloffMultiplier = 1f - normalizedDistance;
-
-        // Optional: If you don't want it to hit for literally 0 damage at the absolute edge, 
-        // you can clamp a minimum baseline (e.g., it always does at least 25% damage/force):
-        // falloffMultiplier = Mathf.Clamp(falloffMultiplier, 0.25f, 1.0f);
         // --------------------------------------
 
         HitInfo info = new HitInfo
         {
             overrideDeathType = DeathHandler.DeathType.Ragdoll,
             faction = myFaction,
-            multiplier = falloffMultiplier, // <-- Utilizing  multiplier slot here /lower dmg and force impact by distance
+            multiplier = falloffMultiplier,
             type = damageType,
             effects = this.effects,
             attacker = caster,
-            isExplosion = false,            
-            forceDirection = dir.normalized // Normalized direction vector is cleaner for physics calculations
-            
+            isExplosion = false,
+            forceDirection = dir.normalized
         };
 
         damageable.TakeDamage(info);

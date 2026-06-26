@@ -1,0 +1,9 @@
+fileFormatVersion: 2
+guid: b330ba4e6bba03047a02412ba98ad468
+AssetOrigin:
+  serializedVersion: 1
+  productId: 351804
+  packageName: Camera Object Fader
+  packageVersion: 1.0
+  assetPath: Assets/QuickSetup/CameraObjectFader/Scripts/Internal/FaderConstants.cs
+  uploadId: 859226

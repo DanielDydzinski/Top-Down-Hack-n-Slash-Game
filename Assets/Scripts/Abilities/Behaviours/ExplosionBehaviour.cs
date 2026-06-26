@@ -9,7 +9,10 @@ public class ExplosionBehaviour : MonoBehaviour
     public bool damageByDistance;
     public Faction myFaction;
     public DamageType damageType;
-    public LayerMask wallLayer; // No more hardcoded 1024
+    
+    [Header("Layer Overrides")]
+    public LayerMask targetLayer; // Determines what can actually be damaged (e.g., Enemy, Player)
+    public LayerMask wallLayer;   // Blocks explosions (e.g., Environment, InteractableEnvironment)
 
     public List<Effect> effects = new List<Effect>();
 
@@ -20,12 +23,13 @@ public class ExplosionBehaviour : MonoBehaviour
     void Start()
     {
         audioSource = GetComponent<AudioSource>();
-        //waity one frame for values to update
+        // Wait one frame for values to update
         StartCoroutine(DelayedExplode());
-        
     }
 
-    public void UpdateValues(List<Effect> aeffects, GameObject aexploPrefab, float aRadius, Faction faction, DamageType dmgType, bool dmgByDist,AudioClip aclip, GameObject aCaster)
+    // UPDATED: Added targetLayer and wallLayer setup into initialization
+    public void UpdateValues(List<Effect> aeffects, GameObject aexploPrefab, float aRadius, Faction faction, DamageType dmgType,
+        bool dmgByDist, AudioClip aclip, GameObject aCaster, LayerMask aTargetLayer, LayerMask aWallLayer)
     {
         effects = aeffects;
         explosionParticles = aexploPrefab;
@@ -35,7 +39,8 @@ public class ExplosionBehaviour : MonoBehaviour
         damageByDistance = dmgByDist;
         audioClip = aclip;
         caster = aCaster;
-        //Explode();
+        targetLayer = aTargetLayer;
+        wallLayer = aWallLayer;
     }
 
     private IEnumerator DelayedExplode()
@@ -44,7 +49,7 @@ public class ExplosionBehaviour : MonoBehaviour
         {
             Instantiate(explosionParticles, transform.position, Quaternion.identity);
         }
-        if(audioClip != null)
+        if (audioClip != null)
         {
             AudioSource.PlayClipAtPoint(audioClip, transform.position);
         }
@@ -55,20 +60,31 @@ public class ExplosionBehaviour : MonoBehaviour
 
     private void Explode()
     {
-        Collider[] hitColliders = Physics.OverlapSphere(transform.position, explosionRadius);
+        // FIX 1: Pass the targetLayer mask so we don't waste performance evaluating floors/static walls
+        Collider[] hitColliders = Physics.OverlapSphere(transform.position, explosionRadius, targetLayer);
 
         foreach (Collider c in hitColliders)
         {
+            // FIX 2: Check for root components or local components to prevent damaging the attacker/caster
+            if (caster != null && (c.gameObject == caster || c.transform.IsChildOf(caster.transform))) continue;
+
             // 1. Faction Check
             EntityIdentity victimIdentity = c.GetComponent<EntityIdentity>();
             if (victimIdentity != null && victimIdentity.faction == myFaction) continue;
 
             // 2. Wall Check
             float dist = Vector3.Distance(transform.position, c.transform.position);
-            Vector3 dir = (c.transform.position - transform.position).normalized;
-            if (Physics.Raycast(transform.position, dir, dist, wallLayer)) continue;
+            
+            // Avoid NaN errors or division by zero if target is exactly on top of explosion origin
+            Vector3 dir = dist > 0.001f ? (c.transform.position - transform.position).normalized : transform.forward;
+            
+            if (dist > 0.01f)
+            {
+                // Raycast evaluates against our wall mask (which now supports both environmental layers)
+                if (Physics.Raycast(transform.position, dir, dist, wallLayer)) continue;
+            }
 
-            // 3. Mailbox Check
+            // 3. Process Damage/Effects Delivery
             IDamageable damageable = c.GetComponent<IDamageable>();
             if (damageable != null)
             {
@@ -76,7 +92,7 @@ public class ExplosionBehaviour : MonoBehaviour
                 float falloff = 1f;
                 if (damageByDistance)
                 {
-                    // We clamp it between 0 and 1 just to be safe
+                    // Clamp it between 0 and 1 just to be safe
                     falloff = Mathf.Clamp01(1.0f - (dist / explosionRadius));
                 }
 
@@ -90,13 +106,12 @@ public class ExplosionBehaviour : MonoBehaviour
                 HitInfo info = new HitInfo
                 {
                     faction = myFaction,
-                    effects = new List<Effect>(effects), // Pass the list
+                    effects = new List<Effect>(effects), // Pass the list copy
                     type = damageType,
-                    attacker = this.gameObject,
+                    attacker = caster != null ? caster : this.gameObject, // Set true attacker to caster if available
                     multiplier = falloff,
                     forceDirection = dir,
                     isExplosion = true
-                    
                 };
 
                 if (c.TryGetComponent<PushPropagator>(out var propagator))
@@ -105,26 +120,9 @@ public class ExplosionBehaviour : MonoBehaviour
                     propagator.PropagatePush(dir * force * Time.deltaTime, this.gameObject);
                 }
 
-                // Logic for falloff: We don't modify the SO, we just tell the receiver!
-                // If you want scaling, you'd handle it inside the specific Effect. 
-                // For now, we deliver the package as-is.
                 damageable.TakeDamage(info);
             }
         }
         Destroy(gameObject);
     }
-    //	private void DamageByDistance(Vector3 targetPos, Vector3 centre,float radius)
-    //	{
-    //		float dmg = takeDamageEff.damageAmount;
-    //		targetPos.y = 0f;
-    //		float distance = Vector3.Distance (targetPos, centre);
-    //		distance -= 1.0f;
-    //		float scale = (distance) / radius;
-    //		float dmgNew = dmg * (1.0f - scale);
-    //		takeDamageEff.damageAmount = dmgNew;
-
-
-    //	}
-
 }
-

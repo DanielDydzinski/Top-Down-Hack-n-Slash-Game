@@ -23,6 +23,10 @@ public class FireBallBehaviour : MonoBehaviour
     public float projectileRange;
     public GameObject caster;
 
+    [Header("Physics Filtering")]
+    public LayerMask targetLayer; // Leverages unified targets from Ability.cs
+    public LayerMask wallLayer;   // Leverages unified environment walls from Ability.cs
+
     public SphereCollider sc;
     public List<Effect> effects = new List<Effect>();
 
@@ -92,9 +96,8 @@ public class FireBallBehaviour : MonoBehaviour
 
     void OnTriggerEnter(Collider col)
     {
-
-
-        if (col.gameObject.layer == LayerMask.NameToLayer("Enviroment"))
+        // REFACTORED: Bitmask check replacing the hardcoded "Enviroment" string lookups
+        if (((1 << col.gameObject.layer) & wallLayer) != 0)
         {
             if (explosionAbility != null && howManyExplosions < 1)
             {
@@ -107,7 +110,8 @@ public class FireBallBehaviour : MonoBehaviour
             return;
         }
 
-        if (col.gameObject.layer == LayerMask.NameToLayer("Enemy") || col.gameObject.layer == LayerMask.NameToLayer("Player"))
+        // REFACTORED: Unified bitmask check against the flexible target layer
+        if (((1 << col.gameObject.layer) & targetLayer) != 0)
         {
             EntityIdentity victimIdentity = col.GetComponent<EntityIdentity>();
             if (victimIdentity != null && victimIdentity.faction == myFaction) return;
@@ -121,7 +125,6 @@ public class FireBallBehaviour : MonoBehaviour
             }
             else if (howManyExplosions < 1) // Original single fireball logic
             {
-
                 IDamageable damageable = col.GetComponent<IDamageable>();
                 if (damageable != null)
                 {
@@ -139,7 +142,7 @@ public class FireBallBehaviour : MonoBehaviour
 
                 if (explosionAbility != null)
                 {
-                    explosionAbility.Cast(transform.position, Quaternion.identity, caster);                    
+                    explosionAbility.Cast(transform.position, Quaternion.identity, caster);
                 }
 
                 howManyExplosions++;
@@ -159,8 +162,8 @@ public class FireBallBehaviour : MonoBehaviour
 
         CheckForEnvironmentWallAhead();
 
-        // Continuous stun evaluation while they remain inside the beam volume
-        if (col.gameObject.layer == LayerMask.NameToLayer("Enemy"))
+        // REFACTORED: Continuous stun evaluation matching the chosen targetLayer setup
+        if (((1 << col.gameObject.layer) & targetLayer) != 0)
         {
             if (col.TryGetComponent<EnemyAIController>(out var controller))
             {
@@ -187,7 +190,6 @@ public class FireBallBehaviour : MonoBehaviour
 
         capturedMasses.Add(rb);
 
-        // Utilize your existing EnemyAIController to trigger the StunState natively
         if (rb.gameObject.TryGetComponent<EnemyAIController>(out var controller))
         {
             controller.ApplyStun(1.0f);
@@ -197,23 +199,19 @@ public class FireBallBehaviour : MonoBehaviour
             agent.enabled = false;
         }
 
-            // Parent directly to the fireball beam for a zero-jitter, smooth sweep
-            rb.transform.SetParent(this.transform, true);
+        // Parent directly to the fireball beam for a zero-jitter, smooth sweep
+        rb.transform.SetParent(this.transform, true);
     }
 
     private void ReleaseEnemy(Rigidbody rb)
     {
         if (rb == null) return;
 
-        // 1. Break the parent connection
         rb.transform.SetParent(null);
 
-        // 2. Safely re-anchor the NavMeshAgent to the closest valid navigation point
         if (rb.gameObject.TryGetComponent<UnityEngine.AI.NavMeshAgent>(out var agent))
         {
             agent.enabled = true;
-            // If the agent drifted off the mesh while traveling with the fireball,
-            // this forces it back onto walkable ground before it tries to resume pathfinding.
             if (UnityEngine.AI.NavMesh.SamplePosition(rb.transform.position, out UnityEngine.AI.NavMeshHit hit, 1.0f, UnityEngine.AI.NavMesh.AllAreas))
             {
                 agent.Warp(hit.position);
@@ -253,15 +251,13 @@ public class FireBallBehaviour : MonoBehaviour
     {
         if (!isBeam) return;
 
-        // Cast a sphere or ray forward from the beam center
-        // Adjust the distance threshold based on your projectileSize/enemy spacing
         float checkDistance = projectileSize + 1f;
 
-        if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, checkDistance, 1 << LayerMask.NameToLayer("Enviroment")))
+        // REFACTORED: Uses our accurate wallLayer configuration instead of custom bit-shifting single names
+        if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, checkDistance, wallLayer))
         {
-
             // Hit a wall ahead! Detonate right now before pushing enemies through it
-            if (explosionAbility != null && howManyExplosions <1)
+            if (explosionAbility != null && howManyExplosions < 1)
             {
                 explosionAbility.Cast(transform.position, Quaternion.identity, caster);
                 howManyExplosions++;
@@ -274,16 +270,17 @@ public class FireBallBehaviour : MonoBehaviour
 
     private void OnDestroy()
     {
-        // Safely unparent everyone before the beam object is completely cleaned up
         ReleaseAllCaptured();
     }
 
+    // UPDATED: Extended signature to ingest targetLayer and wallLayer configurations upon casting initialization
     public void UpdateValues(List<Effect> aeffects, float aprojSpeed, float aprojSize, float aprojRange, GameObject aproj, Ability aexplo, Faction faction, DamageType dmgType,
-                             AudioClip aclip, bool isbeam, GameObject whoCasted)
+                             AudioClip aclip, bool isbeam, GameObject whoCasted, LayerMask aTargetLayer, LayerMask aWallLayer)
     {
         effects = aeffects; projectileSpeed = aprojSpeed; projectileSize = aprojSize; projectileRange = aprojRange;
         projectile = aproj; explosionAbility = aexplo; myFaction = faction; damageType = dmgType; fireBallAudioClip = aclip;
         isBeam = isbeam; caster = whoCasted;
+        targetLayer = aTargetLayer; wallLayer = aWallLayer;
     }
 
     private IEnumerator DelayedInstanciate()

@@ -18,6 +18,7 @@ public struct HitInfo
     // Allows projectiles or spells to override the target's default death type
     public DeathHandler.DeathType? overrideDeathType;
     public bool isExplosion;
+    public Vector3 impactPoint;
 }
 
 // The "Mail Slot" interface

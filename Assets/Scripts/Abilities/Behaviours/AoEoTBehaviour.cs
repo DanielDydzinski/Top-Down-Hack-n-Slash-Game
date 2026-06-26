@@ -13,6 +13,10 @@ public class AoEoTBehaviour : MonoBehaviour
     public DamageType damageType;
     public List<Effect> effects = new List<Effect>();
 
+    [Header("Physics Filtering")]
+    public LayerMask targetLayer; // Leverages unified targets from Ability.cs
+    public LayerMask wallLayer;   // Kept for structural signature unity
+
     [Header("Partial / Random Strike Settings")]
     public bool isPartial;
     public float strikeRadius;
@@ -33,7 +37,6 @@ public class AoEoTBehaviour : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null)
         {
-            // Fallback to guarantee audio won't crash if an AudioSource isn't on the prefab base
             audioSource = gameObject.AddComponent<AudioSource>();
         }
         StartCoroutine(DelayedStart());
@@ -61,7 +64,6 @@ public class AoEoTBehaviour : MonoBehaviour
 
         if (particles != null) Instantiate(particles, transform);
 
-        // Play core ambient sound if provided
         if (audioClip != null && audioSource != null)
         {
             audioSource.clip = audioClip;
@@ -84,34 +86,31 @@ public class AoEoTBehaviour : MonoBehaviour
 
     private void PerformRandomStrike()
     {
-        // 1. Determine ground target point within the circle area
         Vector2 randomCirclePoint = Random.insideUnitCircle * radius;
         Vector3 groundStrikePosition = transform.position + new Vector3(randomCirclePoint.x, 0f, randomCirclePoint.y);
 
-        // 2. Compute visual creation point by applying your custom offset vector
         Vector3 visualSpawnPosition = groundStrikePosition + spawnPositionOffset;
         visualSpawnPosition.y = 0f;
 
-        // 3. Spawn the localized projectile/impact effect
         if (strikeParticles != null)
         {
             Instantiate(strikeParticles, visualSpawnPosition, Quaternion.identity);
         }
 
-        // 4. Play the localized sound element directly at the target location
         if (strikeSound != null)
         {
             AudioSource.PlayClipAtPoint(strikeSound, groundStrikePosition);
         }
 
-        // 5. Query physics collision overlap from the flat impact ground zero
-        Collider[] targets = Physics.OverlapSphere(groundStrikePosition, strikeRadius);
+        // OPTIMIZED: Uses targetLayer to ignore checking non-target environment debris
+        Collider[] targets = Physics.OverlapSphere(groundStrikePosition, strikeRadius, targetLayer);
         ApplyDamageToTargets(targets, groundStrikePosition);
     }
 
     private void PerformFullAreaTick()
     {
-        Collider[] targets = Physics.OverlapSphere(transform.position, radius);
+        // OPTIMIZED: Uses targetLayer to skip processing non-combat layers entirely
+        Collider[] targets = Physics.OverlapSphere(transform.position, radius, targetLayer);
         ApplyDamageToTargets(targets, transform.position);
     }
 
@@ -140,16 +139,18 @@ public class AoEoTBehaviour : MonoBehaviour
                     isExplosion = true
                 };
 
+                // Targets will take damage freely even if separated by environment/walls
                 damageable.TakeDamage(info);
             }
         }
     }
 
+    // UPDATED: Kept signature intact so your ability manager can pass configurations identically
     public void UpdateValues(List<Effect> aeffects, float aduration, float arate, float aradius,
                              Faction faction, GameObject aparticles, DamageType dmgType,
                              AudioClip aclip, GameObject aCaster, bool aisPartial,
                              float astrikeRadius, GameObject astrikeParticles,
-                             Vector3 aspawnOffset, AudioClip astrikeSound)
+                             Vector3 aspawnOffset, AudioClip astrikeSound, LayerMask aTargetLayer, LayerMask aWallLayer)
     {
         effects = aeffects;
         duration = aduration;
@@ -166,5 +167,8 @@ public class AoEoTBehaviour : MonoBehaviour
         strikeParticles = astrikeParticles;
         spawnPositionOffset = aspawnOffset;
         strikeSound = astrikeSound;
+
+        targetLayer = aTargetLayer;
+        wallLayer = aWallLayer; // Stored safely to avoid broken references elsewhere
     }
 }

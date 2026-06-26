@@ -1,0 +1,9 @@
+fileFormatVersion: 2
+guid: 6fa00c14f72bba04ab03c0f291022faf
+AssetOrigin:
+  serializedVersion: 1
+  productId: 351804
+  packageName: Camera Object Fader
+  packageVersion: 1.0
+  assetPath: Assets/QuickSetup/CameraObjectFader/Scripts/Runtime/FaderIgnore.cs
+  uploadId: 859226

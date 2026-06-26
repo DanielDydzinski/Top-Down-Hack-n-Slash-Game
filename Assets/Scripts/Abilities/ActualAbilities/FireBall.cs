@@ -29,7 +29,8 @@ public class FireBall : Ability {
 		fbBehaviour = instance.GetComponent<FireBallBehaviour>();
 		if (fbBehaviour != null)
 		{
-            fbBehaviour.UpdateValues(this.abilityEffects, projectileSpeed, projectileSize, projectileRange, projectilePrefab, explosionAbility, this.myFaction, this.damageType, soundEffect, isBeam, caster);
+            fbBehaviour.UpdateValues(this.abilityEffects, projectileSpeed, projectileSize, projectileRange, projectilePrefab,
+				explosionAbility, this.myFaction, this.damageType, soundEffect, isBeam, caster,this.targetLayer,this.wallLayer);
 
             if (isDestructible)
             {
