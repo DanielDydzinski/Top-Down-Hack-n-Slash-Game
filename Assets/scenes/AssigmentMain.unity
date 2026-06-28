@@ -932,6 +932,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: TombStoneDirt_01 (10)
       objectReference: {fileID: 0}
+    - target: {fileID: 4887832251619601957, guid: c5085d9102dd4a04e94e47b645dd3b64, type: 3}
+      propertyPath: m_Size.x
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 4887832251619601957, guid: c5085d9102dd4a04e94e47b645dd3b64, type: 3}
+      propertyPath: m_Size.z
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 5672348137389684219, guid: c5085d9102dd4a04e94e47b645dd3b64, type: 3}
+      propertyPath: spawnInterval
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1576,7 +1588,7 @@ PrefabInstance:
       objectReference: {fileID: 1484503501}
     - target: {fileID: 114713218590291978, guid: 8a7ca07b72bcbc949b6221e7b7927891, type: 3}
       propertyPath: abilities.Array.size
-      value: 15
+      value: 14
       objectReference: {fileID: 0}
     - target: {fileID: 114713218590291978, guid: 8a7ca07b72bcbc949b6221e7b7927891, type: 3}
       propertyPath: 'abilities.Array.data[1]'
@@ -1625,11 +1637,11 @@ PrefabInstance:
     - target: {fileID: 114713218590291978, guid: 8a7ca07b72bcbc949b6221e7b7927891, type: 3}
       propertyPath: 'abilities.Array.data[12]'
       value: 
-      objectReference: {fileID: 11400000, guid: e1ffa3a17b38dc742b301ef48c6bea28, type: 2}
+      objectReference: {fileID: 11400000, guid: c4958442d1fe8ee44a87a705267f2862, type: 2}
     - target: {fileID: 114713218590291978, guid: 8a7ca07b72bcbc949b6221e7b7927891, type: 3}
       propertyPath: 'abilities.Array.data[13]'
       value: 
-      objectReference: {fileID: 11400000, guid: c4958442d1fe8ee44a87a705267f2862, type: 2}
+      objectReference: {fileID: 11400000, guid: f9e64ab7d8f2ac24fa10d3949370d44b, type: 2}
     - target: {fileID: 114713218590291978, guid: 8a7ca07b72bcbc949b6221e7b7927891, type: 3}
       propertyPath: 'abilities.Array.data[14]'
       value: 
@@ -1714,6 +1726,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1354980020145432, guid: 8a7ca07b72bcbc949b6221e7b7927891, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1068751072}
+    - targetCorrespondingSourceObject: {fileID: 1354980020145432, guid: 8a7ca07b72bcbc949b6221e7b7927891, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1068751091}
   m_SourcePrefab: {fileID: 100100000, guid: 8a7ca07b72bcbc949b6221e7b7927891, type: 3}
 --- !u!1001 &200508683
 PrefabInstance:
@@ -2286,6 +2301,18 @@ PrefabInstance:
     - target: {fileID: 4643628102975243106, guid: c5085d9102dd4a04e94e47b645dd3b64, type: 3}
       propertyPath: m_Name
       value: TombStoneDirt_01 (13)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4887832251619601957, guid: c5085d9102dd4a04e94e47b645dd3b64, type: 3}
+      propertyPath: m_Size.x
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 4887832251619601957, guid: c5085d9102dd4a04e94e47b645dd3b64, type: 3}
+      propertyPath: m_Size.z
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 5672348137389684219, guid: c5085d9102dd4a04e94e47b645dd3b64, type: 3}
+      propertyPath: spawnInterval
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -8545,6 +8572,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6414fefcda592984e891417653f42d52, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1068751091
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 558958375}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e81617e8734d5f44b8699a900f136f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitSounds:
+  - {fileID: 8300000, guid: 4a05b5376c9ef43f4b35987fa28a8038, type: 3}
+  - {fileID: 8300000, guid: aab0b21cf44ea4d1881a3f5fe1bc4a27, type: 3}
+  playChance: 0.5
+  pitchVariation: 0.214
 --- !u!1001 &1084176514
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10623,6 +10667,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: TombStoneDirt_01 (14)
       objectReference: {fileID: 0}
+    - target: {fileID: 4887832251619601957, guid: c5085d9102dd4a04e94e47b645dd3b64, type: 3}
+      propertyPath: m_Size.x
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 4887832251619601957, guid: c5085d9102dd4a04e94e47b645dd3b64, type: 3}
+      propertyPath: m_Size.z
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 5672348137389684219, guid: c5085d9102dd4a04e94e47b645dd3b64, type: 3}
+      propertyPath: spawnInterval
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -11624,6 +11680,18 @@ PrefabInstance:
     - target: {fileID: 4643628102975243106, guid: c5085d9102dd4a04e94e47b645dd3b64, type: 3}
       propertyPath: m_Name
       value: TombStoneDirt_01 (11)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4887832251619601957, guid: c5085d9102dd4a04e94e47b645dd3b64, type: 3}
+      propertyPath: m_Size.x
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 4887832251619601957, guid: c5085d9102dd4a04e94e47b645dd3b64, type: 3}
+      propertyPath: m_Size.z
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 5672348137389684219, guid: c5085d9102dd4a04e94e47b645dd3b64, type: 3}
+      propertyPath: spawnInterval
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -24059,6 +24127,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: TombStoneDirt_01 (9)
       objectReference: {fileID: 0}
+    - target: {fileID: 4887832251619601957, guid: c5085d9102dd4a04e94e47b645dd3b64, type: 3}
+      propertyPath: m_Size.x
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 4887832251619601957, guid: c5085d9102dd4a04e94e47b645dd3b64, type: 3}
+      propertyPath: m_Size.z
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 5672348137389684219, guid: c5085d9102dd4a04e94e47b645dd3b64, type: 3}
+      propertyPath: spawnInterval
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -25073,6 +25153,18 @@ PrefabInstance:
     - target: {fileID: 4643628102975243106, guid: c5085d9102dd4a04e94e47b645dd3b64, type: 3}
       propertyPath: m_Name
       value: TombStoneDirt_01 (12)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4887832251619601957, guid: c5085d9102dd4a04e94e47b645dd3b64, type: 3}
+      propertyPath: m_Size.x
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 4887832251619601957, guid: c5085d9102dd4a04e94e47b645dd3b64, type: 3}
+      propertyPath: m_Size.z
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 5672348137389684219, guid: c5085d9102dd4a04e94e47b645dd3b64, type: 3}
+      propertyPath: spawnInterval
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

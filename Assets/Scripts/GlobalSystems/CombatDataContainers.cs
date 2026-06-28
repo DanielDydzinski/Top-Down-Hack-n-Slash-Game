@@ -19,6 +19,10 @@ public struct HitInfo
     public DeathHandler.DeathType? overrideDeathType;
     public bool isExplosion;
     public Vector3 impactPoint;
+
+    public float energyCostPaid;            // How much energy this specific attack cost to use
+    public float energyGainOnHit;           // Energy rewarded to the attacker when a hit connects
+    public float energyRefundOnKillPercent; // Percentage (0-100) of cost refunded if this hit kills
 }
 
 // The "Mail Slot" interface

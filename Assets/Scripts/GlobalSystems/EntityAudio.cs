@@ -1,9 +1,9 @@
 using UnityEngine;
 
-[RequireComponent(typeof(DamageReceiver))]
+[RequireComponent(typeof(Health))] // Changed to guarantee a Health component exists
 public class EntityAudio : MonoBehaviour
 {
-    private DamageReceiver damageReceiver;
+    private Health health; // Changed from DamageReceiver
     private AudioSource audioSource;
 
     [Header("Hit Sounds")]
@@ -12,21 +12,18 @@ public class EntityAudio : MonoBehaviour
 
     [Header("Settings")]
     [Range(0f, 1f)]
-    [Tooltip("0 = Never play, 1 = Always play")]
     public float playChance = 0.5f;
 
     [Range(0f, 0.3f)]
-    [Tooltip("Slightly varies the pitch so the same clip sounds different")]
     public float pitchVariation = 0.1f;
 
     private float originalPitch;
 
     void Awake()
     {
-        damageReceiver = GetComponent<DamageReceiver>();
+        health = GetComponent<Health>(); // Cache Health instead
         audioSource = GetComponent<AudioSource>();
 
-        // Ensure we have an AudioSource
         if (audioSource == null)
             audioSource = gameObject.AddComponent<AudioSource>();
 
@@ -35,23 +32,32 @@ public class EntityAudio : MonoBehaviour
 
     void OnEnable()
     {
-        damageReceiver.OnHitReceived += TryPlayHitSound;
+        if (health != null)
+        {
+            health.OnDamageTaken += TryPlayHitSound; // Hook into the finalized damage loop
+        }
     }
 
     void OnDisable()
     {
-        damageReceiver.OnHitReceived -= TryPlayHitSound;
+        if (health != null)
+        {
+            health.OnDamageTaken -= TryPlayHitSound; // Safe clean up
+        }
     }
 
     private void TryPlayHitSound(HitInfo info)
     {
+        // This will now print the true, finalized damage calculated by your scriptable objects!
+       // Debug.Log($"[AUDIO PLAYBACK] Source: {gameObject.name} | Confirmed Dmg: {info.damage}");
+
         if (hitSounds.Length == 0) return;
 
         // 1. Roll the dice
-        float roll = Random.value; // Returns 0.0 to 1.0
+        float roll = Random.value;
         if (roll > playChance) return;
 
-        // 2. Randomize Pitch (makes 3 sounds feel like 10)
+        // 2. Randomize Pitch
         audioSource.pitch = originalPitch + Random.Range(-pitchVariation, pitchVariation);
 
         // 3. Pick a random clip

@@ -8,6 +8,29 @@ public enum ComboTrack { Light, Heavy, Magic, Hidden }
 
 public enum VisualAttachPoint { Root, LeftHand, RightHand, Head, Weapon }
 
+public struct MeleeAttackSettings
+{
+    // Hitbox Math
+    public float length;
+    public Vector3 halfExtents;
+    public int maxHits;
+
+    // Filters & Identity
+    public Faction faction;
+    public DamageType damageType;
+    public LayerMask targetLayer;
+    public LayerMask wallLayer;
+
+    // Audio & Visuals
+    public GameObject attackParticles;
+    public AudioClip missSound;
+
+    // Energy Data
+    public float energyCostPaid;
+    public float energyGainOnHit;
+    public float energyRefundOnKillPercent;
+}
+
 public abstract class Ability : ScriptableObject{
 
     [Header("Main Ability Prefab")]
@@ -15,6 +38,8 @@ public abstract class Ability : ScriptableObject{
 
     [Header("List of Effects")]
     public List<Effect> abilityEffects;
+
+    public MeleeAttackSettings attackSettings;
 
     [Header("Ability Info")]
     public string abilityName ;
@@ -55,6 +80,17 @@ public abstract class Ability : ScriptableObject{
     [Range(0f,1f)]
     public float dashEndTime;   // 0- 1 how far into animationtime to stop 0.9 = 90% of animation
 
+    [Header("Energy Settings")]
+    [Tooltip("How much energy it costs to use this ability.")]
+    public float energyCost;
+
+    [Tooltip("How much energy the player gets back per enemy hit (e.g. for Light Attacks).")]
+    public float energyGainOnHit;
+
+    [Tooltip("Percentage (0 to 100) of the energyCost refunded to the player if this attack lands a killing blow.")]
+    [Range(0f, 100f)]
+    public float energyRefundOnKillPercent;
+
     public GameObject abilityVisualPartyicles; // visuals 
     public VisualAttachPoint attachPoint; // Instead of public Transform
     public AudioClip AudioClip;
@@ -85,5 +121,20 @@ public abstract class Ability : ScriptableObject{
     }
 
     public abstract GameObject Cast (Vector3 pos, Quaternion rot, GameObject caster);
+
+    [ContextMenu("MIGRATE DATA NOW")]
+    public void MigrateData()
+    {
+        attackSettings.length = this.length;
+        attackSettings.halfExtents = this.halfExtents;
+        attackSettings.maxHits = this.maxHits;
+        attackSettings.attackParticles = this.abilityVisualPartyicles;
+        attackSettings.missSound = this.AudioClip;
+        attackSettings.energyCost = this.energyCost;
+        attackSettings.energyGainOnHit = this.energyGainOnHit;
+        attackSettings.energyRefundOnKillPercent = this.energyRefundOnKillPercent;
+
+        Debug.Log($"Migration Complete for {this.name}! Check the 'attackSettings' foldout.");
+    }
 
 }

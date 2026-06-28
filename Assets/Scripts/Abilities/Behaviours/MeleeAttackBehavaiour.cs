@@ -21,6 +21,10 @@ public class MeleeAttackBehavaiour : MonoBehaviour
     private AudioClip audioClip;
     private AudioSource audioSource;
 
+    private float energyCostPaid;
+    private float energyGainOnHit;
+    private float energyRefundOnKillPercent;
+
     void Start()
     {
         StartCoroutine(DelayedStart());
