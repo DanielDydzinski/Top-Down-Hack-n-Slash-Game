@@ -89,8 +89,8 @@ public class AoEoTBehaviour : MonoBehaviour
         Vector2 randomCirclePoint = Random.insideUnitCircle * radius;
         Vector3 groundStrikePosition = transform.position + new Vector3(randomCirclePoint.x, 0f, randomCirclePoint.y);
 
+        // Calculate visual spawn position without snapping Y modification completely down to zero on early declarations
         Vector3 visualSpawnPosition = groundStrikePosition + spawnPositionOffset;
-        visualSpawnPosition.y = 0f;
 
         if (strikeParticles != null)
         {

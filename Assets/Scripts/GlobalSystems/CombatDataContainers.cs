@@ -7,7 +7,9 @@ public enum DamageType { Physical, Fire, Frost, Poison, Magic }
 
 // The "Envelope" that carries hit data
 public struct HitInfo
-{   
+{
+    public Ability sourceAbility;
+
     public float damage;
     public DamageType type;
     public List<Effect> effects;

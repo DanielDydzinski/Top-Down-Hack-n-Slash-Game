@@ -6,45 +6,31 @@ using System.Linq; // Added for Sorting
 
 public class MeleeAttackBehavaiour : MonoBehaviour
 {
-    public GameObject attackParticles;
-    public float length;
-    public Vector3 halfExtents;
-    public LayerMask layerMask; //target layer
-    public LayerMask wallLayer; // Now actively used for Line-of-Sight checks
-    public Faction myFaction;
-    public DamageType damageType;
+    // The structured settings containing data from the scriptable object asset instances
+    private BaseAbilitySettings baseSettings;
+    private MeleeAttackSettings meleeSettings;
+
     public List<Effect> effects = new List<Effect>();
-    public int howManyEnemiesToHit = 1;
-    private AudioClip missHitAudio;
     private GameObject caster; // who casted this ability
 
-    private AudioClip audioClip;
     private AudioSource audioSource;
 
-    private float energyCostPaid;
-    private float energyGainOnHit;
-    private float energyRefundOnKillPercent;
+    private Ability sourceAbility;
 
     void Start()
     {
         StartCoroutine(DelayedStart());
     }
 
-    // UPDATED: Added wallLayer parameter to receive masks from the base Ability script
-    public void UpdateValues(Faction faction, List<Effect> aeffect, float alength, Vector3 ahalfExtents,
-        GameObject aparticles, DamageType dmgType, int howManyHits, LayerMask targetLayer, LayerMask aWallLayer, AudioClip aClip, GameObject aCaster)
+    // UPDATED: Now receives the structured packages cleanly from the cast sequence
+    // UPDATED: Ensure this matches the 4-argument call from MeleeAttackAbility
+    public void Initialize(Ability aSourceAbility,BaseAbilitySettings aBaseSettings, MeleeAttackSettings aMeleeSettings, List<Effect> aeffect, GameObject aCaster)
     {
-        myFaction = faction;
+        baseSettings = aBaseSettings;
+        meleeSettings = aMeleeSettings;
         effects = aeffect;
-        length = alength;
-        halfExtents = ahalfExtents;
-        attackParticles = aparticles;
-        damageType = dmgType;
-        howManyEnemiesToHit = howManyHits;
-        layerMask = targetLayer;
-        wallLayer = aWallLayer; // Assigned directly from scriptable object
-        missHitAudio = aClip;
         caster = aCaster;
+        sourceAbility = aSourceAbility; 
     }
 
     private IEnumerator DelayedStart()
@@ -60,7 +46,7 @@ public class MeleeAttackBehavaiour : MonoBehaviour
 
         // 1. Catch anything the box STARTS inside
         Collider[] overlapping = Physics.OverlapBox(
-            transform.position, halfExtents, transform.rotation, layerMask);
+            transform.position, meleeSettings.halfExtents, transform.rotation, baseSettings.targetLayer);
 
         foreach (Collider col in overlapping)
         {
@@ -70,8 +56,8 @@ public class MeleeAttackBehavaiour : MonoBehaviour
 
         // 2. Catch anything hit during the sweep (BoxCast)
         RaycastHit[] hits = Physics.BoxCastAll(
-            transform.position, halfExtents, transform.forward,
-            transform.rotation, length, layerMask);
+            transform.position, meleeSettings.halfExtents, transform.forward,
+            transform.rotation, meleeSettings.length, baseSettings.targetLayer);
 
         foreach (RaycastHit h in hits)
         {
@@ -90,13 +76,13 @@ public class MeleeAttackBehavaiour : MonoBehaviour
 
         foreach (Collider col in sortedColliders)
         {
-            if (hitCount >= howManyEnemiesToHit) break;
+            if (hitCount >= meleeSettings.howManyEnemiesToHit) break;
 
             IDamageable damageable = col.GetComponent<IDamageable>();
             if (damageable == null) continue;
 
             EntityIdentity identity = col.GetComponent<EntityIdentity>();
-            if (identity != null && identity.faction == myFaction) continue;
+            if (identity != null && identity.faction == baseSettings.myFaction) continue;
 
             // --- SMART LINE-OF-SIGHT (WALL) CHECK ---
             Vector3 targetPoint = hitPoints.ContainsKey(col) ? hitPoints[col] : col.bounds.center;
@@ -107,7 +93,7 @@ public class MeleeAttackBehavaiour : MonoBehaviour
             if (distToTarget > 0.01f)
             {
                 // Trace a line from attack origin to our targeted point looking for walls
-                if (Physics.Raycast(originPoint, dirToTarget.normalized, out RaycastHit wallHit, distToTarget + 0.05f, wallLayer))
+                if (Physics.Raycast(originPoint, dirToTarget.normalized, out RaycastHit wallHit, distToTarget + 0.05f, baseSettings.wallLayer))
                 {
                     // CRITICAL FILTER: If we hit an environmental wall object, but it is NOT the 
                     // target we are currently trying to process, something else is obscuring our view!
@@ -122,10 +108,10 @@ public class MeleeAttackBehavaiour : MonoBehaviour
             hitCount++;
 
             // SPAWN PARTICLES USING SNAPPED SURFACE POINT DATA
-            if (attackParticles != null)
+            if (meleeSettings.attackParticles != null)
             {
                 Vector3 hitPoint = hitPoints.ContainsKey(col) ? hitPoints[col] : col.transform.position;
-                Instantiate(attackParticles, hitPoint, transform.rotation);
+                Instantiate(meleeSettings.attackParticles, hitPoint, transform.rotation);
             }
 
             foreach (Effect e in effects)
@@ -135,14 +121,21 @@ public class MeleeAttackBehavaiour : MonoBehaviour
 
             HitInfo info = new HitInfo
             {
-                faction = myFaction,
-                type = damageType,
+                faction = baseSettings.myFaction,
+                type = baseSettings.damageType,
                 effects = effects,
                 attacker = caster != null ? caster : this.gameObject,
                 multiplier = 1.0f,
                 forceDirection = transform.forward,
                 isExplosion = false,
-                impactPoint = targetPoint
+                impactPoint = targetPoint,
+
+                sourceAbility = this.sourceAbility,
+                // Retaining the energy properties directly down the hit payload track
+                energyCostPaid = baseSettings.energyCost,
+                energyGainOnHit = baseSettings.energyGainOnHit,
+                energyRefundOnKillPercent = baseSettings.energyRefundOnKillPercent
+
             };
 
             damageable.TakeDamage(info);
@@ -150,14 +143,17 @@ public class MeleeAttackBehavaiour : MonoBehaviour
 
         if (hitCount < 1) // we missed play woosh sound
         {
-            audioSource = caster.GetComponent<AudioSource>();
-            if (missHitAudio != null && audioSource != null)
+            if (caster != null)
             {
-                audioSource.PlayOneShot(missHitAudio);
+                audioSource = caster.GetComponent<AudioSource>();
+                if (meleeSettings.missHitAudio != null && audioSource != null)
+                {
+                    audioSource.PlayOneShot(meleeSettings.missHitAudio);
+                }
             }
         }
 
-        DrawDebugBox(transform.position, halfExtents, transform.rotation, transform.forward, length, hitCount > 0 ? Color.green : Color.red, 2.0f);
+        DrawDebugBox(transform.position, meleeSettings.halfExtents, transform.rotation, transform.forward, meleeSettings.length, hitCount > 0 ? Color.green : Color.red, 2.0f);
 
         Destroy(gameObject);
     }
@@ -221,8 +217,8 @@ public class MeleeAttackBehavaiour : MonoBehaviour
         Gizmos.color = Color.red;
         Matrix4x4 rotationMatrix = Matrix4x4.TRS(transform.position, transform.rotation, Vector3.one);
         Gizmos.matrix = rotationMatrix;
-        Gizmos.DrawWireCube(Vector3.zero, halfExtents * 2);
-        Gizmos.DrawWireCube(Vector3.forward * length, halfExtents * 2);
-        Gizmos.DrawLine(Vector3.zero, Vector3.forward * length);
+        Gizmos.DrawWireCube(Vector3.zero, meleeSettings.halfExtents * 2);
+        Gizmos.DrawWireCube(Vector3.forward * meleeSettings.length, meleeSettings.halfExtents * 2);
+        Gizmos.DrawLine(Vector3.zero, Vector3.forward * meleeSettings.length);
     }
 }

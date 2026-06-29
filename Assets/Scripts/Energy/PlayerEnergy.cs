@@ -1,44 +1,46 @@
 using UnityEngine;
-using UnityEngine.UI;
+using System;
 
 public class PlayerEnergy : MonoBehaviour
 {
-    [Header("Energy Stats")]
+    [Header("Energy Settings")]
     [SerializeField] private float maxEnergy = 100f;
-    [SerializeField] private float energyPoints = 0f; // Starts empty or full based on your preference
+    [SerializeField]private float currentEnergy;
 
-    [Header("UI Reference")]
-    [SerializeField] private Image energyFillImage;
+    // Action that the UI can listen to whenever energy levels shift
+    public event Action<float, float> OnEnergyChanged;
 
     void Start()
     {
-        UpdateEnergyBar();
+        currentEnergy = maxEnergy;
+        UpdateUI();
     }
 
     public bool CanAfford(float cost)
     {
-        return energyPoints >= cost;
+        return currentEnergy >= cost;
     }
 
     public void UseEnergy(float amount)
     {
-        energyPoints = Mathf.Max(0f, energyPoints - amount);
-        UpdateEnergyBar();
+        currentEnergy = Mathf.Clamp(currentEnergy - amount, 0f, maxEnergy);
+        UpdateUI();
     }
 
-    public void AddEnergy(float amount)
+    public void GainEnergy(float amount)
     {
-        energyPoints = Mathf.Min(maxEnergy, energyPoints + amount);
-        UpdateEnergyBar();
+        currentEnergy = Mathf.Clamp(currentEnergy + amount, 0f, maxEnergy);
+        UpdateUI();
     }
 
-    private void UpdateEnergyBar()
+    private void UpdateUI()
     {
-        if (energyFillImage != null)
-        {
-            energyFillImage.fillAmount = energyPoints / maxEnergy;
-        }
+        // Passes current energy and max energy to any registered UI listener
+        OnEnergyChanged?.Invoke(currentEnergy, maxEnergy);
     }
 
-    public float GetCurrentEnergy() => energyPoints;
+    public float GetCurrentEnergy()
+    {
+        return currentEnergy;
+    }
 }

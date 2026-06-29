@@ -71,7 +71,7 @@ public class EnemyAIController : MonoBehaviour
 
         nav = GetComponent<NavMeshAgent>();
         obstacle = GetComponent<NavMeshObstacle>();
-        aiAnim = GetComponent<Animator>();
+        if(aiAnim == null) aiAnim = GetComponent<Animator>();
         abilityManager = GetComponent<AbilityManager>();
         hp = GetComponent<Health>();
         stats = GetComponent<Stats>();

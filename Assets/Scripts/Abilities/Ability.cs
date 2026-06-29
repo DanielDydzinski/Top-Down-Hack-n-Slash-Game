@@ -8,30 +8,76 @@ public enum ComboTrack { Light, Heavy, Magic, Hidden }
 
 public enum VisualAttachPoint { Root, LeftHand, RightHand, Head, Weapon }
 
-public struct MeleeAttackSettings
+[System.Serializable]
+public struct BaseAbilitySettings
 {
-    // Hitbox Math
-    public float length;
-    public Vector3 halfExtents;
-    public int maxHits;
+    [Header("Ability Info")]
+    public string abilityName;
+    public Sprite icon;
+    public string description;
 
-    // Filters & Identity
-    public Faction faction;
+    [Header("Identity")]
+    public Faction myFaction; // for Identity Checks
     public DamageType damageType;
-    public LayerMask targetLayer;
-    public LayerMask wallLayer;
 
-    // Audio & Visuals
-    public GameObject attackParticles;
-    public AudioClip missSound;
+    [Header("Physics Filtering")]
+    public LayerMask targetLayer; // What this ability can target/damage
+    public LayerMask wallLayer;   // What blocks this ability's line-of-sight
 
-    // Energy Data
-    public float energyCostPaid;
+    [Header("Combo Settings")]
+    public Ability nextComboAbility; // If null, combo ends
+    public float comboWindow; // Time to press button again
+
+    [Header("State Control")]
+    public float movementMultiplier; // Slow down during cast? (e.g. 0.5f)
+    public bool canRotateDuringCast;
+
+    [Description("Lower the heavier turning during cast")]
+    public float rotationOomph;
+    public bool canMoveAttack;
+    public int attackState; // animaton state transition condition value // calls an animation with this state //animation trigger CastAbility()
+    public AnimationLayer animLayer;
+    public float cooldown;
+    public float requiredRange;
+    public int priority;
+    public bool isRanged;
+    public ComboTrack track; // which combo sequence/track does this belong to - player only
+
+    [Header("Dash Settings")]
+    public Vector3 dashDirection;
+    public float dashPower; //dash power during ability cast?
+    [Range(0f, 1f)]
+    public float dashStartTime;  // 0 to 1 - how far into animation to start dashing ( 0.1 = 10% into animation)
+    [Range(0f, 1f)]
+    public float dashEndTime;   // 0- 1 how far into animationtime to stop 0.9 = 90% of animation
+
+    [Header("Energy Settings")]
+    [Tooltip("How much energy it costs to use this ability.")]
+    public float energyCost;
+
+    [Tooltip("How much energy the player gets back per enemy hit (e.g. for Light Attacks).")]
     public float energyGainOnHit;
+
+    [Tooltip("Percentage (0 to 100) of the energyCost refunded to the player if this attack lands a killing blow.")]
+    [Range(0f, 100f)]
     public float energyRefundOnKillPercent;
+
+    public GameObject abilityVisualParticles; // visuals 
+    public VisualAttachPoint attachPoint; // Instead of public Transform
+    public AudioClip audioClip;
+    public AudioClip visualEffectAudio;
+
+    [Header("Ability Positioning")]
+    public Ability.abilitySpawnType spawnLocation;
+    public Vector3 spawnLocationOffset;
+    public Vector3 spawnRotationOffset;
 }
 
-public abstract class Ability : ScriptableObject{
+public abstract class Ability : ScriptableObject
+{
+
+    [Header("--- NEW REFACTORED CONTAINER ---")]
+    public BaseAbilitySettings baseSettings;
 
     [Header("Main Ability Prefab")]
     public GameObject abilityPrefab;
@@ -39,20 +85,19 @@ public abstract class Ability : ScriptableObject{
     [Header("List of Effects")]
     public List<Effect> abilityEffects;
 
-    public MeleeAttackSettings attackSettings;
-
+    [Header("--- LEGACY BASE FIELDS (TEMPORARY UNTIL MIGRATION) ---")]
     [Header("Ability Info")]
-    public string abilityName ;
-	public Sprite icon ;
-	public string description ;
+    public string abilityName;
+    public Sprite icon;
+    public string description;
 
     [Header("Identity")]
     public Faction myFaction; // for Identity Checks
-	public DamageType damageType;
+    public DamageType damageType;
 
     [Header("Physics Filtering")]
     public LayerMask targetLayer; // What this ability can target/damage
-    public LayerMask wallLayer ;   // What blocks this ability's line-of-sight
+    public LayerMask wallLayer;   // What blocks this ability's line-of-sight
 
     [Header("Combo Settings")]
     public Ability nextComboAbility; // If null, combo ends
@@ -65,19 +110,20 @@ public abstract class Ability : ScriptableObject{
     [Description("Lower the heavier turning during cast")]
     public float rotationOomph = 100f;
     public bool canMoveAttack;
-    public int attackState ; // animaton state transition condition value // calls an animation with this state //animation trigger CastAbility()
+    public int attackState; // animaton state transition condition value // calls an animation with this state //animation trigger CastAbility()
     public AnimationLayer animLayer;
-	public float cooldown ;
+    public float cooldown;
     public float requiredRange;
-	public int priority;
-	public bool isRanged;
+    public int priority;
+    public bool isRanged;
     public ComboTrack track; // which combo sequence/track does this belong to - player only
+
     [Header("Dash Settings")]
     public Vector3 dashDirection;
     public float dashPower; //dash power during ability cast?
     [Range(0f, 1f)]
     public float dashStartTime;  // 0 to 1 - how far into animation to start dashing ( 0.1 = 10% into animation)
-    [Range(0f,1f)]
+    [Range(0f, 1f)]
     public float dashEndTime;   // 0- 1 how far into animationtime to stop 0.9 = 90% of animation
 
     [Header("Energy Settings")]
@@ -96,11 +142,10 @@ public abstract class Ability : ScriptableObject{
     public AudioClip AudioClip;
     public AudioClip visualEffectAudio;
 
-
-    public enum abilitySpawnType{Onself, OnTarget, SpecifiedPoint, PlayerRoot};
+    public enum abilitySpawnType { Onself, OnTarget, SpecifiedPoint, PlayerRoot };
     [Header("Ability Positioning")]
     public abilitySpawnType spawnLocation;
-	public Vector3 spawnLocationOffset;
+    public Vector3 spawnLocationOffset;
     public Vector3 spawnRotationOffset;
 
     // --- THE AUTOMATED INSPECTOR SHORTCUT ---
@@ -110,7 +155,7 @@ public abstract class Ability : ScriptableObject{
         // This ensures all your existing assets get updated with zero manual work.
         if (targetLayer == 0)
         {
-            targetLayer = LayerMask.GetMask( "Player");
+            targetLayer = LayerMask.GetMask("Player");
         }
 
         if (wallLayer == 0)
@@ -120,21 +165,5 @@ public abstract class Ability : ScriptableObject{
         }
     }
 
-    public abstract GameObject Cast (Vector3 pos, Quaternion rot, GameObject caster);
-
-    [ContextMenu("MIGRATE DATA NOW")]
-    public void MigrateData()
-    {
-        attackSettings.length = this.length;
-        attackSettings.halfExtents = this.halfExtents;
-        attackSettings.maxHits = this.maxHits;
-        attackSettings.attackParticles = this.abilityVisualPartyicles;
-        attackSettings.missSound = this.AudioClip;
-        attackSettings.energyCost = this.energyCost;
-        attackSettings.energyGainOnHit = this.energyGainOnHit;
-        attackSettings.energyRefundOnKillPercent = this.energyRefundOnKillPercent;
-
-        Debug.Log($"Migration Complete for {this.name}! Check the 'attackSettings' foldout.");
-    }
-
+    public abstract GameObject Cast(Vector3 pos, Quaternion rot, GameObject caster);
 }

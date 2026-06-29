@@ -9,7 +9,7 @@ public class ExplosionBehaviour : MonoBehaviour
     public bool damageByDistance;
     public Faction myFaction;
     public DamageType damageType;
-    
+
     [Header("Layer Overrides")]
     public LayerMask targetLayer; // Determines what can actually be damaged (e.g., Enemy, Player)
     public LayerMask wallLayer;   // Blocks explosions (e.g., Environment, InteractableEnvironment)
@@ -74,10 +74,10 @@ public class ExplosionBehaviour : MonoBehaviour
 
             // 2. Wall Check
             float dist = Vector3.Distance(transform.position, c.transform.position);
-            
+
             // Avoid NaN errors or division by zero if target is exactly on top of explosion origin
             Vector3 dir = dist > 0.001f ? (c.transform.position - transform.position).normalized : transform.forward;
-            
+
             if (dist > 0.01f)
             {
                 // Raycast evaluates against our wall mask (which now supports both environmental layers)

@@ -4,98 +4,88 @@ using UnityEngine;
 using System;
 using static Ability;
 
-public class AbilityManager : MonoBehaviour {
-	
-	GameObject currentAbilityObject;
-	Coroutine castAbilityRoutine;
-	Animator animator;
+public class AbilityManager : MonoBehaviour
+{
+
+    GameObject currentAbilityObject;
+    Coroutine castAbilityRoutine;
+    [SerializeField]Animator animator;
     private static readonly int AttackStateHash = Animator.StringToHash("AttackState");
 
-    public Dictionary<string,CoolDown> cooldowns;
+    public Dictionary<string, CoolDown> cooldowns;
 
-	[SerializeField]
-	private Transform spawnLocation;
-
-	public List<Ability> abilities;
+    [SerializeField] private Transform spawnLocation;
+    public List<Ability> abilities;
 
     private List<Ability> meleeAbilities = new List<Ability>();
     private List<Ability> rangedAbilities = new List<Ability>();
 
     private bool IsCastingAbility = false;
     public Ability activeAbility;
-    private Transform activeTarget; // The target for the current ability execution
+    private Transform activeTarget;
     public event Action OnAbilityReady;
 
-
     private EffectSpawnPossitions effectSpawnPossitions;
+    private PlayerEnergy playerEnergy; // Reference to our energy tracker system
 
     public Transform VisualLeftHandAttachPoint, VisualRightHandAttachPoint;
     private GameObject activeVisualEffect;
 
-    // Use this for initialization
-    void Start () {
-
+    void Start()
+    {
         effectSpawnPossitions = GetComponent<EffectSpawnPossitions>();
+        playerEnergy = GetComponent<PlayerEnergy>(); // Cache the energy component locally
 
-		//if(this.tag == "Enemy")
-		//{
-		//	spawnLocation = transform.GetChild (2).transform; // in the inspector make sure the spwnloaction is a 3rd child
-		//}
+        if (animator == null && GetComponent<Animator>())
+        {
+            animator = GetComponent<Animator>();
+        }
+        else
+        {
+            Debug.Log(gameObject.name + " doesn't have Animator");
+        }
 
-		if (GetComponent<Animator> ()) {
-			animator = GetComponent<Animator> ();
-		} else {
-			Debug.Log (gameObject.name + " does't have Animator");
-		}
+        cooldowns = new Dictionary<string, CoolDown>();
+        foreach (Ability ab in abilities)
+        {
+            // Migrated: Fetching clean identifiers directly out of the baseSettings container
+            cooldowns.Add(ab.baseSettings.abilityName, new CoolDown(ab));
+        }
+    }
 
-		cooldowns = new Dictionary<string, CoolDown> ();
-		foreach (Ability ab in abilities)
-		{
-			cooldowns.Add (ab.abilityName, new CoolDown(ab));
-		}
-	}
-
-	void Update()
-	{
-		if (Input.GetKey (KeyCode.C)) {
-			CancelAbility ();
-		}
-	}
+    void Update()
+    {
+        if (Input.GetKey(KeyCode.C))
+        {
+            CancelAbility();
+        }
+    }
 
     public void InitializeAbilities(List<Ability> allAbilities)
     {
-        // Sort them into their respective buckets once
         foreach (var a in allAbilities)
         {
-            if (a.isRanged) rangedAbilities.Add(a);
+            // Migrated: Evaluating tags via baseSettings container references safely
+            if (a.baseSettings.isRanged) rangedAbilities.Add(a);
             else meleeAbilities.Add(a);
         }
     }
 
-
     public void SetMovementLock(bool locked)
     {
         IsCastingAbility = locked;
-
-        // If we are unlocking, we can also ensure the AttackState is reset
         if (!locked)
         {
             animator.SetInteger(AttackStateHash, -1);
         }
     }
 
-	public bool GetIsCastingAbility()
-	{
-		return IsCastingAbility;
-	}
-    public bool IsPerformingAction()
+    public bool GetIsCastingAbility() { return IsCastingAbility; }
+    public bool IsPerformingAction() { return animator.GetInteger(AttackStateHash) != -1; }
+
+    public void CancelAbility()
     {
-        // If the animator is anything other than -1, an ability is technically "active"
-        return animator.GetInteger(AttackStateHash) != -1;
-    }
-    public void CancelAbility() // animations will have events at end of the animation to call this function - can also be used for interupts etc.
-    {
-        animator.SetInteger(AttackStateHash, -1); // note : animation must not have exit time or this won't work // -1 is no attack 
+        animator.SetInteger(AttackStateHash, -1);
         Debug.Log("Canceling ability");
         if (activeVisualEffect != null)
         {
@@ -107,37 +97,27 @@ public class AbilityManager : MonoBehaviour {
 
     public void CancelAbilityButtonUp()
     {
-        // 1. If we aren't doing anything, don't bother
         if (activeAbility == null || !IsPerformingAction()) return;
 
         PlayerStateMachine psm = GetComponent<PlayerStateMachine>();
+        int targetLayer = psm.BaseLayer;
 
-        // 2. Determine which animator layer we need to clear
-        int targetLayer = psm.BaseLayer; // Default
-
-        if (activeAbility.animLayer == AnimationLayer.UpperBody)
+        // Migrated: Target layer tracking updated to pull directly from structural container
+        if (activeAbility.baseSettings.animLayer == AnimationLayer.UpperBody)
         {
-            targetLayer = psm.AttackLayer; // Index 1
+            targetLayer = psm.AttackLayer;
         }
-        else if (activeAbility.animLayer == AnimationLayer.FullBody)
+        else if (activeAbility.baseSettings.animLayer == AnimationLayer.FullBody)
         {
-            targetLayer = psm.FullBodyLayer; // Index 2
+            targetLayer = psm.FullBodyLayer;
         }
 
-        // 3. Force the crossfade to the empty "Transition" state on that specific layer
-        // 0.1f is the transition duration—it makes the stop feel smooth rather than a "pop"
         animator.CrossFade(psm.TransitionStateHash, 0.1f, targetLayer);
-
-        // 4. Run your standard cleanup (resets AttackState to -1, clears activeAbility)
         CancelAbility();
     }
 
-    public void CancelGetHitAnim()
-	{
-		animator.SetBool ("GetHit", false);
-	}
+    public void CancelGetHitAnim() { animator.SetBool("GetHit", false); }
 
-    // This is what the Animation Event will call ()
     public void ExecuteActiveAbility()
     {
         Vector3 spawnPos = spawnLocation.position;
@@ -145,122 +125,130 @@ public class AbilityManager : MonoBehaviour {
 
         if (activeAbility != null)
         {
-
-            switch (activeAbility.spawnLocation)
+            // Pulled cleanly from our unified baseSettings!
+            switch (activeAbility.baseSettings.spawnLocation)
             {
                 case abilitySpawnType.Onself:
-                    // Stays as spawnLocation defaults
-                    spawnPos += activeAbility.spawnLocationOffset;
+                    spawnPos += activeAbility.baseSettings.spawnLocationOffset;
                     spawnRot = Quaternion.identity;
-
                     break;
 
                 case abilitySpawnType.OnTarget:
                     if (activeTarget != null)
                     {
                         spawnPos = activeTarget.position;
-                        spawnPos += activeAbility.spawnLocationOffset;
+                        spawnPos += activeAbility.baseSettings.spawnLocationOffset;
                         spawnRot = Quaternion.identity;
                     }
                     break;
+
                 case abilitySpawnType.PlayerRoot:
-
                     spawnPos = effectSpawnPossitions.abilitySpawnRootPos.position;
-                        spawnRot = this.transform.rotation;
-
+                    spawnRot = this.transform.rotation;
                     break;
 
                 case abilitySpawnType.SpecifiedPoint:
-
-                    spawnRot *= Quaternion.Euler(activeAbility.spawnRotationOffset);
-                    // Handle third case here
+                    spawnRot *= Quaternion.Euler(activeAbility.baseSettings.spawnRotationOffset);
                     break;
             }
 
-            // We use the already cached activeAbility instead of looking it up by string
-            currentAbilityObject = activeAbility.Cast(spawnPos, spawnRot,this.gameObject);
-           // Debug.Log($"Executed: {activeAbility.abilityName}");
+            // Casts the ability prefab into the world
+            currentAbilityObject = activeAbility.Cast(spawnPos, spawnRot, this.gameObject);
         }
         else
         {
-            Debug.LogWarning("Animation tried to cast, but no activeAbility was set! from " +this.gameObject.name);
+            Debug.LogWarning("Animation tried to cast, but no activeAbility was set! from " + this.gameObject.name);
         }
     }
 
-    public void StartCastingAbility(Ability ab, Transform target) // this will trigger animation to play
-	{
-		if (cooldowns [ab.abilityName].coolDownReady) 
-		{
-
-            activeTarget = target;
-            //activeAbility = cooldowns[ab.name].ability;
-            activeAbility = ab;
-            animator.SetInteger (AttackStateHash, cooldowns [ab.abilityName].ability.attackState);
-            if(ab.AudioClip!=null) GetComponent<AudioSource>().PlayOneShot(ab.AudioClip);//play ability audio when casting
-			StartCoroutine (RunCoolDown (cooldowns [ab.abilityName]));
-		}
-	}
-    public void ClearActiveAbility()
+    // UPDATED: Now validates energy constraints cleanly via baseSettings structures before committing execution pipeline steps
+    // UPDATED: Dynamic validation that bypasses resource constraints if the entity lacks an energy pool
+    public void StartCastingAbility(Ability ab, Transform target)
     {
-        activeAbility = null;
+        string currentName = ab.baseSettings.abilityName;
+
+        if (cooldowns[currentName].coolDownReady)
+        {
+            // 1. If they HAVE an energy script, check if they can afford it. If they DON'T, skip this entirely!
+            if (playerEnergy != null && !playerEnergy.CanAfford(ab.baseSettings.energyCost))
+            {
+               // Debug.LogWarning($"[CAST FAILED] Insufficient resource pool values to cast: {currentName}");
+                return;
+            }
+
+            // 2. Only deduct energy if the component actually exists on this entity
+            if (playerEnergy != null)
+            {
+                playerEnergy.UseEnergy(ab.baseSettings.energyCost);
+                Debug.Log("ABILITY JUST USED ENERGY of " + ab.baseSettings.energyCost);
+                Debug.Log("current Energy = " + playerEnergy.GetCurrentEnergy());
+            }
+
+            // 3. Begin active setup states safely (Works for everyone!)
+            activeTarget = target;
+            activeAbility = ab;
+            animator.SetInteger(AttackStateHash, cooldowns[currentName].ability.baseSettings.attackState);
+
+            if (ab.baseSettings.audioClip != null)
+            {
+                GetComponent<AudioSource>().PlayOneShot(ab.baseSettings.audioClip);
+            }
+
+            StartCoroutine(RunCoolDown(cooldowns[currentName]));
+        }
     }
 
-    public void CastAbility (string name) // animation will have event set at certain frame to call this function with the ability name to triger
-	{
-			currentAbilityObject = cooldowns [name].TriggerAbility (spawnLocation.position, spawnLocation.rotation,this.gameObject);
-			//Debug.Log("Casting ability " + name);
-		//	StartCoroutine (RunCoolDown (cooldowns [name]));
+    public void ClearActiveAbility() { activeAbility = null; }
 
-	}
+    public void CastAbility(string name)
+    {
+        currentAbilityObject = cooldowns[name].TriggerAbility(spawnLocation.position, spawnLocation.rotation, this.gameObject);
+    }
 
-	public void AddAbility(Ability ab)
-	{
-		cooldowns.Add(ab.abilityName, new CoolDown(ab));
-	}
+    public void AddAbility(Ability ab)
+    {
+        cooldowns.Add(ab.baseSettings.abilityName, new CoolDown(ab));
+    }
 
-	private IEnumerator RunCoolDown(CoolDown cd)
-	{
-		cd.stopwatch.Stop ();
-		cd.stopwatch.Reset ();
-		cd.stopwatch.Start ();
+    private IEnumerator RunCoolDown(CoolDown cd)
+    {
+        cd.stopwatch.Stop();
+        cd.stopwatch.Reset();
+        cd.stopwatch.Start();
 
-		cd.coolDownReady = false;
-		cd.timeLeft = cd.ability.cooldown;
+        cd.coolDownReady = false;
+        cd.timeLeft = cd.ability.baseSettings.cooldown;
 
-		while (!cd.coolDownReady)
-		{
-			cd.timeLeft = cd.ability.cooldown - (float)cd.stopwatch.Elapsed.TotalSeconds;
-			cd.coolDownReady = (cd.timeLeft <= 0f);
-			yield return null;
-		}
-			
-		cd.stopwatch.Stop ();
-		cd.stopwatch.Reset ();
-        // TRIGGER THE EVENT: Tell everyone listening new ability became avaliable 
+        while (!cd.coolDownReady)
+        {
+            cd.timeLeft = cd.ability.baseSettings.cooldown - (float)cd.stopwatch.Elapsed.TotalSeconds;
+            cd.coolDownReady = (cd.timeLeft <= 0f);
+            yield return null;
+        }
+
+        cd.stopwatch.Stop();
+        cd.stopwatch.Reset();
         OnAbilityReady?.Invoke();
-
     }
-    // Helper to see if the current casting ability allows movement
+
     public bool CurrentAbilityAllowsMovement()
     {
-        // You'll need to store a reference to the 'activeAbility' when StartCasting is called
-        if (activeAbility != null) return activeAbility.canMoveAttack;
-        return true; // Default to true if not casting
+        if (activeAbility != null) return activeAbility.baseSettings.canMoveAttack;
+        return true;
     }
 
     public Ability GetHighestPriorityAbility()
     {
         Ability bestAbility = null;
-        int topPriority = int.MaxValue; // Start with the lowest possible priority
+        int topPriority = int.MaxValue;
 
         foreach (var cd in cooldowns.Values)
         {
             if (cd.coolDownReady)
             {
-                // If this ability's priority is "more important" (smaller number) than our current best
-                if (cd.ability.priority < topPriority)
+                if (cd.ability.baseSettings.priority < topPriority)
                 {
-                    topPriority = cd.ability.priority;
+                    topPriority = cd.ability.baseSettings.priority;
                     bestAbility = cd.ability;
                 }
             }
@@ -270,45 +258,35 @@ public class AbilityManager : MonoBehaviour {
 
     public void PlayVisuals()
     {
-        // 1. Safety Check
-        if (activeAbility == null ) return;
+        if (activeAbility == null) return;
 
-        // 2. Identify the target parent based on your Enum
-        Transform targetParent = transform; // Default fallback to character root
+        Transform targetParent = transform;
 
-        if (activeAbility.attachPoint == VisualAttachPoint.RightHand)
+        if (activeAbility.baseSettings.attachPoint == VisualAttachPoint.RightHand)
         {
             if (VisualRightHandAttachPoint != null) targetParent = VisualRightHandAttachPoint;
         }
-        else if (activeAbility.attachPoint == VisualAttachPoint.LeftHand)
+        else if (activeAbility.baseSettings.attachPoint == VisualAttachPoint.LeftHand)
         {
             if (VisualLeftHandAttachPoint != null) targetParent = VisualLeftHandAttachPoint;
         }
-        // Root/Default case uses the 'transform' initialized above
 
-        // 3. Calculate Final Position/Rotation using the SO Offsets
-        Vector3 finalPos = targetParent.position + activeAbility.spawnLocationOffset;
+        Vector3 finalPos = targetParent.position + activeAbility.baseSettings.spawnLocationOffset;
+        Quaternion finalRot = targetParent.rotation * Quaternion.Euler(activeAbility.baseSettings.spawnRotationOffset);
 
-        // Combining the parent rotation with the SO's rotation offset
-        Quaternion finalRot = targetParent.rotation * Quaternion.Euler(activeAbility.spawnRotationOffset);
-
-        if (activeAbility.abilityVisualPartyicles != null)
+        if (activeAbility.baseSettings.abilityVisualParticles != null)
         {
-                // 4. Instantiate and Parent
-                // This ensures the particle stays glued to the hand/head during animations
-                activeVisualEffect = Instantiate(
-                activeAbility.abilityVisualPartyicles,
+            activeVisualEffect = Instantiate(
+                activeAbility.baseSettings.abilityVisualParticles,
                 finalPos,
                 finalRot,
                 targetParent
             );
         }
-        if (activeAbility.visualEffectAudio != null)
+        if (activeAbility.baseSettings.visualEffectAudio != null)
         {
-            AudioSource.PlayClipAtPoint(activeAbility.visualEffectAudio, transform.position);
+            AudioSource.PlayClipAtPoint(activeAbility.baseSettings.visualEffectAudio, transform.position);
         }
-        // Optional: If you want to auto-destroy visuals after a set time
-        // Destroy(vfx, 3.0f); 
     }
 
     public Ability GetHighestPriorityReady(bool wantRanged)
@@ -320,9 +298,10 @@ public class AbilityManager : MonoBehaviour {
 
         foreach (var a in listToSearch)
         {
-            if (cooldowns[a.abilityName].coolDownReady && a.priority < topPriority)
+            string nameKey = a.baseSettings.abilityName;
+            if (cooldowns[nameKey].coolDownReady && a.baseSettings.priority < topPriority)
             {
-                topPriority = a.priority;
+                topPriority = a.baseSettings.priority;
                 best = a;
             }
         }
@@ -337,5 +316,4 @@ public class AbilityManager : MonoBehaviour {
         }
         return null;
     }
-
 }
