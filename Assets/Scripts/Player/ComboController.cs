@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ComboController : MonoBehaviour
 {
-    public enum ComboTrackId { Light, Heavy, Magic, Q, E, R, F, DodgeHeavy }
+    public enum ComboTrackId { Light, Heavy, Magic, Q, E, R, F, DodgeHeavy, Counter }
 
     private class TrackState
     {
@@ -20,6 +20,7 @@ public class ComboController : MonoBehaviour
     public int rIndex = 0;
     public int fIndex = 0;
     public int dodgeHeavyIndex = 0;
+    public int counterIndex = 0;
     private PlayerStateMachine psm;
 
     // Each track (left-click, right-click, Q/E/R/F, ...) needs its own "last fired ability" +
@@ -55,6 +56,9 @@ public class ComboController : MonoBehaviour
 
     [Header("Dodge Heavy Attack (Manual Assignment)")]
     public List<Ability> dodgeHeavyAbilities = new();
+
+    [Header("Counter Attack (Manual Assignment)")]
+    public List<Ability> counterAbilities = new();
 
     private void Start()
     {

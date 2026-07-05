@@ -22,8 +22,13 @@ public class PlayerInputHandler : MonoBehaviour
         // Centralized defensive handler handles both block and dodge on Left Shift
         HandleDefensiveInput();
 
+        // While actively blocking, a light-attack press fires a counter instead of the normal light combo.
+        if (psm.GetCurrentState() is BlockState && Input.GetMouseButtonDown(0))
+        {
+            comboController.OnAbilityInput(ComboController.ComboTrackId.Counter, ref comboController.counterIndex, comboController.counterAbilities);
+        }
         // Prevent attacking/casting if the player is actively blocking
-        if (!psm.IsDodging() && !(psm.GetCurrentState() is BlockState))
+        else if (!psm.IsDodging() && !(psm.GetCurrentState() is BlockState))
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {

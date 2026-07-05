@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -350,19 +350,50 @@ public class DeathHandler : MonoBehaviour
         if (rb != null) Destroy(rb);
     }
 
-    private void MatchTargetPose(Transform sourceParent, Transform destinationParent)
+    private void MatchTargetPose(Transform livingRoot, Transform ragdollRoot)
     {
-        for (int i = 0; i < sourceParent.childCount; i++)
-        {
-            var sourceChild = sourceParent.GetChild(i);
-            var destinationChild = destinationParent.Find(sourceChild.name);
+        // Gather ALL transforms inside the living character's armature
+        Transform[] livingTransforms = livingRoot.GetComponentsInChildren<Transform>();
 
-            if (destinationChild != null)
+        // Create a fast-lookup dictionary of the living bones by their names
+        Dictionary<string, Transform> livingBoneMap = new Dictionary<string, Transform>();
+        foreach (Transform t in livingTransforms)
+        {
+            if (!livingBoneMap.ContainsKey(t.name))
             {
-                destinationChild.position = sourceChild.position;
-                destinationChild.rotation = sourceChild.rotation;
-                MatchTargetPose(sourceChild, destinationChild);
+                livingBoneMap.Add(t.name, t);
             }
+        }
+
+        // Gather ALL transforms inside the newly spawned ragdoll
+        Transform[] ragdollTransforms = ragdollRoot.GetComponentsInChildren<Transform>();
+
+        // OPTIMIZATION: Temporarily disable physics on the ragdoll bones so they don't fight the snapping
+        List<Rigidbody> ragdollRigidbodies = new List<Rigidbody>();
+        foreach (Transform rBone in ragdollTransforms)
+        {
+            Rigidbody rb = rBone.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.isKinematic = true; // Freeze physics for a split second
+                ragdollRigidbodies.Add(rb);
+            }
+        }
+
+        // Match positions and rotations perfectly regardless of hierarchy depth mismatches
+        foreach (Transform rBone in ragdollTransforms)
+        {
+            if (livingBoneMap.TryGetValue(rBone.name, out Transform matchingLivingBone))
+            {
+                rBone.position = matchingLivingBone.position;
+                rBone.rotation = matchingLivingBone.rotation;
+            }
+        }
+
+        // Wake physics back up on the ragdoll now that it's in the perfect position
+        foreach (Rigidbody rb in ragdollRigidbodies)
+        {
+            rb.isKinematic = false;
         }
     }
 }
