@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.Events;
 
@@ -18,6 +18,7 @@ namespace CameraObjectFader
                 return;
             }
             Instance = this;
+            _cam = GetComponent<Camera>();
         }
 
         public UnityEvent onObstructionStart;
@@ -33,13 +34,13 @@ namespace CameraObjectFader
         [Range(0f, 1f)] public float fadeAlpha = 0.2f;
         public float fadeSpeed = 5f;
         public bool fadeChildrenRenderers = true;
-        
+
         [Header("Detection Settings")]
         public bool useSphereCast = false;
         public float castRadius = 0.3f;
         public float minDistance = 0.1f;
-        public float maxFadeDistance = 20.0f; 
-        
+        public float maxFadeDistance = 20.0f;
+
         [Header("Distance Scaling")]
         public bool useDistanceScaling = true;
         [Range(0f, 1f)] public float nearAlpha = 0.1f;
@@ -54,8 +55,24 @@ namespace CameraObjectFader
         public List<string> ignoreTags = new List<string> { "IgnoreFading" };
         public List<GameObject> ignoreObjects = new List<GameObject>();
 
+        // ── Mouse Circle Mask ─────────────────────────────────────────────
+        [Header("Mouse Circle Mask")]
+        [Tooltip("The transform that PlayerToMouse moves to the mouse world position.\n" +
+                 "Leave empty to disable the mouse circle entirely.")]
+        public Transform mouseWorldTransform;
+
+        [Tooltip("The mouse circle only appears when the mouse is hovering over an object\n" +
+                 "that is ALREADY fading the player's view this frame.\n" +
+                 "If the player isn't behind the wall, the mouse circle won't show either.")]
+        public float mouseCircleRadius = 180f;
+        public float mouseCircleFeather = 60f;
+
         [Header("Debug")]
         public bool showGizmos = true;
+
+        // ── Shader global IDs ─────────────────────────────────────────────
+        private static readonly int IDCircle2 = Shader.PropertyToID("_DitherCircle2");
+        private static readonly Vector4 OffScreen = new Vector4(-99999f, -99999f, 1f, 1f);
 
         // --- PUBLIC API ---
 
@@ -83,10 +100,11 @@ namespace CameraObjectFader
         }
 
         // --- INTERNAL STATE ---
+        private Camera _cam;
         private bool _isCurrentlyObstructionActive = false;
         private List<FadeableObject> _activeFaders = new List<FadeableObject>();
-        private RaycastHit[] _hitsBuffer = new RaycastHit[20]; 
-        private Dictionary<int, FadeableObject> _knownFaders = new Dictionary<int, FadeableObject>(); 
+        private RaycastHit[] _hitsBuffer = new RaycastHit[20];
+        private Dictionary<int, FadeableObject> _knownFaders = new Dictionary<int, FadeableObject>();
         private HashSet<FadeableObject> _currentFrameFaders = new HashSet<FadeableObject>();
         private Dictionary<FadeableObject, float> _frameAlphaOverrides = new Dictionary<FadeableObject, float>();
 
@@ -96,7 +114,70 @@ namespace CameraObjectFader
 
             ProcessObstructions();
             UpdateFaders();
+
+            // Mouse circle runs AFTER ProcessObstructions so _currentFrameFaders is
+            // already populated with this frame's player-blocking objects.
+            UpdateMouseCircle();
         }
+
+        // ── Mouse circle ──────────────────────────────────────────────────
+
+        private void UpdateMouseCircle()
+        {
+            // No transform assigned → disable the mouse circle shader slot
+            if (mouseWorldTransform == null)
+            {
+                Shader.SetGlobalVector(IDCircle2, OffScreen);
+                return;
+            }
+
+            Vector3 camPos = transform.position;
+            Vector3 toMouse = mouseWorldTransform.position - camPos;
+            float dist = toMouse.magnitude;
+
+            bool mouseIsOverSameObject = false;
+
+            if (dist > 0.01f)
+            {
+                // Raycast from camera toward the mouse world position
+                int hitCount = Physics.RaycastNonAlloc(
+                    camPos, toMouse.normalized, _hitsBuffer, dist, fadeLayer);
+
+                for (int i = 0; i < hitCount; i++)
+                {
+                    FadeableObject fader = _hitsBuffer[i].collider
+                        .GetComponentInParent<FadeableObject>();
+
+                    // Only activate if this object is ALSO blocking the player right now
+                    if (fader != null && _currentFrameFaders.Contains(fader))
+                    {
+                        mouseIsOverSameObject = true;
+                        break;
+                    }
+                }
+            }
+
+            if (mouseIsOverSameObject && _cam != null)
+            {
+                Vector3 sp = _cam.WorldToScreenPoint(mouseWorldTransform.position);
+                if (sp.z > 0f)
+                {
+                    Shader.SetGlobalVector(IDCircle2,
+                        new Vector4(sp.x, sp.y, mouseCircleRadius, mouseCircleFeather));
+                    return;
+                }
+            }
+
+            // Not over a shared fading object — hide the mouse circle
+            Shader.SetGlobalVector(IDCircle2, OffScreen);
+        }
+
+        private void OnDisable()
+        {
+            Shader.SetGlobalVector(IDCircle2, OffScreen);
+        }
+
+        // ── Everything below is unchanged from the original asset ─────────
 
         private void ProcessObstructions()
         {
@@ -112,11 +193,10 @@ namespace CameraObjectFader
                 Vector3 targetFullPos = target.position + targetOffset;
                 Vector3 dir = targetFullPos - camPos;
                 float totalDist = dir.magnitude;
-                
+
                 if (totalDist < minDistance) continue;
 
-                // Perform Physics Check for this target
-                int hitCount = useSphereCast 
+                int hitCount = useSphereCast
                     ? Physics.SphereCastNonAlloc(camPos, castRadius, dir.normalized, _hitsBuffer, totalDist, fadeLayer)
                     : Physics.RaycastNonAlloc(camPos, dir.normalized, _hitsBuffer, totalDist, fadeLayer);
 
@@ -141,27 +221,22 @@ namespace CameraObjectFader
         private bool ShouldExclude(GameObject go, Transform currentTarget)
         {
             if (go == gameObject) return true;
-            
-            // 1. Check if the object is the specific target we are casting toward
+
             if (go == currentTarget.gameObject)
             {
-                // Only exclude the target itself if we are NOT supposed to fade it when close
                 if (!fadeTargetWhenClose) return true;
             }
             else
             {
-                // 2. Check if the object is ONE OF THE OTHER targets
-                // We typically don't want Target A to cause Target B to fade just by standing in front of it.
                 for (int i = 0; i < targets.Count; i++)
                 {
                     if (targets[i] != null && targets[i].gameObject == go) return true;
                 }
             }
-            
-            if (go.GetComponent<FaderIgnore>() != null) return true;
 
+            if (go.GetComponent<FaderIgnore>() != null) return true;
             if (ignoreObjects != null && ignoreObjects.Contains(go)) return true;
-            
+
             if (ignoreTags != null && ignoreTags.Count > 0)
             {
                 string tagStr = go.tag;
@@ -177,7 +252,7 @@ namespace CameraObjectFader
             if (fader == null) return;
 
             _currentFrameFaders.Add(fader);
-            
+
             float finalAlpha = fadeAlpha;
             if (go == currentTarget.gameObject && fadeTargetWhenClose)
             {
@@ -199,7 +274,7 @@ namespace CameraObjectFader
         private FadeableObject GetOrAddFader(GameObject go)
         {
             FadeableObject fader = go.GetComponentInParent<FadeableObject>();
-            
+
             if (fader != null)
             {
                 int id = fader.gameObject.GetInstanceID();
@@ -211,7 +286,7 @@ namespace CameraObjectFader
             fader = go.AddComponent<FadeableObject>();
             fader.fadeChildren = fadeChildrenRenderers;
             fader.Initialize();
-            
+
             _knownFaders[go.GetInstanceID()] = fader;
             return fader;
         }
@@ -272,67 +347,63 @@ namespace CameraObjectFader
 
             Vector3 camPos = transform.position;
 
-            // 1. Draw Lines to Targets
             Gizmos.color = Color.yellow;
             foreach (var t in targets)
             {
                 if (t == null) continue;
                 Vector3 targetPos = t.position + targetOffset;
                 Gizmos.DrawLine(camPos, targetPos);
-                
-                // Draw SphereCast radius along the line if enabled
+
                 if (useSphereCast)
                 {
-                    Gizmos.color = new Color(1f, 0.92f, 0.016f, 0.2f); // Transparent Yellow
-                    // Visualization is approximate: drawing a few spheres along the path
+                    Gizmos.color = new Color(1f, 0.92f, 0.016f, 0.2f);
                     Vector3 dir = (targetPos - camPos);
                     float dist = dir.magnitude;
                     if (dist > minDistance)
                     {
-                        // Draw a cylinder-like representation or just start/end spheres
                         Gizmos.DrawWireSphere(camPos + dir.normalized * minDistance, castRadius);
                         Gizmos.DrawWireSphere(camPos + dir.normalized * Mathf.Min(dist, maxFadeDistance), castRadius);
                     }
                 }
             }
 
-            // 2. Draw Max Fade Distance
-            Gizmos.color = new Color(1, 0, 0, 0.2f); // Red
+            Gizmos.color = new Color(1, 0, 0, 0.2f);
             Gizmos.DrawWireSphere(camPos, maxFadeDistance);
 
-            // 3. Draw Min Distance
-            Gizmos.color = new Color(0, 1, 0, 0.3f); // Green
+            Gizmos.color = new Color(0, 1, 0, 0.3f);
             Gizmos.DrawWireSphere(camPos, minDistance);
 
-            // 4. Draw Target Fade Ranges
             if (fadeTargetWhenClose)
             {
-                // Draw triggers around Camera (original view)
-                Gizmos.color = new Color(0, 1, 1, 0.15f); // Faint Cyan
+                Gizmos.color = new Color(0, 1, 1, 0.15f);
                 Gizmos.DrawWireSphere(camPos, targetFadeStartDistance);
 
-                Gizmos.color = new Color(0, 0, 1, 0.15f); // Faint Blue
+                Gizmos.color = new Color(0, 0, 1, 0.15f);
                 Gizmos.DrawWireSphere(camPos, targetFadeEndDistance);
 
-                // Draw triggers around Targets to visualize Offset and Proximity (Symmetric View)
                 foreach (var t in targets)
                 {
                     if (t == null) continue;
                     Vector3 tPos = t.position + targetOffset;
 
-                    // Show Offset Point - Crucial for understanding what point is being measured
                     Gizmos.color = Color.magenta;
                     Gizmos.DrawWireSphere(tPos, 0.1f);
                     Gizmos.DrawLine(t.position, tPos);
 
-                    // Fade Zones relative to Target
-                    // If Camera enters these spheres (green/blue), fading happens
-                    Gizmos.color = new Color(0, 1, 1, 0.5f); // Cyan - Start Fade Limit
+                    Gizmos.color = new Color(0, 1, 1, 0.5f);
                     Gizmos.DrawWireSphere(tPos, targetFadeStartDistance);
 
-                    Gizmos.color = new Color(0, 0, 1, 0.5f); // Blue - Full Fade Limit
+                    Gizmos.color = new Color(0, 0, 1, 0.5f);
                     Gizmos.DrawWireSphere(tPos, targetFadeEndDistance);
                 }
+            }
+
+            // Draw mouse circle preview in scene view
+            if (mouseWorldTransform != null)
+            {
+                Gizmos.color = new Color(1f, 0.5f, 0f, 0.5f);
+                Gizmos.DrawWireSphere(mouseWorldTransform.position, 0.3f);
+                Gizmos.DrawLine(camPos, mouseWorldTransform.position);
             }
         }
     }

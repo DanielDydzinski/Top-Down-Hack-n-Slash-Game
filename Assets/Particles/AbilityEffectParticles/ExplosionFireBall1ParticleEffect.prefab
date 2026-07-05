@@ -49115,6 +49115,7 @@ GameObject:
   - component: {fileID: 6530738521032408408}
   - component: {fileID: 1070875385867714249}
   - component: {fileID: 4962073069728023384}
+  - component: {fileID: -8424295055023830719}
   m_Layer: 0
   m_Name: ExplosionFireBall1ParticleEffect
   m_TagString: Untagged
@@ -53985,7 +53986,7 @@ AudioSource:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6662407198025422280}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 83a3d45944f24b647a973099cc6fb1d3, type: 3}
@@ -54075,6 +54076,22 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &-8424295055023830719
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6662407198025422280}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7e7d0ff229b99e42a3784c3e93461b0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  byTime: 1
+  destroyTime: 3
+  byDistance: 0
+  destroyDistance: 0
 --- !u!1 &7872212525104406954
 GameObject:
   m_ObjectHideFlags: 0

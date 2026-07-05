@@ -73,6 +73,13 @@ MonoBehaviour:
   damageType: 0
   effects: []
   caster: {fileID: 0}
+  targetLayer:
+    serializedVersion: 2
+    m_Bits: 512
+  wallLayer:
+    serializedVersion: 2
+    m_Bits: 33792
+  useLineOfSight: 1
 --- !u!114 &7044176577811463868
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -85,10 +92,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d882f791d4b3d94a85e8ce8409cc7d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  smallHealthPotionPrefab: {fileID: 1853923159977811795, guid: 918d6dd8b172a7d448c59c29b83f9501,
-    type: 3}
-  largeHealthPotionPrefab: {fileID: 1853923159977811795, guid: d81871609c6987246a9ddb71bbdbedb4,
-    type: 3}
+  smallHealthPotionPrefab: {fileID: 1853923159977811795, guid: 918d6dd8b172a7d448c59c29b83f9501, type: 3}
+  largeHealthPotionPrefab: {fileID: 1853923159977811795, guid: d81871609c6987246a9ddb71bbdbedb4, type: 3}
   smallPotionDropChance: 5
   largePotionDropChance: 5
   crunchSounds:

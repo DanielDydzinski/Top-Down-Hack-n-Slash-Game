@@ -1,13 +1,25 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Health))] // Changed to guarantee a Health component exists
 public class EntityAudio : MonoBehaviour
 {
+    [System.Serializable]
+    public class DamageSoundMapping
+    {
+        public DamageType damageType;
+        [Tooltip("Clips to choose from randomly when this damage type lands")]
+        public AudioClip[] clips;
+    }
+
     private Health health; // Changed from DamageReceiver
     private AudioSource audioSource;
 
     [Header("Hit Sounds")]
-    [Tooltip("Array of clips to choose from randomly")]
+    [Tooltip("Per damage-type sound sets. First matching entry with clips assigned wins.")]
+    public List<DamageSoundMapping> damageSounds = new List<DamageSoundMapping>();
+
+    [Tooltip("Used when no mapping matches the incoming damage type (or its clip list is empty)")]
     public AudioClip[] hitSounds;
 
     [Header("Settings")]
@@ -51,7 +63,8 @@ public class EntityAudio : MonoBehaviour
         // This will now print the true, finalized damage calculated by your scriptable objects!
        // Debug.Log($"[AUDIO PLAYBACK] Source: {gameObject.name} | Confirmed Dmg: {info.damage}");
 
-        if (hitSounds.Length == 0) return;
+        AudioClip clip = GetClipForDamageType(info.type);
+        if (clip == null) return;
 
         // 1. Roll the dice
         float roll = Random.value;
@@ -60,10 +73,27 @@ public class EntityAudio : MonoBehaviour
         // 2. Randomize Pitch
         audioSource.pitch = originalPitch + Random.Range(-pitchVariation, pitchVariation);
 
-        // 3. Pick a random clip
-        AudioClip clip = hitSounds[Random.Range(0, hitSounds.Length)];
+        // 3. Play
+        if (!info.isBlocked)
+        {
+            audioSource.PlayOneShot(clip);
+        }
 
-        // 4. Play
-        audioSource.PlayOneShot(clip);
+    }
+
+    private AudioClip GetClipForDamageType(DamageType type)
+    {
+        for (int i = 0; i < damageSounds.Count; i++)
+        {
+            DamageSoundMapping mapping = damageSounds[i];
+            if (mapping.damageType == type && mapping.clips != null && mapping.clips.Length > 0)
+                return mapping.clips[Random.Range(0, mapping.clips.Length)];
+        }
+
+        // Fallback: no specific mapping for this damage type
+        if (hitSounds != null && hitSounds.Length > 0)
+            return hitSounds[Random.Range(0, hitSounds.Length)];
+
+        return null;
     }
 }

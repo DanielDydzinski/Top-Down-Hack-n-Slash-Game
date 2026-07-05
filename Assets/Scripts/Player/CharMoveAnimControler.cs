@@ -43,12 +43,6 @@ public class CharMoveAnimControler : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		UpdateAnimator ();
-
-        if (Input.GetKeyDown(KeyCode.Escape))
-            {
-
-            Application.Quit();
-            }
 	}
 
 	private void UpdateAnimator()

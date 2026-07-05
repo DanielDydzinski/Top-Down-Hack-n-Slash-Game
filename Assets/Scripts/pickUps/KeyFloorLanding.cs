@@ -19,6 +19,8 @@ public class KeyFloorLanding : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
+        Debug.Log("Woo hoo we landed on floor!");
+
         // Prevent this from firing multiple times if the key bounces
         if (_hasLanded) return;
 

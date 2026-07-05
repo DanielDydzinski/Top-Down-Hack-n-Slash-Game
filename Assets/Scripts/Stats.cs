@@ -15,6 +15,8 @@ public class Stats : MonoBehaviour
 	[SerializeField]
 	private float physicalPower;
     //public float damageReduction;
+    [Header("Block System Settings")]
+    [Range(0f, 100f)] public float blockDamageMitigation = 75f; // 75% of damage is blocked, 25% passes through
 
     public float mass = 3f;
 	[SerializeField] private float dodgeAnimationSpeed= 1f;
@@ -133,5 +135,14 @@ public class Stats : MonoBehaviour
 	{
 		return physicalPower;
 	}
+    public void SetBlockDamageMitigation(float value)
+    {
+        blockDamageMitigation = Mathf.Clamp(value, 0f, 100f);
+    }
+
+    public float GetBlockDamageMitigation()
+    {
+        return blockDamageMitigation;
+    }
 
 }

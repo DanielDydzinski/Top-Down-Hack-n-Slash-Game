@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEditor;
 using CameraObjectFader;
 using CameraObjectFader.Internal;
@@ -26,6 +26,12 @@ namespace CameraObjectFader.Editor
         private SerializedProperty ignoreObjectsProp;
         private SerializedProperty onObstructionStartProp;
         private SerializedProperty onObstructionEndProp;
+
+        // ── Mouse Circle Mask ─────────────────────────────────────────────
+        private SerializedProperty mouseWorldTransformProp;
+        private SerializedProperty mouseCircleRadiusProp;
+        private SerializedProperty mouseCircleFeatherProp;
+        private bool showMouseCircle = true;
 
         private bool showTargetSettings = true;
         private bool showTargetFading = true;
@@ -55,7 +61,7 @@ namespace CameraObjectFader.Editor
             minDistanceProp = serializedObject.FindProperty("minDistance");
             maxFadeDistanceProp = serializedObject.FindProperty("maxFadeDistance");
             fadeChildrenRenderersProp = serializedObject.FindProperty("fadeChildrenRenderers");
-            
+
             useDistanceScalingProp = serializedObject.FindProperty("useDistanceScaling");
             nearAlphaProp = serializedObject.FindProperty("nearAlpha");
             farAlphaProp = serializedObject.FindProperty("farAlpha");
@@ -65,6 +71,11 @@ namespace CameraObjectFader.Editor
             fadeTargetWhenCloseProp = serializedObject.FindProperty("fadeTargetWhenClose");
             targetFadeStartDistanceProp = serializedObject.FindProperty("targetFadeStartDistance");
             targetFadeEndDistanceProp = serializedObject.FindProperty("targetFadeEndDistance");
+
+            // Mouse Circle Mask
+            mouseWorldTransformProp = serializedObject.FindProperty("mouseWorldTransform");
+            mouseCircleRadiusProp = serializedObject.FindProperty("mouseCircleRadius");
+            mouseCircleFeatherProp = serializedObject.FindProperty("mouseCircleFeather");
         }
 
         public override void OnInspectorGUI()
@@ -92,12 +103,11 @@ namespace CameraObjectFader.Editor
             if (showTargetSettings)
             {
                 EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-                
-                // Track multiple targets
+
                 for (int i = 0; i < targetsProp.arraySize; i++)
                 {
                     EditorGUILayout.BeginHorizontal();
-                    EditorGUILayout.PropertyField(targetsProp.GetArrayElementAtIndex(i), new GUIContent($"Target {i+1}"));
+                    EditorGUILayout.PropertyField(targetsProp.GetArrayElementAtIndex(i), new GUIContent($"Target {i + 1}"));
                     if (GUILayout.Button("-", GUILayout.Width(20)))
                     {
                         targetsProp.DeleteArrayElementAtIndex(i);
@@ -107,9 +117,7 @@ namespace CameraObjectFader.Editor
                 }
 
                 if (GUILayout.Button("+ Add Target", EditorStyles.miniButton))
-                {
                     targetsProp.arraySize++;
-                }
 
                 EditorGUILayout.Space(2);
                 EditorGUILayout.PropertyField(targetOffsetProp);
@@ -172,8 +180,7 @@ namespace CameraObjectFader.Editor
             if (showExclusionSettings)
             {
                 EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-                
-                // --- TAGS LIST ---
+
                 showTagsList = EditorGUILayout.Foldout(showTagsList, "Ignore by Tags", true);
                 if (showTagsList)
                 {
@@ -183,7 +190,6 @@ namespace CameraObjectFader.Editor
                         SerializedProperty element = ignoreTagsProp.GetArrayElementAtIndex(i);
                         EditorGUILayout.BeginHorizontal();
                         element.stringValue = EditorGUILayout.TagField($"Slot {i}", element.stringValue);
-                        
                         if (GUILayout.Button("-", GUILayout.Width(20)))
                         {
                             ignoreTagsProp.DeleteArrayElementAtIndex(i);
@@ -191,7 +197,6 @@ namespace CameraObjectFader.Editor
                         }
                         EditorGUILayout.EndHorizontal();
                     }
-
                     if (GUILayout.Button("+ Add New Tag", EditorStyles.miniButton))
                     {
                         ignoreTagsProp.arraySize++;
@@ -202,19 +207,15 @@ namespace CameraObjectFader.Editor
 
                 EditorGUILayout.Space(5);
 
-                // --- OBJECTS LIST ---
                 showObjectsList = EditorGUILayout.Foldout(showObjectsList, "Ignore Specific Objects", true);
                 if (showObjectsList)
                 {
                     EditorGUI.indentLevel++;
-                    
                     for (int i = 0; i < ignoreObjectsProp.arraySize; i++)
                     {
                         SerializedProperty element = ignoreObjectsProp.GetArrayElementAtIndex(i);
                         EditorGUILayout.BeginHorizontal();
-                        
                         EditorGUILayout.PropertyField(element, new GUIContent($"Slot {i}"));
-                        
                         if (GUILayout.Button("-", GUILayout.Width(20)))
                         {
                             ignoreObjectsProp.DeleteArrayElementAtIndex(i);
@@ -222,13 +223,11 @@ namespace CameraObjectFader.Editor
                         }
                         EditorGUILayout.EndHorizontal();
                     }
-
                     if (GUILayout.Button("+ Add New Object", EditorStyles.miniButton))
                     {
                         ignoreObjectsProp.arraySize++;
                         ignoreObjectsProp.GetArrayElementAtIndex(ignoreObjectsProp.arraySize - 1).objectReferenceValue = null;
                     }
-                    
                     EditorGUI.indentLevel--;
                 }
 
@@ -243,7 +242,7 @@ namespace CameraObjectFader.Editor
             {
                 EditorGUILayout.BeginVertical(EditorStyles.helpBox);
                 EditorGUILayout.PropertyField(fadeLayerProp);
-                
+
                 EditorGUILayout.Space(5);
                 EditorGUILayout.PropertyField(useSphereCastProp);
                 if (useSphereCastProp.boolValue)
@@ -256,8 +255,48 @@ namespace CameraObjectFader.Editor
                 EditorGUILayout.Space(5);
                 minDistanceProp.floatValue = EditorGUILayout.Slider("Min Fade Distance", minDistanceProp.floatValue, 0f, 10f);
                 maxFadeDistanceProp.floatValue = EditorGUILayout.Slider("Max Fade Distance", maxFadeDistanceProp.floatValue, 1f, 100f);
-                
+
                 EditorGUILayout.HelpBox("Red WireSphere in Scene view shows the Max Fade Distance range.", MessageType.Info);
+                EditorGUILayout.EndVertical();
+            }
+
+            EditorGUILayout.Space(5);
+
+            // ── Mouse Circle Mask ─────────────────────────────────────────
+            showMouseCircle = EditorGUILayout.Foldout(showMouseCircle, "MOUSE CIRCLE MASK", true, EditorStyles.foldoutHeader);
+            if (showMouseCircle)
+            {
+                EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+
+                EditorGUILayout.PropertyField(mouseWorldTransformProp,
+                    new GUIContent("Mouse World Transform",
+                        "The transform PlayerToMouse moves to the mouse floor position.\n" +
+                        "Leave empty to disable the mouse circle entirely."));
+
+                if (mouseWorldTransformProp.objectReferenceValue != null)
+                {
+                    EditorGUI.indentLevel++;
+                    mouseCircleRadiusProp.floatValue = EditorGUILayout.Slider(
+                        new GUIContent("Circle Radius", "Radius of the reveal circle in screen pixels."),
+                        mouseCircleRadiusProp.floatValue, 10f, 600f);
+
+                    mouseCircleFeatherProp.floatValue = EditorGUILayout.Slider(
+                        new GUIContent("Feather Width", "Soft edge width in screen pixels."),
+                        mouseCircleFeatherProp.floatValue, 0f, 200f);
+                    EditorGUI.indentLevel--;
+
+                    EditorGUILayout.HelpBox(
+                        "The mouse circle only appears when the cursor is over an object " +
+                        "that is already fading the player's view this frame.",
+                        MessageType.Info);
+                }
+                else
+                {
+                    EditorGUILayout.HelpBox(
+                        "Assign a Transform to enable the mouse circle mask.",
+                        MessageType.None);
+                }
+
                 EditorGUILayout.EndVertical();
             }
 
@@ -274,8 +313,7 @@ namespace CameraObjectFader.Editor
             }
 
             EditorGUILayout.Space(15);
-            
-            // Footer Info
+
             GUI.enabled = false;
             EditorGUILayout.LabelField($"Version {FaderConstants.VERSION}", EditorStyles.miniLabel);
             GUI.enabled = true;

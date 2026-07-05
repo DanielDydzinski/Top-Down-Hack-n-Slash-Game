@@ -71,5 +71,6 @@ public class BackflipDodgeState : IPlayerState
         psm.anim.ResetTrigger(psm.isDodgingHash);
         // Revert to Player layer
         psm.gameObject.layer = LayerMask.NameToLayer("Player");
+        psm.StartDodgeHeavyWindow();
     }
 }

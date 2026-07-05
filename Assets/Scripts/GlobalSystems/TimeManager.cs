@@ -18,6 +18,9 @@ public class TimeManager : MonoBehaviour
     private Coroutine _slowMoCoroutine;
     private float _initialFixedDeltaTime;
 
+    public static bool IsPaused { get; private set; }
+    private float _pausedTimeScaleSnapshot = 1f;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -45,6 +48,24 @@ public class TimeManager : MonoBehaviour
         _slowMoCoroutine = StartCoroutine(SlowMoSequence());
     }
 
+    /// <summary>
+    /// Pauses the game, remembering the current timeScale so a slow-mo
+    /// effect mid-recovery resumes from where it left off instead of snapping to 1.
+    /// </summary>
+    public static void SnapshotAndPause()
+    {
+        if (IsPaused) return;
+        if (Instance != null) Instance._pausedTimeScaleSnapshot = Time.timeScale > 0f ? Time.timeScale : 1f;
+        IsPaused = true;
+        Time.timeScale = 0f;
+    }
+
+    public static void Unpause()
+    {
+        IsPaused = false;
+        Time.timeScale = Instance != null ? Instance._pausedTimeScaleSnapshot : 1f;
+    }
+
     private IEnumerator SlowMoSequence()
     {
         // 1. Instantly snap into slow motion for that high-impact punch feel
@@ -58,11 +79,14 @@ public class TimeManager : MonoBehaviour
         float elapsed = 0f;
         while (Time.timeScale < 1.0f)
         {
-            // Smoothly slide time back up to normal
-            Time.timeScale += Time.unscaledDeltaTime * recoverySpeed;
-            Time.timeScale = Mathf.Clamp(Time.timeScale, 0f, 1.0f);
+            if (!IsPaused)
+            {
+                // Smoothly slide time back up to normal
+                Time.timeScale += Time.unscaledDeltaTime * recoverySpeed;
+                Time.timeScale = Mathf.Clamp(Time.timeScale, 0f, 1.0f);
 
-            UpdatePhysicsDeltaTime();
+                UpdatePhysicsDeltaTime();
+            }
             yield return null;
         }
 

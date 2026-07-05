@@ -13,7 +13,7 @@ public class ShockWaveBehaviour : MonoBehaviour
     private GameObject visualParticles;
     private GameObject activeVisual;
 
-    // --- IMMUTABLE REFERENCE FOR HEALTH REFUNDS ---
+    // --- IMMUTABLE REFERENCE FOR HEALTH REFUNDS & ENERGY GAIN ---
     private Ability sourceAbility;
 
     [Header("Physics Filtering & Occlusion")]
@@ -24,12 +24,16 @@ public class ShockWaveBehaviour : MonoBehaviour
     private SphereCollider sc;
     private List<IDamageable> hitTargets = new List<IDamageable>();
 
-    // FIXED: Using your unified Initialize pattern instead of the old UpdateValues
-    public void Initialize(BaseAbilitySettings baseSettings, ShockWaveSettings shockSettings, List<Effect> abilityEffects, GameObject whoCasted)
+    // Shader/Material property cache for clean fading
+    private List<Material> childMaterials = new List<Material>();
+    private float currentFade = 0f;
+
+    // FIXED: Keeps the direct master reference for gain-on-hit tracking
+    public void Initialize(Ability aSourceAbility, BaseAbilitySettings baseSettings, ShockWaveSettings shockSettings, List<Effect> abilityEffects, GameObject whoCasted)
     {
         caster = whoCasted;
+        sourceAbility = aSourceAbility;
 
-        // Extracting data directly out of your new clean containers
         myFaction = baseSettings.myFaction;
         damageType = baseSettings.damageType;
         targetLayer = baseSettings.targetLayer;
@@ -42,20 +46,17 @@ public class ShockWaveBehaviour : MonoBehaviour
 
         effects = abilityEffects;
 
-        // CRITICAL: We find the active ability instance from the player's manager to track refunds!
-        if (caster != null)
-        {
-            AbilityManager manager = caster.GetComponent<AbilityManager>();
-            if (manager != null)
-            {
-                sourceAbility = manager.activeAbility;
-            }
-        }
-
         // Spawn visual effects if applicable
         if (visualParticles != null)
         {
-            activeVisual = Instantiate(visualParticles, transform.position, transform.rotation, transform);
+            activeVisual = Instantiate(visualParticles, transform.position,Quaternion.identity);
+
+            // Cache all renderers on the visual instance to alter the material properties safely
+            Renderer[] renderers = activeVisual.GetComponentsInChildren<Renderer>();
+            foreach (Renderer r in renderers)
+            {
+                childMaterials.AddRange(r.materials);
+            }
         }
 
         sc = GetComponent<SphereCollider>();
@@ -101,8 +102,6 @@ public class ShockWaveBehaviour : MonoBehaviour
             attacker = caster,
             isExplosion = false,
             forceDirection = dir.normalized,
-
-            // FIXED: Compiled flawlessly because sourceAbility is declared and populated above!
             sourceAbility = this.sourceAbility
         };
 
@@ -113,11 +112,39 @@ public class ShockWaveBehaviour : MonoBehaviour
     {
         if (sc != null && sc.radius < maxRadius)
         {
+            // 1. Expand the physical collider
             sc.radius += expansionSpeed * Time.deltaTime;
+
+            // 2. Sync the active mesh visual scale with the expanding radius
+            if (activeVisual != null)
+            {
+                float currentDiameter = sc.radius;
+                activeVisual.transform.localScale = new Vector3(currentDiameter, currentDiameter, currentDiameter);
+            }
+
+            // 3. DYNAMIC FADE: Calculate exact percentage from 0 to 1 based on expansion progress
+            if (maxRadius > 0.01f && childMaterials.Count > 0)
+            {
+                currentFade = sc.radius / maxRadius; // Dynamic ratio!
+                Debug.Log( "Current fade == "  +currentFade);
+
+                if (currentFade > 0)
+                {
+                    for (int i = 0; i < childMaterials.Count; i++)
+                    {
+                        if (childMaterials[i] != null)
+                        {
+                            childMaterials[i].SetFloat("_FadeAmount", currentFade);
+                        }
+                    }
+                }
+            }
         }
         else
         {
-            Destroy(gameObject, 0.5f); // Let visual trails finish fading
+            // Clean up objects instantly since it reached max radius and is fully transparent
+            if (activeVisual != null) Destroy(activeVisual);
+            Destroy(gameObject);
         }
     }
 }

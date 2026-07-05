@@ -36,7 +36,7 @@ public class ShockWave : Ability
         if (behaviour != null)
         {
             // FIXED: Following your exact Melee pattern cleanly passing the 4 container targets!
-            behaviour.Initialize(this.baseSettings, this.shockWaveSettings, this.abilityEffects, caster);
+            behaviour.Initialize(this,this.baseSettings, this.shockWaveSettings, this.abilityEffects, caster);
         }
         else
         {

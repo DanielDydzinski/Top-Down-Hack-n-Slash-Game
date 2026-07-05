@@ -135,7 +135,9 @@ public class FireBallBehaviour : MonoBehaviour
                         type = damageType,
                         effects = this.effects,
                         attacker = this.gameObject,
+                        attackType = AttackType.Ranged,
                         isExplosion = false
+                        
                     };
                     damageable.TakeDamage(info);
                 }

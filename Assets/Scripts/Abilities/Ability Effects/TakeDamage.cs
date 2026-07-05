@@ -19,11 +19,15 @@ public class TakeDamage : Effect
 
         if (hp != null && !hp.GetisDead())
         {
-            // 1. Determine if this specific damage slice is fatal BEFORE applying it
-            bool isKillingBlow = (hp.Gethealth() - finalDamage <= 0f);
-
-            // 2. Commit the structural damage to health points
+            // 1. Commit the structural damage to health points (Health.Damage applies any
+            //    block mitigation internally, so the raw finalDamage here may not be what
+            //    actually lands)
             hp.Damage(finalDamage, info);
+
+            // 2. Read back the real outcome instead of predicting it from unmitigated damage —
+            //    a blocked hit can mean this never actually kills even though finalDamage alone
+            //    would have looked lethal
+            bool isKillingBlow = hp.GetisDead();
 
             // 3. Process energy tracking models
             if (info.attacker != null && info.sourceAbility != null)

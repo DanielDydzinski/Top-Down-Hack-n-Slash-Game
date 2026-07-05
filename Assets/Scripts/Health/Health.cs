@@ -7,7 +7,6 @@ using UnityEngine.UI;
 [RequireComponent(typeof(healthBar))]
 public class Health : MonoBehaviour
 {
-
     [Header("Health Settings")]
     [SerializeField] private float maxHealth;
     [SerializeField] private float healthPoints;
@@ -25,7 +24,6 @@ public class Health : MonoBehaviour
     private bool inCombat;
     private bool isDead;
 
-    // FIXED: This now properly caches via Awake/Start to prevent memory leaks in OnDisable
     private DamageReceiver _receiver;
     private static readonly int getHitHash = Animator.StringToHash("GetHit");
 
@@ -33,13 +31,18 @@ public class Health : MonoBehaviour
     [SerializeField] private Image hpFillImage;
     private Animator animator;
 
+    // --- PIPELINE EVENTS ---
     public event Action<HitInfo> OnDeath;
     public event Action<HitInfo> OnDamageTaken;
+    public event Action<HitInfo> OnBlockSuccess;
+
+    // --- CORE ENGINE REFERENCES ---
+    private Stats stats;
 
     void Awake()
     {
-        // Cache the reference immediately on initialization
         _receiver = GetComponent<DamageReceiver>();
+        stats = GetComponent<Stats>();
     }
 
     void Start()
@@ -80,14 +83,66 @@ public class Health : MonoBehaviour
         Debug.Log("we called HandleDamage from health script");
         if (isDead) return;
 
-        Damage(info.damage, info);
+        float rawDamage = info.damage;
+        Damage(rawDamage, info);
     }
 
+    /// <summary>
+    /// Processes incoming damage from ANY source. Handles blocks, status bypasses, and flinch logic.
+    /// </summary>
     public void Damage(float amount, HitInfo dmgInfo)
     {
         if (amount < 0f) return;
+        if (isDead) return;
 
-        healthPoints -= amount;
+        // Use equality to check against the default empty state of the struct
+        if (dmgInfo.Equals(default(HitInfo)))
+        {
+            dmgInfo = new HitInfo();
+            dmgInfo.damage = amount;
+            dmgInfo.attackType = AttackType.Melee;
+        }
+        else
+        {
+            dmgInfo.damage = amount;
+        }
+
+
+        float finalDamage = amount;
+        bool wasBlocked = false;
+
+        // Blocking is resolved once, upstream in DamageReceiver.TakeDamage, before this event
+        // fans out to every listener (Health AND EffectManager -> Effects). By the time we get
+        // here, dmgInfo.isBlocked already reflects whether the original hit was blocked — DoT
+        // ticks carry that same flag forward from the initial hit (see TakeDoT.cs), so the same
+        // mitigation math applies consistently to both the instant hit and every later tick.
+        if (dmgInfo.isBlocked)
+        {
+            float mitigationPercentage = (stats != null) ? stats.blockDamageMitigation : 75f;
+            float damageMultiplier = 1f - (Mathf.Clamp(mitigationPercentage, 0f, 100f) / 100f);
+
+            finalDamage = amount * damageMultiplier;
+            dmgInfo.damage = finalDamage;
+
+            // Only the initial direct hit gets the physical shield flinch/VFX/SFX;
+            // background DoT ticks stay quiet.
+            if (dmgInfo.attackType != AttackType.DoT)
+            {
+                wasBlocked = true;
+
+                // Melee hits reach Damage() twice: once as a zero-damage envelope via
+                // HandleDamage (OnHitReceived), once with the real amount via the TakeDamage
+                // effect. Only fire the VFX/SFX event on the call that carries real damage,
+                // so a single block doesn't play its effect twice.
+                if (amount > 0f)
+                {
+                    OnBlockSuccess?.Invoke(dmgInfo);
+                }
+            }
+        }
+
+        // Apply calculated health reductions
+        healthPoints -= finalDamage;
         isDead = IsDead();
 
         if (isDead)
@@ -96,25 +151,20 @@ public class Health : MonoBehaviour
         }
         UpdateHealthBar();
 
-        if (timeCombatCo != null)
-        {
-            StopCoroutine(timeCombatCo);
-        }
+        if (timeCombatCo != null) StopCoroutine(timeCombatCo);
         timeCombatCo = StartCoroutine(TimeCombat());
 
-        // stops the running instance handle to clear animation states cleanly
-        if (GetHitCo != null)
+        // Flinch animation gate (Will not trigger for standard DoTs OR mitigated DoTs)
+        if (!wasBlocked && dmgInfo.attackType != AttackType.DoT)
         {
-            StopCoroutine(GetHitCo);
+            if (GetHitCo != null) StopCoroutine(GetHitCo);
+            GetHitCo = StartCoroutine(SetGetHit());
         }
-        GetHitCo = StartCoroutine(SetGetHit());
 
-        //call the event - we took damage
-        if (amount > 0f)
+        if (finalDamage > 0f)
         {
             OnDamageTaken?.Invoke(dmgInfo);
         }
-
     }
 
     private bool IsDead()
@@ -167,7 +217,6 @@ public class Health : MonoBehaviour
 
     void OnEnable()
     {
-        // FIXED: Safe subscription because _receiver isn't null anymore
         if (_receiver != null)
         {
             _receiver.OnHitReceived += HandleDamage;
@@ -176,7 +225,6 @@ public class Health : MonoBehaviour
 
     void OnDisable()
     {
-        // FIXED: Unsubscribes properly when pooled or destroyed, preventing hidden memory leaks!
         if (_receiver != null)
         {
             _receiver.OnHitReceived -= HandleDamage;
@@ -199,226 +247,3 @@ public class Health : MonoBehaviour
         animator.SetBool(getHitHash, true);
     }
 }
-
-
-
-
-
-
-//using System;
-//using System.Collections;
-//using System.Collections.Generic;
-//using UnityEngine;
-//using UnityEngine.UI;
-
-//[RequireComponent(typeof(healthBar))]
-//public class Health : MonoBehaviour {
-
-//    [SerializeField] private float maxHealth;
-//    [SerializeField] private float healthPoints;
-//    [SerializeField] private bool canRegen;
-//    [SerializeField] private float regenRate;
-//    [SerializeField] private float regenAmount;
-//    [SerializeField] private float outCombatTime;
-//	[SerializeField] private float regenOutCombatRate;
-//    [SerializeField] private float regenOutCombatAmount;
-
-//    private Coroutine timeCombatCo;
-//	private Coroutine GetHitCo;
-//    private bool inCombat;
-//    private bool isDead;
-//    private DamageReceiver _receiver;
-//    private static readonly int getHitHash = Animator.StringToHash("GetHit");
-
-//    [SerializeField]
-//	private Image hpFillImage; // reference to hp sprite
-//	private Animator animator;
-
-//    public event Action<HitInfo> OnDeath;
-
-
-//    // Use this for initialization
-//    void Start () {
-
-
-//         var receiver = GetComponent<DamageReceiver>();
-//        if (receiver != null)
-//        {
-//            receiver.OnHitReceived += HandleDamage;
-//        }
-
-
-//        if (hpFillImage == null) 
-//		{
-//            Debug.LogError("no hpFill sprite found in " + gameObject.name);
-//        }
-
-
-//		if (GetComponent<Animator> ())
-//		{
-//			animator = GetComponent<Animator> ();
-//		} 
-//		else 
-//		{
-//			Debug.LogError ("no Animator found in " + gameObject.name);
-//		}
-//		healthPoints = maxHealth;
-
-
-//        StartCoroutine(Regen());
-//	}
-
-
-//    public void Heal(float amount)
-//    {
-//		if (!isDead) {
-//			healthPoints += amount;
-//			if (healthPoints > maxHealth) {
-//				healthPoints = maxHealth;
-//			}
-//			UpdateHealthBar ();
-//		}
-//    }
-
-//    void HandleDamage(HitInfo info)
-//    {
-//        // Damage(info.damage); // Health only cares about the number
-
-//        Debug.Log("we called HandleDamage from health script");
-//        // Don't process damage if already dead
-//        if (isDead) return;
-
-//        // Process actual numerical damage
-//        Damage(info.damage, info);
-
-
-//    }
-
-//    public void Damage(float amount, HitInfo dmgInfo)
-//    {
-//        if (amount < 0f)
-//        {
-//            return;
-//        }
-//        healthPoints -= amount;
-//        isDead = IsDead();
-//        if (isDead)
-//        {
-//            OnDeath?.Invoke(dmgInfo);
-//           // animator.SetBool("isDead", true);
-//        }
-//        UpdateHealthBar();
-
-//        if (timeCombatCo != null)
-//        {
-//            StopCoroutine(timeCombatCo);
-//        }
-
-//        timeCombatCo = StartCoroutine(TimeCombat());
-
-
-
-//        if (GetHitCo != null)
-//        {
-//            StopCoroutine(SetGetHit());
-//        }
-//        GetHitCo = StartCoroutine(SetGetHit());
-
-
-//    }
-
-//    private bool IsDead()
-//    {
-//        if(healthPoints <= 0)
-//        {
-//            healthPoints = 0;
-//            return true;
-//        }
-//        return false;
-//    }
-
-//    IEnumerator Regen()
-//    {
-//        while (canRegen && !isDead)
-//        {
-//            if (inCombat)
-//            {
-//                Heal(regenAmount);
-//				yield return new WaitForSeconds(regenRate);
-//            }
-//            else
-//            {
-//                Heal(regenOutCombatAmount);
-//				yield return new WaitForSeconds(regenOutCombatRate);
-//            }
-//        }
-
-//    }
-
-//    public bool GetisDead()
-//    {
-//        return isDead;
-//    }
-
-//    IEnumerator TimeCombat() // will need change this because can still be incombat without take dmg, but dealing dmg
-//    {
-//        inCombat = true;
-//        yield return new WaitForSeconds(outCombatTime);
-//        inCombat = false;
-
-//    }
-
-//	public void SetMaxHealth(float hp)
-//	{
-//		maxHealth = hp;
-//	}
-
-//	private void UpdateHealthBar()
-//	{
-//		hpFillImage.fillAmount = healthPoints / maxHealth; // value 0.0-1.0
-
-//	}
-
-//    public float Gethealth()
-//    {
-//        return healthPoints;
-//    }
-//    public float GetMaxHealth()
-//    {
-//        return maxHealth;
-//    }
-
-//    void OnEnable()
-//    {
-//        if (_receiver != null)
-//        {
-//            // Subscribe to the event
-//            _receiver.OnHitReceived += HandleDamage;
-//        }
-//    }
-
-//    void OnDisable()
-//    {
-//        if (_receiver != null)
-//        {
-//            // IMPORTANT: Unsubscribe to avoid memory leaks!
-//            _receiver.OnHitReceived -= HandleDamage;
-//        }
-//    }
-
-//    IEnumerator SetGetHit()
-//	{
-//		if (animator.GetBool (getHitHash)) 
-//		{
-//			animator.SetBool (getHitHash, false);
-//		} 
-//		else 
-//		{
-//			animator.SetBool (getHitHash, true);
-//			yield break;
-//		}
-//		yield return new WaitForSeconds(0.02f);
-//		animator.SetBool (getHitHash, true);
-
-//	}
-//}

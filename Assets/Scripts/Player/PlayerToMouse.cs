@@ -8,6 +8,7 @@ public class PlayerToMouse : MonoBehaviour {
 	public Vector3 playerToMouseDir { private set;  get; }
 	public Vector3 mouseInWorldPos { private set;  get; }
 	[SerializeField] LayerMask maskFloorLayer;
+	[SerializeField] private Transform mouseWorldTransform;
 
 	// Use this for initialization
 	void Start () {
@@ -35,6 +36,8 @@ public class PlayerToMouse : MonoBehaviour {
 			// Ensure the vector is entirely along the floor plane.
 			dir.y = 0f;
 			playerToMouseDir = dir;
+
+			mouseWorldTransform.position = mouseInWorldPos;
 		}
 	}
 }

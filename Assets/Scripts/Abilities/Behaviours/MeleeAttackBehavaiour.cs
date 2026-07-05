@@ -129,7 +129,7 @@ public class MeleeAttackBehavaiour : MonoBehaviour
                 forceDirection = transform.forward,
                 isExplosion = false,
                 impactPoint = targetPoint,
-
+                attackType = AttackType.Melee,
                 sourceAbility = this.sourceAbility,
                 // Retaining the energy properties directly down the hit payload track
                 energyCostPaid = baseSettings.energyCost,

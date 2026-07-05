@@ -4,7 +4,14 @@ using UnityEngine;
 
 public class ComboController : MonoBehaviour
 {
-   [SerializeField] private Ability currentAbility;
+    public enum ComboTrackId { Light, Heavy, Magic, Q, E, R, F, DodgeHeavy }
+
+    private class TrackState
+    {
+        public Ability currentAbility;
+        public float lastInputTime;
+    }
+
    public int lightCombosIndex = 0;
    public  int heavyCombosIndex = 0;
    public  int magicCombosIndex = 0;
@@ -12,8 +19,26 @@ public class ComboController : MonoBehaviour
     public int eIndex = 0;
     public int rIndex = 0;
     public int fIndex = 0;
-    private float lastInputTime;
+    public int dodgeHeavyIndex = 0;
     private PlayerStateMachine psm;
+
+    // Each track (left-click, right-click, Q/E/R/F, ...) needs its own "last fired ability" +
+    // "last input time" pair - sharing a single pair across tracks let pressing one button
+    // reset or continue another button's combo window.
+    private readonly Dictionary<ComboTrackId, TrackState> trackStates = new();
+
+    private TrackState GetTrackState(ComboTrackId id)
+    {
+        if (!trackStates.TryGetValue(id, out TrackState state))
+        {
+            state = new TrackState();
+            trackStates[id] = state;
+        }
+        return state;
+    }
+
+    public Ability GetLastFiredAbility(ComboTrackId id) => GetTrackState(id).currentAbility;
+    public float GetLastInputTime(ComboTrackId id) => GetTrackState(id).lastInputTime;
 
     // This would be your "Equipped" sequence
     public List<Ability> equippedSequence;
@@ -27,6 +52,9 @@ public class ComboController : MonoBehaviour
     public List<Ability> eAbilities = new();
     public List<Ability> rAbilities = new();
     public List<Ability> fAbilities = new();
+
+    [Header("Dodge Heavy Attack (Manual Assignment)")]
+    public List<Ability> dodgeHeavyAbilities = new();
 
     private void Start()
     {
@@ -50,51 +78,41 @@ public class ComboController : MonoBehaviour
     }
 
 
-    public void OnAbilityInput(ref int index,List<Ability> comboList)
+    public void OnAbilityInput(ComboTrackId trackId, ref int index, List<Ability> comboList)
     {
         if (psm.IsStunned()) return;
-
-
-        Debug.Log(psm.abilityManager.IsPerformingAction());
         if (psm.abilityManager.IsPerformingAction()) return; //dont continue if we already casting
+        if (comboList == null || comboList.Count == 0) return;
 
-        // If we are within the combo window, go to next ability
-        if (Time.time - lastInputTime < currentAbility?.comboWindow)
-        {
-            index++;
-            if (index >= comboList.Count) index = 0;
-        }
-        else
-        {
-            index = 0; // Reset if too slow
-        }
+        TrackState state = GetTrackState(trackId);
+        int candidateIndex = GetCandidateIndex(state, index, comboList.Count);
+        Ability nextAb = comboList[candidateIndex];
 
-        Ability nextAb = comboList[index];
+        // Check cooldown through the Manager. Bail out before mutating index/state so a
+        // press that can't actually fire doesn't corrupt this track's combo position.
+        if (!psm.abilityManager.cooldowns[nextAb.abilityName].coolDownReady) return;
 
-        // Check cooldown through the Manager
-        if (psm.abilityManager.cooldowns[nextAb.abilityName].coolDownReady )
-        {
-            currentAbility = nextAb;
-            lastInputTime = Time.time;
+        index = candidateIndex;
+        state.currentAbility = nextAb;
+        state.lastInputTime = Time.time;
 
-            //i want to chck if we not in stun state here then execute switch to action state?
-            // Execute!
-            psm.SwitchState(new ActionState(psm, nextAb));
-        }
+        psm.SwitchState(new ActionState(psm, nextAb));
     }
 
-    private void PreloadAbility(Ability ab)
+    // The ability a press would trigger next on this track, without committing to it.
+    // Used both by OnAbilityInput and by the ability-slot UI so both agree on what "next" means.
+    public Ability PeekNextAbility(ComboTrackId trackId, int index, List<Ability> comboList)
     {
-        currentAbility = ab;
-        
+        if (comboList == null || comboList.Count == 0) return null;
+        TrackState state = GetTrackState(trackId);
+        int candidateIndex = GetCandidateIndex(state, index, comboList.Count);
+        return comboList[candidateIndex];
     }
 
-    private void ExecuteCombo(Ability ab)
+    private int GetCandidateIndex(TrackState state, int currentIndex, int count)
     {
-        currentAbility = ab;
-        lastInputTime = Time.time;
-
-        // Tell State Machine to enter ActionState for this specific ability
-        GetComponent<PlayerStateMachine>().SwitchState(new ActionState(psm, ab));
+        bool withinWindow = state.currentAbility != null
+            && Time.time - state.lastInputTime < state.currentAbility.comboWindow;
+        return withinWindow ? (currentIndex + 1) % count : 0;
     }
 }

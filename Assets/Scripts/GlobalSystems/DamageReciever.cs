@@ -3,31 +3,42 @@ using UnityEngine;
 
 public class DamageReceiver : MonoBehaviour, IDamageable
 {
-    // Other scripts (Health, EffectManager) will subscribe to this
+    // Existing event for regular hits
     public event Action<HitInfo> OnHitReceived;
+
+    // --- NEW: Expose a dedicated event for successful blocks ---
+    public event Action<HitInfo> OnBlockSuccess;
 
     public void TakeDamage(HitInfo info)
     {
-        // 1. Try to get the PSM
         PlayerStateMachine psm = GetComponent<PlayerStateMachine>();
 
         if (psm != null)
         {
-            // 2. Check the Animator for the "Dodge" tag
-            // We check both layer 0 (Base) and layer 2 (FullBody) just in case
+            // Check the Animator for the "Dodge" tag
             bool isDOdgeState = psm.anim.GetCurrentAnimatorStateInfo(psm.FullBodyLayer).IsTag("Dodge");
-   ;
 
             if (isDOdgeState)
             {
                 Debug.Log("Dodge! Damage Negated.");
-                // Optional: Trigger a "Dodge" UI text or sound here
                 return;
+            }
+
+            // BLOCK CHECK — resolved ONCE here, before OnHitReceived fans out.
+            // HitInfo is a struct: if this ran later (e.g. inside Health.Damage), the
+            // isBlocked flag would only mutate that call's local copy and never reach
+            // the sibling copy that EffectManager hands to each Effect (TakeDamage, TakeDoT...).
+            // Resolving it here means every listener's copy already has isBlocked set correctly.
+            if (info.attackType != AttackType.DoT && psm.GetCurrentState() is BlockState blockState)
+            {
+                if (blockState.TryBlock(info))
+                {
+                    info.isBlocked = true;
+                }
             }
         }
 
-
-        // Shouts the info to anyone listening
+        // Shouts the info to anyone listening (like your Health script)
         OnHitReceived?.Invoke(info);
     }
 }
