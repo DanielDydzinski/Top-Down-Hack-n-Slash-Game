@@ -185,7 +185,14 @@ public class EffectManager : MonoBehaviour
                 ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
             }
 
-            Destroy(child.gameObject);
+            if (ObjectPooler.Instance != null)
+            {
+                ObjectPooler.Instance.ReturnToPool(child.gameObject);
+            }
+            else
+            {
+                Destroy(child.gameObject);
+            }
         }
     }
 

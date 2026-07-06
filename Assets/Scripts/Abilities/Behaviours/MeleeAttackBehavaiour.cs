@@ -111,7 +111,14 @@ public class MeleeAttackBehavaiour : MonoBehaviour
             if (meleeSettings.attackParticles != null)
             {
                 Vector3 hitPoint = hitPoints.ContainsKey(col) ? hitPoints[col] : col.transform.position;
-                Instantiate(meleeSettings.attackParticles, hitPoint, transform.rotation);
+                if (ObjectPooler.Instance != null)
+                {
+                    ObjectPooler.Instance.SpawnFromPool(meleeSettings.attackParticles, hitPoint, transform.rotation);
+                }
+                else
+                {
+                    Instantiate(meleeSettings.attackParticles, hitPoint, transform.rotation);
+                }
             }
 
             foreach (Effect e in effects)

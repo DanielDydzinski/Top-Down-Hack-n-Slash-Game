@@ -70,6 +70,8 @@ public class DeathHandler : MonoBehaviour
     [SerializeField] private bool includeBloodBathRagdoll = false;
     [Tooltip("Spawn the blood bath prefab for a complete exploding ragdoll death.")]
     [SerializeField] private bool includeBloodBathExploding = false;
+    [Tooltip("How long the spawned blood bath effect stays alive before being recycled back into the object pool.")]
+    [SerializeField] private float bloodBathLifetime = 30f;
 
     [Header("Lifespan & Delay Constraints")]
     [Tooltip("Time before the physics ragdoll or broken chunks are deleted to clear memory.")]
@@ -253,7 +255,15 @@ public class DeathHandler : MonoBehaviour
         Vector3 spawnPosition = transform.position + bloodBathOffset;
         // Randomized yaw only - keeps the decals level so their ground raycast still hits straight down.
         Quaternion levelRotation = Quaternion.Euler(0f, Random.Range(0f, 360f), 0f);
-        Instantiate(chosenBloodBathPrefab, spawnPosition, levelRotation);
+
+        if (ObjectPooler.Instance != null)
+        {
+            ObjectPooler.Instance.SpawnFromPool(chosenBloodBathPrefab, spawnPosition, levelRotation, bloodBathLifetime);
+        }
+        else
+        {
+            Instantiate(chosenBloodBathPrefab, spawnPosition, levelRotation);
+        }
     }
 
     private void HandleAnimationDeath()
@@ -279,14 +289,12 @@ public class DeathHandler : MonoBehaviour
 
         if (animationSawpRagdollPrefab != null)
         {
-            // 3. Instantiate the ragdoll surrogate container
-            GameObject ragdollInstanceSwap = Instantiate(animationSawpRagdollPrefab, transform.position, transform.rotation);
+            // 3. Spawn the ragdoll surrogate container (pooled if available)
+            GameObject ragdollInstanceSwap = SpawnRagdollPart(animationSawpRagdollPrefab, transform.position, transform.rotation, ragdollLifespan);
+            ResetRagdollPhysics(ragdollInstanceSwap);
 
             // 4. Snaps the ragdoll bones directly to the intermediate animated pose frame!
             MatchTargetPose(transform, ragdollInstanceSwap.transform);
-
-            // Clean up the spawned ragdoll out of memory after its natural lifespan
-            Destroy(ragdollInstanceSwap, ragdollLifespan);
         }
 
         if (includeBloodBathAnimation) SpawnBloodBath();
@@ -302,7 +310,8 @@ public class DeathHandler : MonoBehaviour
 
         if (completelyExplode)
         {
-            GameObject gibsInstance = Instantiate(explodingPartsPrefab, transform.position, transform.rotation);
+            GameObject gibsInstance = SpawnRagdollPart(explodingPartsPrefab, transform.position, transform.rotation, ragdollLifespan);
+            ResetRagdollPhysics(gibsInstance);
 
             Rigidbody[] gibBodies = gibsInstance.GetComponentsInChildren<Rigidbody>();
             foreach (Rigidbody gibRb in gibBodies)
@@ -310,8 +319,6 @@ public class DeathHandler : MonoBehaviour
                 gibRb.AddExplosionForce(completeExplodeBlastForce, blastOrigin, explosionRadius, upwardModifier, ForceMode.Impulse);
                 gibRb.AddForce((punchVector * maxPunchForce) * 0.1f, ForceMode.Impulse);
             }
-
-            Destroy(gibsInstance, ragdollLifespan);
 
             if (includeBloodBathExploding) SpawnBloodBath();
         }
@@ -323,7 +330,8 @@ public class DeathHandler : MonoBehaviour
             int selectedRagdollIndex = Random.Range(0, ragdollPrefabs.Count);
             GameObject chosenRagdollPrefab = ragdollPrefabs[selectedRagdollIndex];
 
-            GameObject ragdollInstance = Instantiate(chosenRagdollPrefab, transform.position, transform.rotation);
+            GameObject ragdollInstance = SpawnRagdollPart(chosenRagdollPrefab, transform.position, transform.rotation, ragdollLifespan);
+            ResetRagdollPhysics(ragdollInstance);
             MatchTargetPose(transform, ragdollInstance.transform);
 
             SkinnedMeshRenderer[] ragdollMeshes = ragdollInstance.GetComponentsInChildren<SkinnedMeshRenderer>();
@@ -331,13 +339,38 @@ public class DeathHandler : MonoBehaviour
 
             RigidBodyAndPhysicsApplication(ragdollInstance, info, punchVector, damageScale);
 
-            Destroy(ragdollInstance, ragdollLifespan);
-
             if (includeBloodBathRagdoll) SpawnBloodBath();
         }
 
         SwitchOffFunctionality();
         Destroy(gameObject, audioCleanupDelay);
+    }
+
+    // Spawns a ragdoll/gib/swap-ragdoll prefab through the pool (auto-recycled after lifetime),
+    // falling back to the old Instantiate+Destroy(delay) pairing if no ObjectPooler exists in the scene.
+    private GameObject SpawnRagdollPart(GameObject prefab, Vector3 position, Quaternion rotation, float lifetime)
+    {
+        if (ObjectPooler.Instance != null)
+        {
+            return ObjectPooler.Instance.SpawnFromPool(prefab, position, rotation, lifetime);
+        }
+
+        GameObject instance = Instantiate(prefab, position, rotation);
+        Destroy(instance, lifetime);
+        return instance;
+    }
+
+    // A reused pooled ragdoll/gib can still carry momentum from its last death - clear it before
+    // MatchTargetPose or any new AddForce/AddExplosionForce is applied, so old flight doesn't
+    // compound with the new hit's force.
+    private void ResetRagdollPhysics(GameObject root)
+    {
+        Rigidbody[] bodies = root.GetComponentsInChildren<Rigidbody>();
+        foreach (Rigidbody rb in bodies)
+        {
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
     }
 
     private void RigidBodyAndPhysicsApplication(GameObject ragdollInstance, HitInfo info, Vector3 punchVector, float damageScale)

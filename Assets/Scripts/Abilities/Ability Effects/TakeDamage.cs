@@ -66,7 +66,14 @@ public class TakeDamage : Effect
             var effectSpawnLocations = target.GetComponent<EffectSpawnPossitions>();
             if (effectSpawnLocations != null)
             {
-                Instantiate(effectParticles, effectSpawnLocations.center);
+                if (ObjectPooler.Instance != null)
+                {
+                    ObjectPooler.Instance.SpawnFromPool(effectParticles, effectSpawnLocations.center.position, effectSpawnLocations.center.rotation, effectSpawnLocations.center);
+                }
+                else
+                {
+                    Instantiate(effectParticles, effectSpawnLocations.center);
+                }
             }
         }
 

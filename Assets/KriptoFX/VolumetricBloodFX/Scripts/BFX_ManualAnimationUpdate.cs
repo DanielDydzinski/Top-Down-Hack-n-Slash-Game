@@ -40,6 +40,10 @@ namespace BFX
             propertyBlock.SetFloat(TimeInFrames,  0.0f);
             rend.SetPropertyBlock(propertyBlock);
 
+            // Re-arm the renderer: ManualUpdate() disables it when the animation finishes,
+            // so a pooled instance must flip it back on when reactivated or it stays invisible forever.
+            rend.enabled = true;
+
             currentTime = 0;
         }
 

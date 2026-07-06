@@ -43,7 +43,14 @@ public class TakeDoT : Effect
                 var anchors = target.GetComponent<EffectSpawnPossitions>();
                 if (anchors != null)
                 {
-                    Instantiate(effectParticles, anchors.center.position, Quaternion.identity, anchors.center);
+                    if (ObjectPooler.Instance != null)
+                    {
+                        ObjectPooler.Instance.SpawnFromPool(effectParticles, anchors.center.position, Quaternion.identity, anchors.center);
+                    }
+                    else
+                    {
+                        Instantiate(effectParticles, anchors.center.position, Quaternion.identity, anchors.center);
+                    }
                 }
             }
 

@@ -88,13 +88,28 @@ public class CarcassCruncher : MonoBehaviour
         PlayRandomCrunchSound(crunchSounds, spawnPosition);
 
         // ─── STEP 3: CLEANUP OLD CORPSE ───
-        if (carcassData != null)
+        GameObject corpseRoot = (carcassData != null ? carcassData.transform.root : carcassWindow.transform.root).gameObject;
+
+        // A multi-piece gib burst (ZombieExplodingParts, ZombieDebris) has one CarcassData PER
+        // PIECE, all under one pooled container root - crunching one piece should only remove that
+        // piece, not the whole group. A single-body ragdoll has exactly one CarcassData in its
+        // hierarchy, so crunching it destroys/returns the whole corpse as before.
+        bool isMultiPieceBurst = carcassData != null && corpseRoot.GetComponentsInChildren<CarcassData>(true).Length > 1;
+
+        if (isMultiPieceBurst)
         {
-            Destroy(carcassData.transform.root.gameObject);
+            // The container's own pooled lifetime (DeathHandler/ObjectPooler) still returns the
+            // whole group later; PoolInfo re-activates this piece automatically next time the
+            // container is reused, so simply hiding it now is enough.
+            carcassData.gameObject.SetActive(false);
+        }
+        else if (ObjectPooler.Instance != null)
+        {
+            ObjectPooler.Instance.ReturnToPool(corpseRoot);
         }
         else
         {
-            Destroy(carcassWindow.transform.root.gameObject);
+            Destroy(corpseRoot);
         }
     }
 
