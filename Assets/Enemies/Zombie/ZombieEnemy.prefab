@@ -843,7 +843,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1272996731057236}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0, y: -0.26235762, z: 0, w: 0.96497077}
   m_LocalPosition: {x: 38.1, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -858,7 +858,7 @@ Transform:
   - {fileID: 4037432503945992170}
   - {fileID: 8028192787068709517}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -30.42, z: 0}
 --- !u!114 &114640441802799940
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1011,6 +1011,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a601873c4e091124fa57ca5e8736828d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  animator: {fileID: 0}
   spawnLocation: {fileID: 4632307391019170}
   abilities:
   - {fileID: 11400000, guid: 574d2f6bd08bbce40b0cd6320a5a8eca, type: 2}
@@ -1033,6 +1034,7 @@ MonoBehaviour:
   moveSpeed: 1
   abilityPower: 0
   physicalPower: 0
+  blockDamageMitigation: 75
   mass: 3
   dodgeAnimationSpeed: 1
   dodgePower: 0
@@ -1093,6 +1095,7 @@ MonoBehaviour:
   moveSpeed: 1
   abilityPower: 0
   physicalPower: 0
+  blockDamageMitigation: 75
   mass: 3
   dodgeAnimationSpeed: 1
   dodgePower: 0
@@ -1151,6 +1154,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e81617e8734d5f44b8699a900f136f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  damageSounds: []
   hitSounds:
   - {fileID: 8300000, guid: 7de28999b358ec547aad1a64ac01b20b, type: 3}
   - {fileID: 8300000, guid: 8fbdda83ee795ad489bd0c05cbbf4a81, type: 3}
@@ -1294,8 +1298,7 @@ MonoBehaviour:
   - {fileID: 6195872117262740494, guid: b65fc03b16c17f846b09b0447a6aad02, type: 3}
   - {fileID: 8042722266352500479, guid: 306cb532c733b884a903fe1b746b0022, type: 3}
   - {fileID: 7915822033476151219, guid: a9d9218405dc92541a28dd3852b0db48, type: 3}
-  animationSawpRagdollPrefab: {fileID: 6195872117262740494, guid: b65fc03b16c17f846b09b0447a6aad02,
-    type: 3}
+  animationSawpRagdollPrefab: {fileID: 6195872117262740494, guid: b65fc03b16c17f846b09b0447a6aad02, type: 3}
   partsExploSound:
   - {fileID: 8300000, guid: e21813588667a1e44b73b11304818ef1, type: 3}
   - {fileID: 8300000, guid: 493cec6d161d6994d8bb05a79ba7affb, type: 3}
@@ -1308,9 +1311,17 @@ MonoBehaviour:
   explosionBlastForce: 100
   explosionRadius: 0.1
   upwardModifier: 1
-  explodingPartsPrefab: {fileID: 4453159007717504736, guid: 9415d12ea95c2db47aa53cf911cbe1e1,
-    type: 3}
+  explodingPartsPrefab: {fileID: 4453159007717504736, guid: 9415d12ea95c2db47aa53cf911cbe1e1, type: 3}
   completeExplodeBlastForce: 750
+  bloodBathPrefabs:
+  - {fileID: 8197951861065148966, guid: e91c7e76ffe6e284baf4ab106da202f8, type: 3}
+  - {fileID: 5936082179827903908, guid: cb58ece77d11ef945aecd072f2e46a8d, type: 3}
+  - {fileID: 5494213943435191861, guid: db51fe09adf27d640b4e10018c2d76ba, type: 3}
+  - {fileID: 5371219466416337994, guid: f9e099178c81bee439a79eecec91dacb, type: 3}
+  bloodBathOffset: {x: 0, y: 1.5, z: 0}
+  includeBloodBathAnimation: 0
+  includeBloodBathRagdoll: 1
+  includeBloodBathExploding: 1
   ragdollLifespan: 60
   audioCleanupDelay: 3
   randomizeAnimationLifespan: 1
@@ -1721,8 +1732,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1449564288357116}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.0000000018626449, y: -0.0000000012951205, z: -2.3283064e-10,
-    w: 1}
+  m_LocalRotation: {x: 0.0000000018626449, y: -0.0000000012951205, z: -2.3283064e-10, w: 1}
   m_LocalPosition: {x: -0.037750624, y: 0.0000000011920929, z: 0}
   m_LocalScale: {x: 1, y: 1.0000001, z: 1}
   m_ConstrainProportionsScale: 0
@@ -2877,8 +2887,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1891190214247486}
   serializedVersion: 2
-  m_LocalRotation: {x: -2.7755582e-17, y: 0.0000000037252907, z: 0.0000000074505815,
-    w: 1}
+  m_LocalRotation: {x: -2.7755582e-17, y: 0.0000000037252907, z: 0.0000000074505815, w: 1}
   m_LocalPosition: {x: -0.18827407, y: 0.000000038146972, z: 0.000000009536743}
   m_LocalScale: {x: 0.9999999, y: 0.9999999, z: 0.99999994}
   m_ConstrainProportionsScale: 0

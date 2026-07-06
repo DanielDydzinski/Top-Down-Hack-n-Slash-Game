@@ -59,6 +59,18 @@ public class DeathHandler : MonoBehaviour
     [Tooltip("A flat, unscaled physics explosion force applied exclusively to the broken body chunks.")]
     [SerializeField] private float completeExplodeBlastForce = 750f;
 
+    [Header("Blood Bath (Ground Splash)")]
+    [Tooltip("Ground blood-splash prefabs (e.g. BloodBomb variants). One is picked at random and spawned as its own independent instance alongside the ragdoll/visual, leveled so its decals project straight down regardless of the death pose's tilt.")]
+    [SerializeField] private List<GameObject> bloodBathPrefabs = new List<GameObject>();
+    [Tooltip("Local offset from the death position where the blood bath prefab is spawned.")]
+    [SerializeField] private Vector3 bloodBathOffset = Vector3.zero;
+    [Tooltip("Spawn the blood bath prefab for a low-intensity animation-only death.")]
+    [SerializeField] private bool includeBloodBathAnimation = false;
+    [Tooltip("Spawn the blood bath prefab for a standard ragdoll death.")]
+    [SerializeField] private bool includeBloodBathRagdoll = false;
+    [Tooltip("Spawn the blood bath prefab for a complete exploding ragdoll death.")]
+    [SerializeField] private bool includeBloodBathExploding = false;
+
     [Header("Lifespan & Delay Constraints")]
     [Tooltip("Time before the physics ragdoll or broken chunks are deleted to clear memory.")]
     [SerializeField] private float ragdollLifespan = 10f;
@@ -232,6 +244,18 @@ public class DeathHandler : MonoBehaviour
         }
     }
 
+    private void SpawnBloodBath()
+    {
+        if (bloodBathPrefabs == null || bloodBathPrefabs.Count == 0) return;
+
+        GameObject chosenBloodBathPrefab = bloodBathPrefabs[Random.Range(0, bloodBathPrefabs.Count)];
+
+        Vector3 spawnPosition = transform.position + bloodBathOffset;
+        // Randomized yaw only - keeps the decals level so their ground raycast still hits straight down.
+        Quaternion levelRotation = Quaternion.Euler(0f, Random.Range(0f, 360f), 0f);
+        Instantiate(chosenBloodBathPrefab, spawnPosition, levelRotation);
+    }
+
     private void HandleAnimationDeath()
     {
         if (enemyController != null && enemyController.aiAnim != null)
@@ -265,6 +289,8 @@ public class DeathHandler : MonoBehaviour
             Destroy(ragdollInstanceSwap, ragdollLifespan);
         }
 
+        if (includeBloodBathAnimation) SpawnBloodBath();
+
         // Tidy up and destroy the main character shell immediately
         Destroy(gameObject);
     }
@@ -286,6 +312,8 @@ public class DeathHandler : MonoBehaviour
             }
 
             Destroy(gibsInstance, ragdollLifespan);
+
+            if (includeBloodBathExploding) SpawnBloodBath();
         }
         else
         {
@@ -304,6 +332,8 @@ public class DeathHandler : MonoBehaviour
             RigidBodyAndPhysicsApplication(ragdollInstance, info, punchVector, damageScale);
 
             Destroy(ragdollInstance, ragdollLifespan);
+
+            if (includeBloodBathRagdoll) SpawnBloodBath();
         }
 
         SwitchOffFunctionality();

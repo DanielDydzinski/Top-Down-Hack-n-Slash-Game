@@ -102,6 +102,7 @@ GameObject:
   - component: {fileID: 500803296711988408}
   - component: {fileID: 3849379370426498414}
   - component: {fileID: 991913521522058618}
+  - component: {fileID: -3376140398913712286}
   m_Layer: 9
   m_Name: Spider2Enemy
   m_TagString: Untagged
@@ -554,6 +555,15 @@ MonoBehaviour:
   upwardModifier: 0.5
   explodingPartsPrefab: {fileID: 0}
   completeExplodeBlastForce: 70
+  bloodBathPrefabs:
+  - {fileID: 8197951861065148966, guid: e91c7e76ffe6e284baf4ab106da202f8, type: 3}
+  - {fileID: 5936082179827903908, guid: cb58ece77d11ef945aecd072f2e46a8d, type: 3}
+  - {fileID: 5494213943435191861, guid: db51fe09adf27d640b4e10018c2d76ba, type: 3}
+  - {fileID: 3034872428933141512, guid: 52d94bfe44b09ff4b9e9788e9a86a778, type: 3}
+  bloodBathOffset: {x: 0, y: 1, z: 0}
+  includeBloodBathAnimation: 1
+  includeBloodBathRagdoll: 1
+  includeBloodBathExploding: 0
   ragdollLifespan: 10
   audioCleanupDelay: 3
   randomizeAnimationLifespan: 1
@@ -582,6 +592,22 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &-3376140398913712286
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2187212384583384717}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7e7d0ff229b99e42a3784c3e93461b0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  byTime: 1
+  destroyTime: 30
+  byDistance: 0
+  destroyDistance: 0
 --- !u!1 &3108695516532465150
 GameObject:
   m_ObjectHideFlags: 0
