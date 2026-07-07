@@ -1,6 +1,9 @@
 using UnityEngine;
 
-public class RollDodgeState : IPlayerState
+// A chained follow-up to RollDodgeState, entered when Shift is pressed again during the first
+// roll dodge (see RollDodgeState.UpdateState). Behaves the same way but does not itself chain
+// further - always returns to locomotion.
+public class SecondRollDodgeState : IPlayerState
 {
     private PlayerStateMachine psm;
     private float _duration;
@@ -9,10 +12,10 @@ public class RollDodgeState : IPlayerState
     private Vector3 _leapDirection;
 
     private Quaternion _targetMouseRotation;
-    private bool _canSteer; // The lock that persists for the whole dodge
-    private bool _secondDodgeQueued;
+    private bool _canSteer;
+    private bool _vaultImpulseApplied;
 
-    public RollDodgeState(PlayerStateMachine _psm, Vector3 dodgeDirection)
+    public SecondRollDodgeState(PlayerStateMachine _psm, Vector3 dodgeDirection)
     {
         psm = _psm;
         _leapDirection = dodgeDirection;
@@ -20,37 +23,32 @@ public class RollDodgeState : IPlayerState
 
     public void EnterState()
     {
-        // ensuring we have the most accurate data for the dodge direction.
         psm.rotator.UpdateOrientation();
 
         psm.gameObject.layer = LayerMask.NameToLayer("Default");
         _timer = 0;
 
-        // 1. DETERMINE IF WE CAN STEER (The "Lock")
-        // Compare dodge input direction against the current facing direction maintained by PlayerRotate.
-        // If they are within 45 degrees (dot > 0.707), we allow steering.
         Vector3 dodgeDirNorm = _leapDirection.normalized;
         Vector3 facingDirNorm = psm.rotator.facingDirVec3.normalized;
 
         float dot = Vector3.Dot(dodgeDirNorm, facingDirNorm);
         _canSteer = (dot > 0.707f);
 
-        // 2. ANIMATION & SETUP
         psm.anim.Play(psm.TransitionStateHash, psm.AttackLayer);
         psm.anim.Play(psm.TransitionStateHash, psm.FullBodyLayer);
-        psm.anim.CrossFade(psm.rollDodgeHash, 0.15f, psm.FullBodyLayer);
-        psm.anim.SetTrigger(psm.isRollDodgeHash);
+        psm.anim.CrossFade(psm.secondRollDodgeHash, 0.15f, psm.FullBodyLayer);
+        psm.anim.SetTrigger(psm.isSecondRollDodgeHash);
 
         float playbackSpeed = psm.dodgeAnimationSpeed;
-        _duration = psm.rollDodgeAnimationClip.length / playbackSpeed;
+        _duration = psm.secondRollDodgeAnimationClip.length / playbackSpeed;
         _dodgeForce = psm.stats.dodgePower;
 
         psm.playerMovement.enabled = false;
         psm.rotator.enabled = false;
 
         psm.ShrinkController(psm.dodgeControllerHeight);
+        _vaultImpulseApplied = false;
 
-        // Snap character to initial face direction
         if (_leapDirection != Vector3.zero)
             psm.transform.rotation = Quaternion.LookRotation(_leapDirection);
     }
@@ -59,40 +57,27 @@ public class RollDodgeState : IPlayerState
     {
         _timer += Time.deltaTime;
 
-        // 1. CONDITIONAL STEERING
-        // Only runs if the lock was set to true during EnterState
         if (_canSteer)
         {
             UpdateTargetRotation();
             ApplySteering();
         }
 
-        // 2. MOVEMENT
-        // We use psm.transform.forward because it updates as we steer, allowing for curves.
-        if (_timer >= _duration * psm.rollDodgeMoveStart && _timer <= _duration * psm.rollDodgeMoveEnd)
+        if (_timer >= _duration * psm.secondRollDodgeMoveStart && _timer <= _duration * psm.secondRollDodgeMoveEnd)
         {
+            // One-shot: fires the jump exactly as the dash starts, not the instant the state is entered.
+            if (!_vaultImpulseApplied)
+            {
+                psm.mover.SetVerticalVelocity(psm.secondRollDodgeVaultVelocity);
+                _vaultImpulseApplied = true;
+            }
+
             psm.mover.GetComponent<CharacterController>().Move(psm.transform.forward * _dodgeForce * Time.deltaTime);
         }
 
-        // 2.5 CHAIN DETECTION: once past the configured window, a fresh Shift press queues a second dodge
-        if (!_secondDodgeQueued && _timer >= _duration * psm.secondDodgeWindowStart && Input.GetKeyDown(KeyCode.LeftShift))
+        if (_timer >= _duration * psm.secondRollDodgeExitAt)
         {
-            _secondDodgeQueued = true;
-        }
-
-        // 3. EXIT
-        if (_timer >= _duration * psm.rollDodgeExitAt)
-        {
-            if (_secondDodgeQueued)
-            {
-                // Continues in whatever direction we're currently facing - steering during this
-                // dodge may have already turned us towards the mouse.
-                psm.SwitchState(new SecondRollDodgeState(psm, psm.transform.forward));
-            }
-            else
-            {
-                psm.SwitchState(psm.locomotionState);
-            }
+            psm.SwitchState(psm.locomotionState);
         }
     }
 
@@ -108,7 +93,6 @@ public class RollDodgeState : IPlayerState
 
     private void ApplySteering()
     {
-        // Rotate towards the mouse using the dodge-specific rotation speed
         psm.transform.rotation = Quaternion.RotateTowards(
             psm.transform.rotation,
             _targetMouseRotation,
@@ -120,9 +104,9 @@ public class RollDodgeState : IPlayerState
     {
         if (psm.playerMovement) psm.playerMovement.enabled = true;
         psm.rotator.enabled = true;
-        psm.rotator.UpdateOrientation(); // Recalculate facing dir after dodge is done
+        psm.rotator.UpdateOrientation();
         psm.anim.CrossFade(psm.TransitionStateHash, 0.1f, psm.FullBodyLayer);
-        psm.anim.ResetTrigger(psm.isRollDodgeHash);
+        psm.anim.ResetTrigger(psm.isSecondRollDodgeHash);
         psm.gameObject.layer = LayerMask.NameToLayer("Player");
         psm.RestoreControllerSize();
         psm.StartDodgeHeavyWindow();

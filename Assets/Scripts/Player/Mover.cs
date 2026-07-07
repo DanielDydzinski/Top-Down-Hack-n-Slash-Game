@@ -71,6 +71,13 @@ public class Mover : MonoBehaviour
         impactVelocity += direction * force / mass;
     }
 
+    // Injects an instantaneous vertical speed (e.g. a jump/vault impulse) - gravity in
+    // ApplyGravity() then arcs it back down every subsequent frame exactly like a normal fall.
+    public void SetVerticalVelocity(float yVelocity)
+    {
+        verticalVelocity.y = yVelocity;
+    }
+
     public void Move()
     {
         // Calculation: (Base Stat Speed) * (Active Effects from Stats) * (Ability Multiplier)

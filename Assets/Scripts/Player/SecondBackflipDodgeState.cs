@@ -1,17 +1,18 @@
 using UnityEngine;
 
-public class BackflipDodgeState : IPlayerState
+// A chained follow-up to BackflipDodgeState, entered when Shift is pressed again during the
+// first backflip dodge (see BackflipDodgeState.UpdateState). Behaves the same way but does not
+// itself chain further - always returns to locomotion.
+public class SecondBackflipDodgeState : IPlayerState
 {
     private PlayerStateMachine psm;
-    private float _duration = 0.4f; // Adjust to your animation length
+    private float _duration = 0.4f;
     private float _timer;
     private float _dodgeForce = 2;
     private Vector3 _leapDirection;
-    private bool _secondDodgeQueued;
     private bool _vaultImpulseApplied;
 
-
-    public BackflipDodgeState(PlayerStateMachine _psm, Vector3 dodgeDirection)
+    public SecondBackflipDodgeState(PlayerStateMachine _psm, Vector3 dodgeDirection)
     {
         psm = _psm;
         _leapDirection = dodgeDirection;
@@ -19,30 +20,21 @@ public class BackflipDodgeState : IPlayerState
 
     public void EnterState()
     {
-
-        // Revert to Player layer
         psm.gameObject.layer = LayerMask.NameToLayer("Default");
 
         _timer = 0;
 
-       
-        // This stops any pending Animation Events from firing
         psm.anim.Play(psm.TransitionStateHash, psm.AttackLayer);
         psm.anim.Play(psm.TransitionStateHash, psm.FullBodyLayer);
 
-        // 2. PLAY THE DODGE: Since it's a full body move, play it on the Full Body layer
-        psm.anim.CrossFade(psm.BackFlipDodgeHash, 0.25f, psm.FullBodyLayer);
-        psm.anim.SetTrigger(psm.isDodgingHash);
-
+        psm.anim.CrossFade(psm.secondBackFlipDodgeHash, 0.25f, psm.FullBodyLayer);
+        psm.anim.SetTrigger(psm.isSecondBackFlipDodgeHash);
 
         float playbackSpeed = psm.dodgeAnimationSpeed;
 
-        _duration = psm.backFlipDodgeAnimationClip.length/ playbackSpeed;
-       _dodgeForce=psm.stats.dodgePower;
+        _duration = psm.secondBackFlipDodgeAnimationClip.length / playbackSpeed;
+        _dodgeForce = psm.stats.dodgePower;
 
-        //psm.mover.AddForce(leapDir, _dodgeForce);
-
-        // 4. LOCKDOWN
         psm.playerMovement.enabled = false;
         psm.rotator.enabled = false;
         psm.rotator.StopAllRotation();
@@ -56,36 +48,20 @@ public class BackflipDodgeState : IPlayerState
         _timer += Time.deltaTime;
         psm.mover.transform.rotation = Quaternion.LookRotation(_leapDirection * -1f);
 
-
-        if (_timer >= _duration * psm.backflipDodgeMoveStart && _timer <= _duration * psm.backflipDodgeMoveEnd)
+        if (_timer >= _duration * psm.secondBackflipDodgeMoveStart && _timer <= _duration * psm.secondBackflipDodgeMoveEnd)
         {
             // One-shot: fires the jump exactly as the dash starts, not the instant the state is entered.
             if (!_vaultImpulseApplied)
             {
-                psm.mover.SetVerticalVelocity(psm.backflipDodgeVaultVelocity);
+                psm.mover.SetVerticalVelocity(psm.secondBackflipDodgeVaultVelocity);
                 _vaultImpulseApplied = true;
             }
 
             psm.mover.GetComponent<CharacterController>().Move(_leapDirection * _dodgeForce * Time.deltaTime);
         }
-
-        // CHAIN DETECTION: once past the configured window, a fresh Shift press queues a second dodge
-        if (!_secondDodgeQueued && _timer >= _duration * psm.secondDodgeWindowStart && Input.GetKeyDown(KeyCode.LeftShift))
+        if (_timer >= _duration * psm.secondBackflipDodgeExitAt)
         {
-            _secondDodgeQueued = true;
-        }
-
-        if (_timer >= _duration * psm.backflipDodgeExitAt)
-        {
-            if (_secondDodgeQueued)
-            {
-                // Just hops backward again in the same direction as this one.
-                psm.SwitchState(new SecondBackflipDodgeState(psm, _leapDirection));
-            }
-            else
-            {
-                psm.SwitchState(psm.locomotionState);
-            }
+            psm.SwitchState(psm.locomotionState);
         }
     }
 
@@ -95,8 +71,7 @@ public class BackflipDodgeState : IPlayerState
         psm.rotator.enabled = true;
         psm.rotator.UpdateOrientation();
         psm.anim.CrossFade(psm.TransitionStateHash, psm.FullBodyLayer);
-        psm.anim.ResetTrigger(psm.isDodgingHash);
-        // Revert to Player layer
+        psm.anim.ResetTrigger(psm.isSecondBackFlipDodgeHash);
         psm.gameObject.layer = LayerMask.NameToLayer("Player");
         psm.RestoreControllerSize();
         psm.StartDodgeHeavyWindow();
