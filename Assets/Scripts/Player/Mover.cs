@@ -78,6 +78,19 @@ public class Mover : MonoBehaviour
         verticalVelocity.y = yVelocity;
     }
 
+    // Lets a state (e.g. FallingState) inject horizontal drift that ApplyGravity() folds into its
+    // own Move() call every frame, instead of the caller doing a second separate Move(). Two
+    // independent Move() calls in the same frame - one purely horizontal, one purely vertical -
+    // makes CharacterController.isGrounded unreliable, since a horizontal-only move often fails to
+    // register ground contact even when resting right on the floor, and whichever call runs last
+    // that frame (order between MonoBehaviours isn't guaranteed) can clobber the other's result.
+    public void SetHorizontalVelocity(Vector3 horizontalVelocity)
+    {
+        horizontalVelocity.y = 0f;
+        verticalVelocity.x = horizontalVelocity.x;
+        verticalVelocity.z = horizontalVelocity.z;
+    }
+
     public void Move()
     {
         // Calculation: (Base Stat Speed) * (Active Effects from Stats) * (Ability Multiplier)

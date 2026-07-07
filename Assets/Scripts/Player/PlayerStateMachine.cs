@@ -18,6 +18,7 @@ public class PlayerStateMachine : MonoBehaviour
     [HideInInspector] public AnimationClip rollDodgeAnimationClip;
     [HideInInspector] public AnimationClip secondRollDodgeAnimationClip;
     [HideInInspector] public AnimationClip secondBackFlipDodgeAnimationClip;
+    [HideInInspector] public AnimationClip landingAnimationClip;
     [HideInInspector] public CharacterController characterController;
 
     [Header("Block System Settings")]
@@ -62,6 +63,16 @@ public class PlayerStateMachine : MonoBehaviour
     [Tooltip("CharacterController height while any dodge state is active, letting the player fit through low gaps.")]
     public float dodgeControllerHeight = 0.5f;
 
+    [Header("Falling / Landing Settings")]
+    [Tooltip("How far (meters) the ground must be below the player's feet before LocomotionState commits to FallingState. CharacterController.isGrounded alone flickers false on stairs/edges regardless of actual drop height, so this measures the real distance with a raycast instead.")]
+    public float fallHeightThreshold = 1f;
+    [Tooltip("Which layers count as ground for the fall-height raycast.")]
+    public LayerMask groundLayerMask = ~0;
+    [Tooltip("How long (seconds) the ground must be continuously beyond fallHeightThreshold before committing to FallingState - guards against a single-frame raycast miss (e.g. a seam between floor meshes), not the primary gate.")]
+    public float fallDetectionDelay = 0.1f;
+    [Tooltip("Fraction of the Landing clip's length (0-1) before LandingState returns to locomotion.")]
+    [Range(0f, 1f)] public float landingExitAt = 0.9f;
+
     private float _defaultControllerHeight;
     private Vector3 _defaultControllerCenter;
 
@@ -82,6 +93,10 @@ public class PlayerStateMachine : MonoBehaviour
     public readonly int isSecondRollDodgeHash = Animator.StringToHash("isSecondRollDodge");
     public readonly int secondBackFlipDodgeHash = Animator.StringToHash("2ndBackFlipDodge");
     public readonly int isSecondBackFlipDodgeHash = Animator.StringToHash("isSecondBackFlipDodge");
+    public readonly int fallingHash = Animator.StringToHash("Falling");
+    public readonly int isFallingHash = Animator.StringToHash("isFalling");
+    public readonly int landingHash = Animator.StringToHash("Landing");
+    public readonly int isLandingHash = Animator.StringToHash("isLanding");
     [HideInInspector] public int BlockLoopHash;
 
     public readonly int BaseLayer = 0;
@@ -116,6 +131,7 @@ public class PlayerStateMachine : MonoBehaviour
         rollDodgeAnimationClip = GetClipByName("RollDodge");
         secondRollDodgeAnimationClip = GetClipByName("2ndDodge");
         secondBackFlipDodgeAnimationClip = GetClipByName("2ndBackFlipDodge");
+        landingAnimationClip = GetClipByName("Landing");
 
         _defaultControllerHeight = characterController.height;
         _defaultControllerCenter = characterController.center;
@@ -215,5 +231,16 @@ public class PlayerStateMachine : MonoBehaviour
     {
         characterController.height = _defaultControllerHeight;
         characterController.center = _defaultControllerCenter;
+    }
+
+    // Measures the real distance from the player's feet to the ground below via raycast, rather
+    // than trusting CharacterController.isGrounded - which flickers false on stairs and platform
+    // edges regardless of how small the actual gap is. Returns true if ground is found within
+    // maxDistance of the feet.
+    public bool IsGroundedWithinDistance(float maxDistance)
+    {
+        Vector3 feetPosition = transform.position + characterController.center + Vector3.down * (characterController.height * 0.5f);
+        Vector3 rayOrigin = feetPosition + Vector3.up * 0.1f;
+        return Physics.Raycast(rayOrigin, Vector3.down, maxDistance + 0.1f, groundLayerMask);
     }
 }

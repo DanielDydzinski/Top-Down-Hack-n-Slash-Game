@@ -8,6 +8,8 @@ public class LocomotionState : IPlayerState
     public static readonly int isMovingHash = Animator.StringToHash("isMoving");
     public static readonly int runBlendHash = Animator.StringToHash("RunBlend");
 
+    private float _ungroundedTimer;
+
     public LocomotionState(PlayerStateMachine stateMachine)
     {
         psm = stateMachine;
@@ -23,10 +25,30 @@ public class LocomotionState : IPlayerState
 
         // Reset animator parameters
         psm.anim.SetBool("isMoving", false);
+
+        _ungroundedTimer = 0f;
     }
 
     public void UpdateState()
     {
+        // Checked every frame (not just on enter) so walking off a ledge mid-locomotion is caught,
+        // not just re-entering this state while already off the ground. Uses a raycast-measured
+        // distance to the ground rather than CharacterController.isGrounded, which flickers false
+        // on stairs/platform edges regardless of how small the actual drop is - the sustained
+        // delay on top of that only guards against a single-frame raycast miss.
+        if (!psm.IsGroundedWithinDistance(psm.fallHeightThreshold))
+        {
+            _ungroundedTimer += Time.deltaTime;
+            if (_ungroundedTimer >= psm.fallDetectionDelay)
+            {
+                psm.SwitchState(new FallingState(psm));
+                return;
+            }
+        }
+        else
+        {
+            _ungroundedTimer = 0f;
+        }
 
         UpdateAnimator();
         // Here, we could listen for inputs to switch to an AttackState.

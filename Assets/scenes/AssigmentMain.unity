@@ -3560,8 +3560,20 @@ PrefabInstance:
       value: 800
       objectReference: {fileID: 0}
     - target: {fileID: 5155127641587721050, guid: 8a7ca07b72bcbc949b6221e7b7927891, type: 3}
+      propertyPath: dodgeRotationSpeed
+      value: 250
+      objectReference: {fileID: 0}
+    - target: {fileID: 5155127641587721050, guid: 8a7ca07b72bcbc949b6221e7b7927891, type: 3}
       propertyPath: blockLoopAnimationName
       value: BlockState
+      objectReference: {fileID: 0}
+    - target: {fileID: 5155127641587721050, guid: 8a7ca07b72bcbc949b6221e7b7927891, type: 3}
+      propertyPath: dodgeVaultJumpVelocity
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5155127641587721050, guid: 8a7ca07b72bcbc949b6221e7b7927891, type: 3}
+      propertyPath: backflipDodgeVaultVelocity
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 5155127641587721050, guid: 8a7ca07b72bcbc949b6221e7b7927891, type: 3}
       propertyPath: blockReactionClipNames.Array.size
