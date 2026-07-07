@@ -29,6 +29,8 @@ public class PlayerStateMachine : MonoBehaviour
 
     [Header("Dodge Settings")]
     [SerializeField] public float dodgeRotationSpeed = 720f;
+    [Tooltip("The 2nd dodge state rotation input")]
+    [SerializeField] public float DodgeRotationSpeed2 = 100;
     public float dodgeAnimationSpeed = 1;
     [Tooltip("How far into the first dodge's animation (0-1) Shift must be held before a press registers as a chained second dodge.")]
     [Range(0f, 1f)] public float secondDodgeWindowStart = 0.5f;

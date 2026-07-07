@@ -25,7 +25,7 @@ public class FallingState : IPlayerState
         psm.mover.SetHorizontalVelocity(currentVelocity);
 
         psm.playerMovement.enabled = false;
-        psm.rotator.enabled = false;
+        //psm.rotator.enabled = false;
 
         psm.anim.Play(psm.TransitionStateHash, psm.AttackLayer);
         psm.anim.Play(psm.TransitionStateHash, psm.FullBodyLayer);

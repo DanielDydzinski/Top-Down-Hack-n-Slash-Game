@@ -96,7 +96,7 @@ public class SecondRollDodgeState : IPlayerState
         psm.transform.rotation = Quaternion.RotateTowards(
             psm.transform.rotation,
             _targetMouseRotation,
-            psm.dodgeRotationSpeed * Time.deltaTime
+            psm.DodgeRotationSpeed2 * Time.deltaTime
         );
     }
 
