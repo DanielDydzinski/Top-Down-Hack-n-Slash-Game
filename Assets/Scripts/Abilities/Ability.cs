@@ -51,6 +51,21 @@ public struct BaseAbilitySettings
     [Range(0f, 1f)]
     public float dashEndTime;   // 0- 1 how far into animationtime to stop 0.9 = 90% of animation
 
+    [Header("Vault Settings")]
+    [Tooltip("One-shot upward velocity applied exactly when the dash window opens (dashStartTime). 0 or less disables the jump.")]
+    public float verticalJumpForce;
+    [Tooltip("CharacterController height while this ability's dash window is active. 0 or less leaves the controller size untouched.")]
+    public float abilityControllerHeight;
+    [Tooltip("Enables the mid-air freeze below. Only meaningful when verticalJumpForce > 0.")]
+    public bool freezeInAir;
+    [Range(0f, 1f)]
+    [Tooltip("How far into the clip (0-1) to check whether we're still airborne - if so, the animation freezes there until landing.")]
+    public float airFreezeCheckPoint;
+    [Tooltip("Ground-distance threshold (meters) used at the check point above - closer to the ground than this counts as landed, not airborne, so the animation is not frozen.")]
+    public float airbornHeightThreshold;
+    [Tooltip("Zeros the carried-over horizontal drift the instant the player touches ground again, instead of letting it continue until the ability ends.")]
+    public bool stopDashOnGrounded;
+
     [Header("Energy Settings")]
     [Tooltip("How much energy it costs to use this ability.")]
     public float energyCost;
@@ -62,7 +77,7 @@ public struct BaseAbilitySettings
     [Range(0f, 100f)]
     public float energyRefundOnKillPercent;
 
-    public GameObject abilityVisualParticles; // visuals 
+    public GameObject abilityVisualParticles; // visuals
     public VisualAttachPoint attachPoint; // Instead of public Transform
     public AudioClip audioClip;
     public AudioClip visualEffectAudio;
@@ -137,7 +152,7 @@ public abstract class Ability : ScriptableObject
     [Range(0f, 100f)]
     public float energyRefundOnKillPercent;
 
-    public GameObject abilityVisualPartyicles; // visuals 
+    public GameObject abilityVisualPartyicles; // visuals
     public VisualAttachPoint attachPoint; // Instead of public Transform
     public AudioClip AudioClip;
     public AudioClip visualEffectAudio;

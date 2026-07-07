@@ -50,7 +50,7 @@ public class PushPropagator : MonoBehaviour
 
                     float transferRatio = myMass / (myMass + theirMass);
                     nextPropagator.PropagatePush(velocity * transferRatio, gameObject);
-                    velocity *= transferRatio;
+                    velocity *= (1f - transferRatio);
                 }
             }
         }
