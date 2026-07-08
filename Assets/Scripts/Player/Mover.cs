@@ -28,42 +28,65 @@ public class Mover : MonoBehaviour
     private CharacterController controller;
     private Stats stats;
 
+    // DEBUG - remove once fall-speed investigation is done
+    private PlayerMovement _debugPlayerMovement;
+
     void Start()
     {
         controller = GetComponent<CharacterController>();
         moveDirection = Vector3.zero;
         stats = GetComponent<Stats>();
+        _debugPlayerMovement = GetComponent<PlayerMovement>();
     }
 
+    // Everything that moves this character - knockback, WASD locomotion, gravity, and any drift fed
+    // in by ability/dodge/fall states via SetHorizontalVelocity/SetVerticalVelocity - is folded into
+    // ONE CharacterController.Move() call here. Splitting movement across multiple Move() calls in
+    // the same frame (as this and PlayerMovement used to do independently) makes
+    // CharacterController.isGrounded unreliable: a call that doesn't touch the ground can report
+    // ungrounded even while standing still, which silently breaks the "-2f while grounded" gravity
+    // clamp below and lets verticalVelocity accumulate unbounded until the character finally leaves
+    // the ground and the whole backlog of speed dumps out at once.
     void Update()
     {
-        // 1. Always process Impact/Knockback (even when stunned!)
+        Vector3 frameVelocity = Vector3.zero;
+
+        // 1. Impact/Knockback (even when stunned!)
         if (impactVelocity.magnitude > 0.2f)
         {
-            controller.Move(impactVelocity * Time.deltaTime);
+            frameVelocity += impactVelocity;
         }
-
-        // 2. Consume the force over time (Damping)
         impactVelocity = Vector3.Lerp(impactVelocity, Vector3.zero, 2f * Time.deltaTime);
 
+        // 2. Regular WASD locomotion - PlayerMovement only sets the direction now (and clears it to
+        // zero in OnDisable), it no longer calls Move() itself.
+        float finalSpeed = stats.GetModifiedSpeed() * speedMultiplier;
+        frameVelocity += moveDirection * finalSpeed;
+
+        // 3. Gravity, plus any horizontal/vertical drift fed in by ability/dodge/fall states.
+        // DEBUG - remove once fall-speed investigation is done
+        bool groundedBefore = controller.isGrounded;
+        bool wasClamped = false;
         if (useGravity)
         {
-            ApplyGravity();
+            if (controller.isGrounded && verticalVelocity.y < 0)
+            {
+                verticalVelocity.y = -2f;
+                wasClamped = true;
+            }
+            verticalVelocity.y += gravityValue * Time.deltaTime;
+            frameVelocity += verticalVelocity;
         }
+
+        controller.Move(frameVelocity * Time.deltaTime);
+
+        // DEBUG - remove once fall-speed investigation is done
+        Debug.Log($"[GravityDebug] t={Time.time:F3} isGroundedBefore={groundedBefore} clamped={wasClamped} playerMovementEnabled={(_debugPlayerMovement != null ? _debugPlayerMovement.enabled : (bool?)null)} moveDirection={moveDirection} finalSpeed={finalSpeed:F2} locomotionContribution={moveDirection * finalSpeed} vVel={verticalVelocity} frameVelocity={frameVelocity} controllerVelAfterMove={controller.velocity} isGroundedAfterMove={controller.isGrounded}");
     }
 
 
     public void SetSpeedMultiplier(float mult) => speedMultiplier = mult;
 
-    private void ApplyGravity()
-    {
-        if (controller.isGrounded && verticalVelocity.y < 0)
-        {
-            verticalVelocity.y = -2f;
-        }
-        verticalVelocity.y += gravityValue * Time.deltaTime;
-        controller.Move(verticalVelocity * Time.deltaTime);
-    }
     public void AddForce(Vector3 direction, float force)
     {
         direction.Normalize();
@@ -71,34 +94,20 @@ public class Mover : MonoBehaviour
         impactVelocity += direction * force / mass;
     }
 
-    // Injects an instantaneous vertical speed (e.g. a jump/vault impulse) - gravity in
-    // ApplyGravity() then arcs it back down every subsequent frame exactly like a normal fall.
+    // Injects an instantaneous vertical speed (e.g. a jump/vault impulse) - gravity in Update()
+    // then arcs it back down every subsequent frame exactly like a normal fall.
     public void SetVerticalVelocity(float yVelocity)
     {
         verticalVelocity.y = yVelocity;
     }
 
-    // Lets a state (e.g. FallingState) inject horizontal drift that ApplyGravity() folds into its
-    // own Move() call every frame, instead of the caller doing a second separate Move(). Two
-    // independent Move() calls in the same frame - one purely horizontal, one purely vertical -
-    // makes CharacterController.isGrounded unreliable, since a horizontal-only move often fails to
-    // register ground contact even when resting right on the floor, and whichever call runs last
-    // that frame (order between MonoBehaviours isn't guaranteed) can clobber the other's result.
+    // Lets a state (e.g. FallingState) inject horizontal drift that gets folded into the single
+    // per-frame Move() in Update() above, instead of the caller doing a separate Move() of its own.
     public void SetHorizontalVelocity(Vector3 horizontalVelocity)
     {
         horizontalVelocity.y = 0f;
         verticalVelocity.x = horizontalVelocity.x;
         verticalVelocity.z = horizontalVelocity.z;
-    }
-
-    public void Move()
-    {
-        // Calculation: (Base Stat Speed) * (Active Effects from Stats) * (Ability Multiplier)
-        float finalSpeed = stats.GetModifiedSpeed() * speedMultiplier;
-
-        // CharacterController handles the collision "slide" for us here
-        Vector3 movement = moveDirection * finalSpeed * Time.deltaTime;
-        controller.Move(movement);
     }
 
     public void SetDirection(Vector3 dir)

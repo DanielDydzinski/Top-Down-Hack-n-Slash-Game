@@ -20,6 +20,10 @@ public class ActionState : IPlayerState
     private bool _driftStopped;
     private float _airDriftSpeed;
 
+    // Captured in EnterState() before anything freezes playback, so unfreezing restores whatever this
+    // clip's actual speed was (some animations run at other-than-1x by default) instead of assuming 1.
+    private float _originalAnimSpeed;
+
     public ActionState(PlayerStateMachine stateMachine, Ability abilityToRun)
     {
         psm = stateMachine;
@@ -29,6 +33,9 @@ public class ActionState : IPlayerState
 
     public void EnterState()
     {
+        // Capture before anything (including the freeze below) can touch it.
+        _originalAnimSpeed = psm.anim.speed;
+
         if (!ability.baseSettings.canMoveAttack)
         {
             psm.anim.SetBool(psm.IsMovingHash, false);
@@ -39,11 +46,10 @@ public class ActionState : IPlayerState
         psm.rotator.StopAllRotation();
         psm.rotator.enabled = false;
 
-        // Vault-style abilities own movement entirely while airborne - PlayerMovement.Update() calls
-        // its own Mover.Move() whenever a direction key is held, a second CharacterController.Move()
-        // in the same frame as Mover's gravity Move(), which makes isGrounded unreliable (see
-        // Mover.SetHorizontalVelocity) and was preventing the air-freeze landing check from ever
-        // passing while a key was held.
+        // Vault-style abilities own movement entirely while airborne - PlayerMovement's WASD
+        // direction now feeds into the same single per-frame Mover.Move() as gravity/drift (see
+        // Mover.Update()), so leaving it enabled here would let player input steer on top of the
+        // ability's own controlled trajectory instead of just driving normal ground locomotion.
         if (ability.baseSettings.verticalJumpForce > 0f)
             psm.playerMovement.enabled = false;
 
@@ -108,7 +114,7 @@ public class ActionState : IPlayerState
             if (psm.characterController.isGrounded)
             {
                 _isFrozen = false;
-                psm.anim.speed = 1f;
+                psm.anim.speed = _originalAnimSpeed;
             }
             else
             {
@@ -281,6 +287,6 @@ public class ActionState : IPlayerState
 
         // Safety net: if this state is interrupted while frozen (e.g. hit/stagger), don't leave the
         // Animator permanently paused for whatever state comes next.
-        if (_isFrozen) psm.anim.speed = 1f;
+        if (_isFrozen) psm.anim.speed = _originalAnimSpeed;
     }
 }

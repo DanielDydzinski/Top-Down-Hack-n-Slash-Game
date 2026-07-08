@@ -20,6 +20,7 @@ public class PlayerStateMachine : MonoBehaviour
     [HideInInspector] public AnimationClip secondBackFlipDodgeAnimationClip;
     [HideInInspector] public AnimationClip landingAnimationClip;
     [HideInInspector] public CharacterController characterController;
+    [HideInInspector] public CameraFollow cameraFollow;
 
     [Header("Block System Settings")]
     [Range(0f, 180f)] public float blockAngleLimit = 45f;
@@ -83,6 +84,10 @@ public class PlayerStateMachine : MonoBehaviour
     public float dodgeHeavyWindow = 1f;
     private float dodgeHeavyWindowStartTime = -Mathf.Infinity;
 
+    [Header("Mid-Air Attack Drift")]
+    [Tooltip("Fixed horizontal speed a Q/DodgeHeavy mid-air attack launches at (see MidFallAttackState) - always this exact value, regardless of whatever momentum (dodge, fall, etc.) the player actually had the instant it was triggered.")]
+    public float midAirAttackDriftSpeed = 8f;
+
 
     public readonly int CombatStanceStateHash = Animator.StringToHash("CombatStance");
     public readonly int TransitionStateHash = Animator.StringToHash("Transition");
@@ -123,6 +128,9 @@ public class PlayerStateMachine : MonoBehaviour
         stats = GetComponent<Stats>();
         playerEnergy = GetComponent<PlayerEnergy>();
         characterController = GetComponent<CharacterController>();
+        // Lives on the camera, not this GameObject - CameraFollow itself already resolves the scene
+        // camera the same way (Camera.main) inside its own CamFollow(), so this stays consistent.
+        if (Camera.main != null) cameraFollow = Camera.main.GetComponent<CameraFollow>();
 
         BlockLoopHash = Animator.StringToHash(blockLoopAnimationName);
         dodgeAnimationSpeed = stats.GetDodgeAnimationSpeed();
@@ -132,7 +140,7 @@ public class PlayerStateMachine : MonoBehaviour
         backFlipDodgeAnimationClip = GetClipByName("BackFlipDodge");
         rollDodgeAnimationClip = GetClipByName("RollDodge");
         secondRollDodgeAnimationClip = GetClipByName("2ndDodge");
-        secondBackFlipDodgeAnimationClip = GetClipByName("2ndBackFlipDodge");
+        secondBackFlipDodgeAnimationClip = GetClipByName("2ndDodge");
         landingAnimationClip = GetClipByName("Landing");
 
         _defaultControllerHeight = characterController.height;
@@ -198,6 +206,18 @@ public class PlayerStateMachine : MonoBehaviour
     {
         return currentState is BackflipDodgeState || currentState is RollDodgeState
             || currentState is SecondRollDodgeState || currentState is SecondBackflipDodgeState;
+    }
+
+    // Ground truth for input-gating (mid-air-only ability variants, blocking a fresh dodge while
+    // airborne), instead of checking "is currentState FallingState". LocomotionState only switches
+    // to FallingState after fallDetectionDelay has elapsed (a debounce against a single-frame raycast
+    // miss), so a dodge/attack that exits back to LocomotionState while still airborne (e.g. mid-vault)
+    // would otherwise read as grounded for up to that whole delay - letting the full ground combo/dodge
+    // set fire mid-air. Uses the same raycast check LocomotionState itself uses, so it agrees with the
+    // moment LocomotionState would eventually commit to FallingState, just without waiting for the debounce.
+    public bool IsAirborne()
+    {
+        return !IsGroundedWithinDistance(fallHeightThreshold);
     }
 
     public IPlayerState GetCurrentState() => currentState;

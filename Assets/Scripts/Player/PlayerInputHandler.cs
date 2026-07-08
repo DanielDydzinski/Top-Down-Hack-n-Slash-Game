@@ -30,10 +30,14 @@ public class PlayerInputHandler : MonoBehaviour
         // Prevent attacking/casting if the player is actively blocking
         else if (!psm.IsDodging() && !(psm.GetCurrentState() is BlockState))
         {
-            // While falling, only Heavy (mouse 1) and Q are allowed through - everything else used to
+            // While airborne, only Heavy (mouse 1) and Q are allowed through - everything else used to
             // fire straight into the glitched mid-air animation. Both route into MidFallAttackState
-            // (via startAirborne) instead of the normal ActionState.
-            bool isFalling = psm.GetCurrentState() is FallingState;
+            // (via startAirborne) instead of the normal ActionState. Uses psm.IsAirborne() (a physics
+            // check) rather than "currentState is FallingState" - a dodge/attack that exits back to
+            // LocomotionState while still airborne (e.g. mid-vault) would otherwise read as grounded
+            // until LocomotionState's fallDetectionDelay elapses, letting the full ground combo set
+            // (and, via HandleDefensiveInput below, even a fresh dodge) fire mid-air.
+            bool isFalling = psm.IsAirborne();
 
             if (!isFalling && Input.GetKeyDown(KeyCode.Space))
             {
@@ -120,8 +124,10 @@ public class PlayerInputHandler : MonoBehaviour
     /// </summary>
     void HandleDefensiveInput()
     {
-        // Global safety lockouts
-        if (psm.IsStunned() || psm.IsDodging() || psm.GetCurrentState() is FallingState) return;
+        // Global safety lockouts. See the isFalling comment above - psm.IsAirborne() catches the gap
+        // where a dodge/attack has exited back to LocomotionState but hasn't actually landed yet, so a
+        // fresh Shift+direction press can't chain into another dodge (or trigger block) mid-air.
+        if (psm.IsStunned() || psm.IsDodging() || psm.IsAirborne()) return;
 
         // --- NEW: Check if the player is physically pressing WASD / Directional keys right now ---
         bool isTouchingDirectionKeys = Input.GetAxisRaw("Horizontal") != 0f || Input.GetAxisRaw("Vertical") != 0f;

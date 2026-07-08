@@ -2595,7 +2595,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: isSecondBackFlipDodge
+  m_Name: 2ndBackFlipDodge
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -2608,7 +2608,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: -203655887218126122, guid: 79271bcbf0517034dafa74c2673fca5b, type: 3}
+  m_Motion: {fileID: 7400000, guid: dc17c7509bee94a439d032f17b59afb5, type: 2}
   m_Tag: Dodge
   m_SpeedParameter: 
   m_MirrorParameter: 

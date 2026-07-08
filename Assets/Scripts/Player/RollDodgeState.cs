@@ -12,6 +12,14 @@ public class RollDodgeState : IPlayerState
     private bool _canSteer; // The lock that persists for the whole dodge
     private bool _secondDodgeQueued;
 
+    // True while the dodge's own horizontal push is (or should still be) feeding Mover, so it
+    // keeps being applied through the no-movement tail instead of dropping to zero the instant
+    // this state stops calling Move() - see UpdateState. Fed via Mover.SetHorizontalVelocity using
+    // the dodge's own known speed rather than read back from CharacterController.velocity, because
+    // that read used to race Mover's own separate Move() call before movement was consolidated into
+    // a single per-frame Move() in Mover.Update().
+    private bool _driftActive;
+
     public RollDodgeState(PlayerStateMachine _psm, Vector3 dodgeDirection)
     {
         psm = _psm;
@@ -25,6 +33,10 @@ public class RollDodgeState : IPlayerState
 
         psm.gameObject.layer = LayerMask.NameToLayer("Default");
         _timer = 0;
+        _driftActive = false;
+        // Defensive: clear any leftover drift feed from whatever state we came from, so it can't
+        // stack with this dodge's own movement.
+        psm.mover.SetHorizontalVelocity(Vector3.zero);
 
         // 1. DETERMINE IF WE CAN STEER (The "Lock")
         // Compare dodge input direction against the current facing direction maintained by PlayerRotate.
@@ -59,6 +71,18 @@ public class RollDodgeState : IPlayerState
     {
         _timer += Time.deltaTime;
 
+        // Stop carrying the dash drift the instant we touch ground - otherwise Mover keeps
+        // sliding us forever, since its per-frame Move() folds verticalVelocity.x/z in every frame
+        // regardless of grounded state. Uses the same raycast-based ground check as
+        // LocomotionState rather than CharacterController.isGrounded, which flickers false right
+        // at ledge edges - a missed clear here was leaking drift into locomotion, stacking with
+        // normal WASD movement until it got captured (inflated) by the next real fall.
+        if (_driftActive && psm.IsGroundedWithinDistance(psm.fallHeightThreshold))
+        {
+            psm.mover.SetHorizontalVelocity(Vector3.zero);
+            _driftActive = false;
+        }
+
         // 1. CONDITIONAL STEERING
         // Only runs if the lock was set to true during EnterState
         if (_canSteer)
@@ -67,11 +91,20 @@ public class RollDodgeState : IPlayerState
             ApplySteering();
         }
 
-        // 2. MOVEMENT
+        // 2. MOVEMENT - fed through Mover (not a raw controller.Move()) using the dodge's own known
+        // speed, so it combines with gravity into ONE Move() call per frame (see Mover.Update()) and
+        // keeps being applied through the no-movement tail below without needing to read it back off
+        // CharacterController.velocity (that read used to race Mover's own Update(), which would
+        // zero the horizontal component itself once nothing was feeding it).
         // We use psm.transform.forward because it updates as we steer, allowing for curves.
         if (_timer >= _duration * psm.rollDodgeMoveStart && _timer <= _duration * psm.rollDodgeMoveEnd)
         {
-            psm.mover.GetComponent<CharacterController>().Move(psm.transform.forward * _dodgeForce * Time.deltaTime);
+            _driftActive = true;
+        }
+
+        if (_driftActive)
+        {
+            psm.mover.SetHorizontalVelocity(psm.transform.forward * _dodgeForce);
         }
 
         // 2.5 CHAIN DETECTION: once past the configured window, a fresh Shift press queues a second dodge
@@ -118,7 +151,13 @@ public class RollDodgeState : IPlayerState
 
     public void ExitState()
     {
-        if (psm.playerMovement) psm.playerMovement.enabled = true;
+        // Only hand WASD control back immediately if we're grounded. If this dodge chained into a
+        // vault that's still airborne, re-enabling here would let held input stack additively on top
+        // of the carried drift in Mover.verticalVelocity.x/z (see SetHorizontalVelocity) for the few
+        // frames before LocomotionState detects ungrounded and switches to FallingState - inflating
+        // the velocity FallingState.EnterState() captures. LocomotionState re-enables it once actually
+        // grounded (safety net for landing before fallDetectionDelay would've triggered FallingState).
+        if (psm.playerMovement && psm.IsGroundedWithinDistance(psm.fallHeightThreshold)) psm.playerMovement.enabled = true;
         psm.rotator.enabled = true;
         psm.rotator.UpdateOrientation(); // Recalculate facing dir after dodge is done
         psm.anim.CrossFade(psm.TransitionStateHash, 0.1f, psm.FullBodyLayer);

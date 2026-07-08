@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 
 public class CameraFollow : MonoBehaviour
@@ -27,6 +25,8 @@ public class CameraFollow : MonoBehaviour
     private float damping;                          // how fast camera travels to its destination
     [SerializeField]
     private float heightDamping = 5f;               // how fast camera follows vertical (level) changes
+    [Tooltip("Vertical offset added on top of the player's root position when framing them - target.position is the feet (root pivot), so without this the camera aims at the feet rather than roughly chest/head height. Barely visible zoomed out, obvious up close (e.g. the zoom override).")]
+    [SerializeField] private float targetLookHeightOffset = 1.2f;
 
     [SerializeField] float playerToscreenEdgeLimit;     //how close to the screen the player can be
 
@@ -34,6 +34,19 @@ public class CameraFollow : MonoBehaviour
     [SerializeField] private float cameraBounderXMax;
     [SerializeField] private float CamerabounderZMin;
     [SerializeField] private float CamerabounderZMax;
+
+    [Header("Zoom Override (forced close zoom, e.g. mid-air attacks)")]
+    [Tooltip("Offset (camera distance) forced while a zoom override is active - overrides the normal scroll-controlled offset entirely, not just its max.")]
+    [SerializeField] private float zoomOverrideOffset = 3f;
+    [Tooltip("Height forced while a zoom override is active.")]
+    [SerializeField] private float zoomOverrideHeight = 2f;
+    [Tooltip("Damping (lerp speed) used while a zoom override is active - separate from the normal damping so the forced zoom can snap in faster/slower than regular scroll-zoom does.")]
+    [SerializeField] private float zoomOverrideDamping = 10f;
+
+    private bool _isZoomOverridden;                 // set/cleared by SetZoomOverride/ClearZoomOverride (see MidFallAttackState Enter/ExitState)
+    private float _overrideOffset;
+    private float _overrideHeight;
+    private float _overrideDamping;
 
     private Vector3 centre;                         //centre between the mouse and target, is where the camera will travel to
     private PlayerToMouse playerToMouse;            // holds cursor info
@@ -68,16 +81,26 @@ public class CameraFollow : MonoBehaviour
         // world or on raycasting terrain of unknown height.
         groundHeight = Mathf.Lerp(groundHeight, target.position.y, Time.deltaTime * heightDamping);
 
-        Vector3 cursorWorldPos = playerToMouse.mouseInWorldPos;
-        // Centre is horizontal only (x/z from player+cursor); vertical comes from groundHeight,
-        // so moving the cursor over a canyon no longer drags the camera down.
+        // Flat variant (terrain-height-independent) rather than mouseInWorldPos - see PlayerToMouse.
+        Vector3 cursorWorldPos = playerToMouse.mouseInWorldPosFlat;
+        // Centre is horizontal only (x/z from player+cursor); vertical comes from groundHeight plus
+        // targetLookHeightOffset, so moving the cursor over a canyon no longer drags the camera down,
+        // and the camera frames roughly chest/head height instead of the feet-level root position.
         centre = new Vector3(
             (target.position.x + cursorWorldPos.x) / 2.0f,
-            groundHeight,
+            groundHeight + targetLookHeightOffset,
             (cursorWorldPos.z + target.position.z) / 2.0f);
 
-        Vector3 desiredPos = centre + new Vector3(0f, height, -offset);
-        Vector3 currentPos = Vector3.Lerp(transform.position, desiredPos, Time.deltaTime * damping); // lerp for the slowing-down-on-approach effect
+        // While overridden, both the target (offset/height) and the transition speed (damping) are
+        // swapped for the override's own values - the normal scroll-controlled offset/height keep
+        // updating underneath (ScrollHeight still runs every frame) but are ignored until cleared,
+        // so whatever the player had scrolled to is exactly where the camera eases back to.
+        float useOffset = _isZoomOverridden ? _overrideOffset : offset;
+        float useHeight = _isZoomOverridden ? _overrideHeight : height;
+        float useDamping = _isZoomOverridden ? _overrideDamping : damping;
+
+        Vector3 desiredPos = centre + new Vector3(0f, useHeight, -useOffset);
+        Vector3 currentPos = Vector3.Lerp(transform.position, desiredPos, Time.deltaTime * useDamping); // lerp for the slowing-down-on-approach effect
         transform.position = currentPos; // apply so the viewport calc below uses the new position
 
         Vector3 targetCoords = Camera.main.WorldToViewportPoint(target.position); // player's viewport position
@@ -187,7 +210,29 @@ public class CameraFollow : MonoBehaviour
         }
     }
 
-    //change the camera offset based on camera height 
+    // Forces a close zoom for as long as it's held, rather than a brief pulse - e.g. for the whole
+    // duration of a mid-air attack (see MidFallAttackState.EnterState/ExitState). CamFollow's own
+    // damping lerp still smooths the transition in and out, using zoomOverrideDamping instead of the
+    // normal damping while active, so it can snap in faster than regular scroll-zoom does.
+    public void SetZoomOverride()
+    {
+        SetZoomOverride(zoomOverrideOffset, zoomOverrideHeight, zoomOverrideDamping);
+    }
+
+    public void SetZoomOverride(float offsetOverride, float heightOverride, float transitionDamping)
+    {
+        _isZoomOverridden = true;
+        _overrideOffset = offsetOverride;
+        _overrideHeight = heightOverride;
+        _overrideDamping = transitionDamping;
+    }
+
+    public void ClearZoomOverride()
+    {
+        _isZoomOverridden = false;
+    }
+
+    //change the camera offset based on camera height
     private void CamAutoOffset(float offsetMin, float offsetMax)
     {
         float diff = heightMax - heightMin;

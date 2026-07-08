@@ -27,6 +27,13 @@ public class PlayerMovement : MonoBehaviour {
 		
 	}
 
+	// Clears the fed direction so Mover's single per-frame Move() doesn't keep carrying a stale
+	// WASD direction while this script is disabled (dodges/abilities/falling all disable it).
+	void OnDisable()
+	{
+		if (_Mover != null) _Mover.SetDirection(Vector3.zero);
+	}
+
 	private void InitializeVariables()
 	{
 		_Mover = GetComponent<Mover> ();
@@ -98,10 +105,9 @@ public class PlayerMovement : MonoBehaviour {
 		}
 			
 		if (move == true) {
-		
+
 			_Mover.SetDirection (movingDirection);
-			_Mover.Move ();
-		} 
+		}
 
 
 

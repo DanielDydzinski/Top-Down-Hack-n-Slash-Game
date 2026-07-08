@@ -27,6 +27,10 @@ public class MidFallAttackState : IPlayerState
     private bool _driftStopped;
     private Quaternion _targetMouseRotation;
 
+    // Captured in EnterState() before anything freezes playback, so unfreezing restores whatever this
+    // clip's actual speed was (some animations run at other-than-1x by default) instead of assuming 1.
+    private float _originalAnimSpeed;
+
     public MidFallAttackState(PlayerStateMachine stateMachine, Ability abilityToRun)
     {
         psm = stateMachine;
@@ -36,12 +40,15 @@ public class MidFallAttackState : IPlayerState
 
     public void EnterState()
     {
+        // Capture before anything (including the freeze below) can touch it.
+        _originalAnimSpeed = psm.anim.speed;
+
         psm.rotator.StopAllRotation();
         psm.rotator.enabled = false;
 
-        // Own movement entirely while airborne - PlayerMovement.Update() calls its own Mover.Move()
-        // whenever a direction key is held, a second CharacterController.Move() in the same frame as
-        // Mover's gravity Move(), which makes isGrounded unreliable (see Mover.SetHorizontalVelocity).
+        // Own movement entirely while airborne - PlayerMovement's WASD direction feeds into the same
+        // single per-frame Mover.Move() as this state's own drift (see Mover.Update()), so leaving it
+        // enabled would let player input steer on top of the controlled mid-air trajectory.
         psm.playerMovement.enabled = false;
 
         psm.abilityManager.SetMovementLock(true);
@@ -60,12 +67,15 @@ public class MidFallAttackState : IPlayerState
         psm.abilityManager.StartCastingAbility(ability, null);
         psm.mover.SetSpeedMultiplier(0f);
 
-        // Carry over whatever horizontal momentum the fall had. characterController.velocity reflects
-        // the last actual Move() delta, so this is still accurate even though FallingState.ExitState()
-        // already zeroed Mover's own internal horizontal-velocity bookkeeping this same frame.
-        Vector3 horizontalVelocity = psm.characterController.velocity;
-        horizontalVelocity.y = 0f;
-        _driftSpeed = horizontalVelocity.magnitude;
+        // Force a close zoom for the whole mid-air attack (see CameraFollow.SetZoomOverride) -
+        // cleared in ExitState() below, which runs the moment this state hands off after landing.
+        if (psm.cameraFollow != null) psm.cameraFollow.SetZoomOverride();
+
+        // Fixed launch speed, not a carry-over of whatever momentum the player actually had (dodge push,
+        // vault, normal fall, etc. all varied - see psm.midAirAttackDriftSpeed). Direction still comes
+        // from transform.forward every frame in UpdateState, so steering still works; only the magnitude
+        // is now constant so the attack feels the same regardless of what preceded it.
+        _driftSpeed = psm.midAirAttackDriftSpeed;
 
         if (ability.baseSettings.abilityControllerHeight > 0f)
             psm.ShrinkController(ability.baseSettings.abilityControllerHeight);
@@ -98,7 +108,13 @@ public class MidFallAttackState : IPlayerState
             if (!psm.characterController.isGrounded) return;
 
             _isFrozen = false;
-            psm.anim.speed = 1f;
+            psm.anim.speed = _originalAnimSpeed;
+
+            // Landing, not the state fully exiting, is the actual moment to release the forced close
+            // zoom - it used to hold until ExitState(), which is well after landing (unfreeze, the
+            // rest of the clip playing out, ExitGracePeriod), so with the player no longer falling the
+            // tight override just stared at the ground with the player pushed to the top of frame.
+            if (psm.cameraFollow != null) psm.cameraFollow.ClearZoomOverride();
 
             if (ability.baseSettings.stopDashOnGrounded)
             {
@@ -135,7 +151,10 @@ public class MidFallAttackState : IPlayerState
                 psm.anim.speed = 0f;
                 return;
             }
-            // Already grounded by the time we routed - fall through to the exit check.
+            // Already grounded by the time we routed - never freezes, so the unfreeze branch above
+            // never runs either. Release the forced close zoom here instead.
+            if (psm.cameraFollow != null) psm.cameraFollow.ClearZoomOverride();
+            // Fall through to the exit check.
         }
 
         // Landed (or grounded before ever needing to freeze): let the rest of the clip play out, then
@@ -171,6 +190,10 @@ public class MidFallAttackState : IPlayerState
         psm.rotator.enabled = true;
         psm.rotator.UpdateOrientation();
 
+        // Runs whether this state ends normally (landed) or is interrupted (e.g. hit/stagger) -
+        // either way the forced close zoom shouldn't outlive the mid-air attack.
+        if (psm.cameraFollow != null) psm.cameraFollow.ClearZoomOverride();
+
         psm.abilityManager.SetMovementLock(false);
         psm.abilityManager.CancelAbility();
         psm.anim.SetBool(psm.IsMovingHash, true);
@@ -181,6 +204,6 @@ public class MidFallAttackState : IPlayerState
 
         // Safety net: if interrupted (e.g. hit/stagger) before landing, don't leave the Animator
         // permanently paused for whatever state comes next.
-        if (_isFrozen) psm.anim.speed = 1f;
+        if (_isFrozen) psm.anim.speed = _originalAnimSpeed;
     }
 }

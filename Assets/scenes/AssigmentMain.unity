@@ -3577,6 +3577,10 @@ PrefabInstance:
       propertyPath: regenOutCombatAmount
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 114913637868370104, guid: 8a7ca07b72bcbc949b6221e7b7927891, type: 3}
+      propertyPath: gravityValue
+      value: -7
+      objectReference: {fileID: 0}
     - target: {fileID: 1965982398144568650, guid: 8a7ca07b72bcbc949b6221e7b7927891, type: 3}
       propertyPath: healAmount
       value: 50
@@ -25125,7 +25129,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 1068751015}
   height: 8
-  heightMin: 5
+  heightMin: 3
   heightMax: 10
   angle: 70
   offset: 2
@@ -25133,11 +25137,15 @@ MonoBehaviour:
   offsetMax: 3
   damping: 2
   heightDamping: 5
+  targetLookHeightOffset: 1.2
   playerToscreenEdgeLimit: 0.2
   CameraBounderXmin: -20
   cameraBounderXMax: 20
   CamerabounderZMin: -20
   CamerabounderZMax: 20
+  zoomOverrideOffset: 1.5
+  zoomOverrideHeight: 2
+  zoomOverrideDamping: 10
 --- !u!114 &1265923926
 MonoBehaviour:
   m_ObjectHideFlags: 0

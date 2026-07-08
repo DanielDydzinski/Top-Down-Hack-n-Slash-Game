@@ -1156,7 +1156,7 @@ MonoBehaviour:
   minSpeed: 0
   speed: 4
   useGravity: 1
-  gravityValue: -9.81
+  gravityValue: -6
   mass: 3
 --- !u!114 &114136291646099544
 MonoBehaviour:

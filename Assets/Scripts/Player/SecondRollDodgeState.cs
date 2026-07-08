@@ -15,6 +15,10 @@ public class SecondRollDodgeState : IPlayerState
     private bool _canSteer;
     private bool _vaultImpulseApplied;
 
+    // See RollDodgeState for why this exists and why it's fed via Mover.SetHorizontalVelocity
+    // using the dodge's own known speed instead of a CharacterController.velocity read-back.
+    private bool _driftActive;
+
     public SecondRollDodgeState(PlayerStateMachine _psm, Vector3 dodgeDirection)
     {
         psm = _psm;
@@ -27,6 +31,10 @@ public class SecondRollDodgeState : IPlayerState
 
         psm.gameObject.layer = LayerMask.NameToLayer("Default");
         _timer = 0;
+        _driftActive = false;
+        // Defensive: this can be entered mid-air off the first dodge's drift feed - clear it so it
+        // can't stack with this dodge's own movement.
+        psm.mover.SetHorizontalVelocity(Vector3.zero);
 
         Vector3 dodgeDirNorm = _leapDirection.normalized;
         Vector3 facingDirNorm = psm.rotator.facingDirVec3.normalized;
@@ -57,6 +65,14 @@ public class SecondRollDodgeState : IPlayerState
     {
         _timer += Time.deltaTime;
 
+        // See RollDodgeState - uses the raycast-based ground check, not CharacterController.isGrounded
+        // (flickers false at ledge edges, which was leaking drift into locomotion).
+        if (_driftActive && psm.IsGroundedWithinDistance(psm.fallHeightThreshold))
+        {
+            psm.mover.SetHorizontalVelocity(Vector3.zero);
+            _driftActive = false;
+        }
+
         if (_canSteer)
         {
             UpdateTargetRotation();
@@ -72,7 +88,12 @@ public class SecondRollDodgeState : IPlayerState
                 _vaultImpulseApplied = true;
             }
 
-            psm.mover.GetComponent<CharacterController>().Move(psm.transform.forward * _dodgeForce * Time.deltaTime);
+            _driftActive = true;
+        }
+
+        if (_driftActive)
+        {
+            psm.mover.SetHorizontalVelocity(psm.transform.forward * _dodgeForce);
         }
 
         if (_timer >= _duration * psm.secondRollDodgeExitAt)
@@ -102,7 +123,10 @@ public class SecondRollDodgeState : IPlayerState
 
     public void ExitState()
     {
-        if (psm.playerMovement) psm.playerMovement.enabled = true;
+        // See RollDodgeState.ExitState - only hand WASD control back immediately if grounded, so held
+        // input can't stack additively on top of the vault/drift velocity still carried in Mover while
+        // airborne. LocomotionState re-enables it once actually grounded.
+        if (psm.playerMovement && psm.IsGroundedWithinDistance(psm.fallHeightThreshold)) psm.playerMovement.enabled = true;
         psm.rotator.enabled = true;
         psm.rotator.UpdateOrientation();
         psm.anim.CrossFade(psm.TransitionStateHash, 0.1f, psm.FullBodyLayer);

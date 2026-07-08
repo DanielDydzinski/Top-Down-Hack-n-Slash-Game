@@ -10,6 +10,10 @@ public class BackflipDodgeState : IPlayerState
     private bool _secondDodgeQueued;
     private bool _vaultImpulseApplied;
 
+    // See RollDodgeState for why this exists and why it's fed via Mover.SetHorizontalVelocity
+    // using the dodge's own known speed instead of a CharacterController.velocity read-back.
+    private bool _driftActive;
+
 
     public BackflipDodgeState(PlayerStateMachine _psm, Vector3 dodgeDirection)
     {
@@ -24,8 +28,12 @@ public class BackflipDodgeState : IPlayerState
         psm.gameObject.layer = LayerMask.NameToLayer("Default");
 
         _timer = 0;
+        _driftActive = false;
+        // Defensive: clear any leftover drift feed from whatever state we came from, so it can't
+        // stack with this dodge's own movement.
+        psm.mover.SetHorizontalVelocity(Vector3.zero);
 
-       
+
         // This stops any pending Animation Events from firing
         psm.anim.Play(psm.TransitionStateHash, psm.AttackLayer);
         psm.anim.Play(psm.TransitionStateHash, psm.FullBodyLayer);
@@ -56,6 +64,13 @@ public class BackflipDodgeState : IPlayerState
         _timer += Time.deltaTime;
         psm.mover.transform.rotation = Quaternion.LookRotation(_leapDirection * -1f);
 
+        // See RollDodgeState - uses the raycast-based ground check, not CharacterController.isGrounded
+        // (flickers false at ledge edges, which was leaking drift into locomotion).
+        if (_driftActive && psm.IsGroundedWithinDistance(psm.fallHeightThreshold))
+        {
+            psm.mover.SetHorizontalVelocity(Vector3.zero);
+            _driftActive = false;
+        }
 
         if (_timer >= _duration * psm.backflipDodgeMoveStart && _timer <= _duration * psm.backflipDodgeMoveEnd)
         {
@@ -66,7 +81,14 @@ public class BackflipDodgeState : IPlayerState
                 _vaultImpulseApplied = true;
             }
 
-            psm.mover.GetComponent<CharacterController>().Move(_leapDirection * _dodgeForce * Time.deltaTime);
+            _driftActive = true;
+        }
+
+        // Backflip moves along the fixed leap direction (not transform.forward - the character
+        // faces the opposite way).
+        if (_driftActive)
+        {
+            psm.mover.SetHorizontalVelocity(_leapDirection.normalized * _dodgeForce);
         }
 
         // CHAIN DETECTION: once past the configured window, a fresh Shift press queues a second dodge
@@ -91,7 +113,10 @@ public class BackflipDodgeState : IPlayerState
 
     public void ExitState()
     {
-        if (psm.playerMovement) psm.playerMovement.enabled = true;
+        // See RollDodgeState.ExitState - only hand WASD control back immediately if grounded, so held
+        // input can't stack additively on top of the vault/drift velocity still carried in Mover while
+        // airborne. LocomotionState re-enables it once actually grounded.
+        if (psm.playerMovement && psm.IsGroundedWithinDistance(psm.fallHeightThreshold)) psm.playerMovement.enabled = true;
         psm.rotator.enabled = true;
         psm.rotator.UpdateOrientation();
         psm.anim.CrossFade(psm.TransitionStateHash, psm.FullBodyLayer);
