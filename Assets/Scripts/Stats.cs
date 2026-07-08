@@ -20,7 +20,6 @@ public class Stats : MonoBehaviour
 
     public float mass = 3f;
 	[SerializeField] private float dodgeAnimationSpeed= 1f;
-	public float dodgePower;
 
 
     public float GetDodgeAnimationSpeed() => dodgeAnimationSpeed;

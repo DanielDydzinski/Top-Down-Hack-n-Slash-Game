@@ -49,7 +49,7 @@ public class SecondRollDodgeState : IPlayerState
 
         float playbackSpeed = psm.dodgeAnimationSpeed;
         _duration = psm.secondRollDodgeAnimationClip.length / playbackSpeed;
-        _dodgeForce = psm.stats.dodgePower;
+        _dodgeForce = psm.secondRollDodgeForce;
 
         psm.playerMovement.enabled = false;
         psm.rotator.enabled = false;

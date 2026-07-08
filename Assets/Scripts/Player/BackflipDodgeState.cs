@@ -46,7 +46,7 @@ public class BackflipDodgeState : IPlayerState
         float playbackSpeed = psm.dodgeAnimationSpeed;
 
         _duration = psm.backFlipDodgeAnimationClip.length/ playbackSpeed;
-       _dodgeForce=psm.stats.dodgePower;
+       _dodgeForce=psm.backflipDodgeForce;
 
         //psm.mover.AddForce(leapDir, _dodgeForce);
 

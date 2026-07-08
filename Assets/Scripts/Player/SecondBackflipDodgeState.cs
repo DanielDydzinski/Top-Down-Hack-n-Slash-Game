@@ -41,7 +41,7 @@ public class SecondBackflipDodgeState : IPlayerState
         float playbackSpeed = psm.dodgeAnimationSpeed;
 
         _duration = psm.secondBackFlipDodgeAnimationClip.length / playbackSpeed;
-        _dodgeForce = psm.stats.dodgePower;
+        _dodgeForce = psm.secondBackflipDodgeForce;
 
         psm.playerMovement.enabled = false;
         psm.rotator.enabled = false;

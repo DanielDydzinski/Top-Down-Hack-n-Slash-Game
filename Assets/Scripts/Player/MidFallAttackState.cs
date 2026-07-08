@@ -22,6 +22,7 @@ public class MidFallAttackState : IPlayerState
     private bool _routed;
     private bool _isFrozen;
     private float _timeSinceLanded;
+    private bool _zoomOverrideReleased;
 
     private float _driftSpeed;
     private bool _driftStopped;
@@ -67,8 +68,10 @@ public class MidFallAttackState : IPlayerState
         psm.abilityManager.StartCastingAbility(ability, null);
         psm.mover.SetSpeedMultiplier(0f);
 
-        // Force a close zoom for the whole mid-air attack (see CameraFollow.SetZoomOverride) -
-        // cleared in ExitState() below, which runs the moment this state hands off after landing.
+        // Force a close zoom for the whole mid-air attack (see CameraFollow.SetZoomOverride) - held
+        // through landing and released psm.midAirAttackZoomReleaseDelay seconds later (see
+        // UpdateState), not the instant landing is detected. ExitState() below still clears it
+        // unconditionally as a safety net if this state is interrupted first.
         if (psm.cameraFollow != null) psm.cameraFollow.SetZoomOverride();
 
         // Fixed launch speed, not a carry-over of whatever momentum the player actually had (dodge push,
@@ -85,6 +88,7 @@ public class MidFallAttackState : IPlayerState
         _isFrozen = false;
         _timeSinceLanded = 0f;
         _driftStopped = false;
+        _zoomOverrideReleased = false;
     }
 
     public void UpdateState()
@@ -105,16 +109,14 @@ public class MidFallAttackState : IPlayerState
 
         if (_isFrozen)
         {
-            if (!psm.characterController.isGrounded) return;
+            // Raycast-based check, not characterController.isGrounded - the latter can misreport
+            // grounded=true for a frame (e.g. right after EnterState()'s ShrinkController resize),
+            // which was clearing the zoom override almost immediately instead of holding it through
+            // the actual fall.
+            if (!psm.IsGroundedWithinDistance(psm.fallHeightThreshold)) return;
 
             _isFrozen = false;
             psm.anim.speed = _originalAnimSpeed;
-
-            // Landing, not the state fully exiting, is the actual moment to release the forced close
-            // zoom - it used to hold until ExitState(), which is well after landing (unfreeze, the
-            // rest of the clip playing out, ExitGracePeriod), so with the player no longer falling the
-            // tight override just stared at the ground with the player pushed to the top of frame.
-            if (psm.cameraFollow != null) psm.cameraFollow.ClearZoomOverride();
 
             if (ability.baseSettings.stopDashOnGrounded)
             {
@@ -143,23 +145,34 @@ public class MidFallAttackState : IPlayerState
             if (info.shortNameHash == psm.TransitionStateHash) return;
 
             // Routed - the clip already starts at the freeze pose, so freeze right here, no seeking or
-            // waiting for any particular normalized time.
+            // waiting for any particular normalized time. Same raycast-based check as above - this is
+            // exactly the frame right after ShrinkController() ran in EnterState(), where
+            // characterController.isGrounded is most likely to falsely read true.
             _routed = true;
-            if (!psm.characterController.isGrounded)
+            if (!psm.IsGroundedWithinDistance(psm.fallHeightThreshold))
             {
                 _isFrozen = true;
                 psm.anim.speed = 0f;
                 return;
             }
             // Already grounded by the time we routed - never freezes, so the unfreeze branch above
-            // never runs either. Release the forced close zoom here instead.
-            if (psm.cameraFollow != null) psm.cameraFollow.ClearZoomOverride();
-            // Fall through to the exit check.
+            // never runs either. Fall through to the exit check.
         }
 
         // Landed (or grounded before ever needing to freeze): let the rest of the clip play out, then
-        // exit exactly like ActionState does.
+        // exit exactly like ActionState does. _timeSinceLanded only starts advancing once we reach
+        // here, so it doubles as "time since landing" for the zoom-release delay below.
         _timeSinceLanded += Time.deltaTime;
+
+        // Held for a beat after landing rather than released the instant landing is detected - see
+        // psm.midAirAttackZoomReleaseDelay. Guarded so it only fires once; ExitState() still clears it
+        // unconditionally as a safety net if this state is interrupted before the delay elapses.
+        if (!_zoomOverrideReleased && _timeSinceLanded >= psm.midAirAttackZoomReleaseDelay)
+        {
+            if (psm.cameraFollow != null) psm.cameraFollow.ClearZoomOverride();
+            _zoomOverrideReleased = true;
+        }
+
         if (_timeSinceLanded < ExitGracePeriod) return;
         if (psm.anim.GetInteger(ActionState.attackStateHash) == -1) psm.SwitchState(new LocomotionState(psm));
     }

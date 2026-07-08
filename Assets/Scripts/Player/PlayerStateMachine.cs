@@ -40,11 +40,15 @@ public class PlayerStateMachine : MonoBehaviour
     [Range(0f, 1f)] public float rollDodgeMoveStart = 0.1f;
     [Range(0f, 1f)] public float rollDodgeMoveEnd = 0.9f;
     [Range(0f, 1f)] public float rollDodgeExitAt = 0.91f;
+    [Tooltip("Horizontal dash force for this dodge (see RollDodgeState).")]
+    public float rollDodgeForce = 6f;
 
     [Header("Second Roll Dodge Timing (fraction of clip duration)")]
     [Range(0f, 1f)] public float secondRollDodgeMoveStart = 0.1f;
     [Range(0f, 1f)] public float secondRollDodgeMoveEnd = 0.9f;
     [Range(0f, 1f)] public float secondRollDodgeExitAt = 0.91f;
+    [Tooltip("Horizontal dash force for this dodge (see SecondRollDodgeState).")]
+    public float secondRollDodgeForce = 6f;
     [Tooltip("Upward velocity applied when the second roll dodge starts moving, arcing the player over obstacles.")]
     public float secondRollDodgeVaultVelocity = 6f;
 
@@ -52,6 +56,8 @@ public class PlayerStateMachine : MonoBehaviour
     [Range(0f, 1f)] public float backflipDodgeMoveStart = 0.2f;
     [Range(0f, 1f)] public float backflipDodgeMoveEnd = 0.7f;
     [Range(0f, 1f)] public float backflipDodgeExitAt = 0.75f;
+    [Tooltip("Horizontal dash force for this dodge (see BackflipDodgeState).")]
+    public float backflipDodgeForce = 6f;
     [Tooltip("Upward velocity applied when the backflip dodge starts moving, arcing the player over obstacles.")]
     public float backflipDodgeVaultVelocity = 6f;
 
@@ -59,6 +65,8 @@ public class PlayerStateMachine : MonoBehaviour
     [Range(0f, 1f)] public float secondBackflipDodgeMoveStart = 0.2f;
     [Range(0f, 1f)] public float secondBackflipDodgeMoveEnd = 0.7f;
     [Range(0f, 1f)] public float secondBackflipDodgeExitAt = 0.75f;
+    [Tooltip("Horizontal dash force for this dodge (see SecondBackflipDodgeState).")]
+    public float secondBackflipDodgeForce = 6f;
     [Tooltip("Upward velocity applied when the second backflip dodge starts moving, arcing the player over obstacles.")]
     public float secondBackflipDodgeVaultVelocity = 6f;
 
@@ -87,6 +95,8 @@ public class PlayerStateMachine : MonoBehaviour
     [Header("Mid-Air Attack Drift")]
     [Tooltip("Fixed horizontal speed a Q/DodgeHeavy mid-air attack launches at (see MidFallAttackState) - always this exact value, regardless of whatever momentum (dodge, fall, etc.) the player actually had the instant it was triggered.")]
     public float midAirAttackDriftSpeed = 8f;
+    [Tooltip("How long (seconds) after landing a mid-air attack holds the forced close camera zoom before releasing it back to normal - not released the instant landing is detected.")]
+    public float midAirAttackZoomReleaseDelay = 1f;
 
 
     public readonly int CombatStanceStateHash = Animator.StringToHash("CombatStance");

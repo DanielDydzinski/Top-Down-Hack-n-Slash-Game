@@ -3579,7 +3579,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 114913637868370104, guid: 8a7ca07b72bcbc949b6221e7b7927891, type: 3}
       propertyPath: gravityValue
-      value: -7
+      value: -9.81
       objectReference: {fileID: 0}
     - target: {fileID: 1965982398144568650, guid: 8a7ca07b72bcbc949b6221e7b7927891, type: 3}
       propertyPath: healAmount
@@ -3708,6 +3708,10 @@ PrefabInstance:
     - target: {fileID: 5155127641587721050, guid: 8a7ca07b72bcbc949b6221e7b7927891, type: 3}
       propertyPath: dodgeVaultJumpVelocity
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5155127641587721050, guid: 8a7ca07b72bcbc949b6221e7b7927891, type: 3}
+      propertyPath: secondBackflipDodgeForce
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 5155127641587721050, guid: 8a7ca07b72bcbc949b6221e7b7927891, type: 3}
       propertyPath: backflipDodgeVaultVelocity
@@ -25144,8 +25148,8 @@ MonoBehaviour:
   CamerabounderZMin: -20
   CamerabounderZMax: 20
   zoomOverrideOffset: 1.5
-  zoomOverrideHeight: 2
-  zoomOverrideDamping: 10
+  zoomOverrideHeight: 3
+  zoomOverrideDamping: 4
 --- !u!114 &1265923926
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -47400,7 +47404,6 @@ MonoBehaviour:
   blockDamageMitigation: 75
   mass: 3
   dodgeAnimationSpeed: 1
-  dodgePower: 0
   isPushed: 1
 --- !u!4 &1945090434 stripped
 Transform:
