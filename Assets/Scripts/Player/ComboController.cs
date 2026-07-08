@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ComboController : MonoBehaviour
 {
-    public enum ComboTrackId { Light, Heavy, Magic, Q, E, R, F, DodgeHeavy, Counter }
+    public enum ComboTrackId { Light, Heavy, Magic, Q, E, R, F, DodgeHeavy, Counter, QMidAir, DodgeHeavyMidAir }
 
     private class TrackState
     {
@@ -21,6 +21,8 @@ public class ComboController : MonoBehaviour
     public int fIndex = 0;
     public int dodgeHeavyIndex = 0;
     public int counterIndex = 0;
+    public int qMidAirIndex = 0;
+    public int dodgeHeavyMidAirIndex = 0;
     private PlayerStateMachine psm;
 
     // Each track (left-click, right-click, Q/E/R/F, ...) needs its own "last fired ability" +
@@ -57,6 +59,12 @@ public class ComboController : MonoBehaviour
     [Header("Dodge Heavy Attack (Manual Assignment)")]
     public List<Ability> dodgeHeavyAbilities = new();
 
+    [Header("Mid-Air Variants (Manual Assignment)")]
+    [Tooltip("Used instead of qAbilities when Q is pressed while falling - trimmed clips that already start at the freeze pose, see MidFallAttackState.")]
+    public List<Ability> qMidAirAbilities = new();
+    [Tooltip("Used instead of dodgeHeavyAbilities when Heavy (mouse 1) is pressed while falling.")]
+    public List<Ability> dodgeHeavyMidAirAbilities = new();
+
     [Header("Counter Attack (Manual Assignment)")]
     public List<Ability> counterAbilities = new();
 
@@ -82,7 +90,7 @@ public class ComboController : MonoBehaviour
     }
 
 
-    public void OnAbilityInput(ComboTrackId trackId, ref int index, List<Ability> comboList)
+    public void OnAbilityInput(ComboTrackId trackId, ref int index, List<Ability> comboList, bool startAirborne = false)
     {
         if (psm.IsStunned()) return;
         if (psm.abilityManager.IsPerformingAction()) return; //dont continue if we already casting
@@ -100,7 +108,12 @@ public class ComboController : MonoBehaviour
         state.currentAbility = nextAb;
         state.lastInputTime = Time.time;
 
-        psm.SwitchState(new ActionState(psm, nextAb));
+        // Triggered while already falling (Q/DodgeHeavy only, see PlayerInputHandler) - MidFallAttackState
+        // skips the grounded windup/dash and starts the ability already frozen at airFreezeCheckPoint.
+        if (startAirborne)
+            psm.SwitchState(new MidFallAttackState(psm, nextAb));
+        else
+            psm.SwitchState(new ActionState(psm, nextAb));
     }
 
     // The ability a press would trigger next on this track, without committing to it.

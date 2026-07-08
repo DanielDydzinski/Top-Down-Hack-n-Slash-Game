@@ -30,17 +30,31 @@ public class PlayerInputHandler : MonoBehaviour
         // Prevent attacking/casting if the player is actively blocking
         else if (!psm.IsDodging() && !(psm.GetCurrentState() is BlockState))
         {
-            if (Input.GetKeyDown(KeyCode.Space))
+            // While falling, only Heavy (mouse 1) and Q are allowed through - everything else used to
+            // fire straight into the glitched mid-air animation. Both route into MidFallAttackState
+            // (via startAirborne) instead of the normal ActionState.
+            bool isFalling = psm.GetCurrentState() is FallingState;
+
+            if (!isFalling && Input.GetKeyDown(KeyCode.Space))
             {
                 comboController.OnAbilityInput(ComboController.ComboTrackId.Magic, ref comboController.magicCombosIndex, comboController.magicCombos);
             }
-            else if (Input.GetMouseButtonDown(0))
+            else if (!isFalling && Input.GetMouseButtonDown(0))
             {
                 comboController.OnAbilityInput(ComboController.ComboTrackId.Light, ref comboController.lightCombosIndex, comboController.lightCombos);
             }
             else if (Input.GetMouseButtonDown(1))
             {
-                if (psm.IsInDodgeHeavyWindow() && comboController.dodgeHeavyAbilities.Count > 0)
+                if (isFalling)
+                {
+                    // Mid-air uses its own trimmed-clip variants (see MidFallAttackState) - not the
+                    // normal dodgeHeavyAbilities list, and no post-dodge window to check.
+                    if (comboController.dodgeHeavyMidAirAbilities.Count > 0)
+                    {
+                        comboController.OnAbilityInput(ComboController.ComboTrackId.DodgeHeavyMidAir, ref comboController.dodgeHeavyMidAirIndex, comboController.dodgeHeavyMidAirAbilities, true);
+                    }
+                }
+                else if (psm.IsInDodgeHeavyWindow() && comboController.dodgeHeavyAbilities.Count > 0)
                 {
                     psm.ConsumeDodgeHeavyWindow();
                     comboController.OnAbilityInput(ComboController.ComboTrackId.DodgeHeavy, ref comboController.dodgeHeavyIndex, comboController.dodgeHeavyAbilities);
@@ -50,19 +64,30 @@ public class PlayerInputHandler : MonoBehaviour
                     comboController.OnAbilityInput(ComboController.ComboTrackId.Heavy, ref comboController.heavyCombosIndex, comboController.heavyCombos);
                 }
             }
-            else if (Input.GetKeyDown(KeyCode.F))
+            else if (!isFalling && Input.GetKeyDown(KeyCode.F))
             {
                 comboController.OnAbilityInput(ComboController.ComboTrackId.F, ref comboController.fIndex, comboController.fAbilities);
             }
             else if (Input.GetKeyDown(KeyCode.Q))
             {
-                comboController.OnAbilityInput(ComboController.ComboTrackId.Q, ref comboController.qIndex, comboController.qAbilities);
+                if (isFalling)
+                {
+                    // Mid-air uses its own trimmed-clip variant (see MidFallAttackState), not qAbilities.
+                    if (comboController.qMidAirAbilities.Count > 0)
+                    {
+                        comboController.OnAbilityInput(ComboController.ComboTrackId.QMidAir, ref comboController.qMidAirIndex, comboController.qMidAirAbilities, true);
+                    }
+                }
+                else
+                {
+                    comboController.OnAbilityInput(ComboController.ComboTrackId.Q, ref comboController.qIndex, comboController.qAbilities);
+                }
             }
-            else if (Input.GetKeyDown(KeyCode.E))
+            else if (!isFalling && Input.GetKeyDown(KeyCode.E))
             {
                 comboController.OnAbilityInput(ComboController.ComboTrackId.E, ref comboController.eIndex, comboController.eAbilities);
             }
-            else if (Input.GetKeyDown(KeyCode.R))
+            else if (!isFalling && Input.GetKeyDown(KeyCode.R))
             {
                 comboController.OnAbilityInput(ComboController.ComboTrackId.R, ref comboController.rIndex, comboController.rAbilities);
             }
@@ -96,7 +121,7 @@ public class PlayerInputHandler : MonoBehaviour
     void HandleDefensiveInput()
     {
         // Global safety lockouts
-        if (psm.IsStunned() || psm.IsDodging()) return;
+        if (psm.IsStunned() || psm.IsDodging() || psm.GetCurrentState() is FallingState) return;
 
         // --- NEW: Check if the player is physically pressing WASD / Directional keys right now ---
         bool isTouchingDirectionKeys = Input.GetAxisRaw("Horizontal") != 0f || Input.GetAxisRaw("Vertical") != 0f;
