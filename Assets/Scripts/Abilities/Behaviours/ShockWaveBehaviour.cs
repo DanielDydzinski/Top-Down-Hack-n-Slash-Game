@@ -30,6 +30,7 @@ public class ShockWaveBehaviour : MonoBehaviour
     // Shader/Material property cache for clean fading
     private List<Material> childMaterials = new List<Material>();
     private float currentFade = 0f;
+    private AnimationCurve fadeCurve;
 
     // FIXED: Keeps the direct master reference for gain-on-hit tracking
     public void Initialize(Ability aSourceAbility, BaseAbilitySettings baseSettings, ShockWaveSettings shockSettings, List<Effect> abilityEffects, GameObject whoCasted)
@@ -59,6 +60,7 @@ public class ShockWaveBehaviour : MonoBehaviour
         expansionSpeed = shockSettings.expansionSpeed;
         useLineOfSight = shockSettings.useLOS;
         visualParticles = shockSettings.shockWaveVisualPrefab;
+        fadeCurve = shockSettings.fadeCurve;
 
         effects = abilityEffects;
 
@@ -150,8 +152,15 @@ public class ShockWaveBehaviour : MonoBehaviour
             // 3. DYNAMIC FADE: Calculate exact percentage from 0 to 1 based on expansion progress
             if (maxRadius > 0.01f && childMaterials.Count > 0)
             {
-                currentFade = sc.radius / maxRadius; // Dynamic ratio!
-                Debug.Log( "Current fade == "  +currentFade);
+                float expansionProgress = sc.radius / maxRadius;
+
+                // An unset/empty curve (the field's default until someone authors one in the
+                // Inspector) evaluates to 0 everywhere in Unity, not linear - fall back to the old
+                // straight ratio so every ShockWave that hasn't opted into a custom curve keeps its
+                // exact previous fade behavior instead of silently never fading.
+                currentFade = (fadeCurve != null && fadeCurve.length > 0)
+                    ? fadeCurve.Evaluate(expansionProgress)
+                    : expansionProgress;
 
                 if (currentFade > 0)
                 {
