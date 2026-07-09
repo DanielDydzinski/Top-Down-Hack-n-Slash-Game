@@ -21,6 +21,8 @@ The codebase deliberately favors two patterns — match them when adding new beh
 
 Ability flow: `Ability` (ScriptableObject) → `Cast()` instantiates a prefab running a matching `Behaviours/` MonoBehaviour (e.g. `MeleeAttackBehavaiour`, `FireBallBehaviour`, `ShockWaveBehaviour`, `AoEoTBehaviour`) → behaviour builds a `HitInfo` and calls `IDamageable.TakeDamage` on whatever it hits → `DamageReceiver` resolves dodge/block once, then fans out via `OnHitReceived` to `Health` (applies damage/mitigation, flinch, death) and `EffectManager` (runs the ability's `Effect` list as coroutines).
 
+For a deep dive on the ability-casting pipeline (ScriptableObject abilities/effects, `AbilityManager` cooldowns, Animator `AttackState` int, attack tags/layers, `ComboController`, and how `PlayerStateMachine` states relate to casting), see `docs/ABILITY_SYSTEM.md`.
+
 ## Critical gotcha: `HitInfo` is a struct
 
 `HitInfo` (`Assets/Scripts/GlobalSystems/CombatDataContainers.cs`) is a **value type**, not a class. Mutating a field inside one method (e.g. inside `Health.Damage`) does **not** propagate back to a caller's copy, and does not propagate sideways to a sibling subscriber's copy of the same event payload (`Health` and `EffectManager` each get their own copy from `OnHitReceived`).
@@ -36,4 +38,3 @@ This is why block-mitigation resolution lives in `DamageReceiver.TakeDamage`, re
 - `Assets/Scripts/Health/healthBar.cs` — lowercase-first class/file name, inconsistent with PascalCase used elsewhere.
 - The Unity layer used for environment raycasts is literally named `"Enviroment"` (missing the second "n") — `Ability.OnEnable()` hardcodes `LayerMask.GetMask("Enviroment", "InteractableEnvironment")` to match. Don't "fix" the spelling in code without also renaming the actual Unity layer, or raycasts will silently stop matching.
 - `Assets/Scripts/pickUps/` (lowercase, under Scripts) and `Assets/PickUps/` (top-level Assets folder) are different folders — easy to grab the wrong one.
-- `Ability.cs` is mid-migration: it has both a `baseSettings` struct and parallel "LEGACY BASE FIELDS (TEMPORARY UNTIL MIGRATION)" duplicating the same concepts directly on the class (e.g. legacy `abilityVisualPartyicles` (typo) vs. `baseSettings.abilityVisualParticles`, legacy `AudioClip AudioClip` field vs. `baseSettings.audioClip`). Check which one a given code path actually reads before editing ability fields.

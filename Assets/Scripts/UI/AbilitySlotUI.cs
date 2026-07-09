@@ -44,11 +44,7 @@ public class AbilitySlotUI : MonoBehaviour
         if (icon != null)
         {
             icon.enabled = true;
-            // Icon lives on either the legacy field or baseSettings depending on the asset
-            // (the two haven't been fully migrated/synced yet) - fall back between them,
-            // and only swap the sprite at all if one of them actually has an icon assigned.
-            Sprite resolvedIcon = current.icon != null ? current.icon : current.baseSettings.icon;
-            if (resolvedIcon != null) icon.sprite = resolvedIcon;
+            if (current.baseSettings.icon != null) icon.sprite = current.baseSettings.icon;
         }
 
         if (cooldownOverlay != null)
@@ -74,7 +70,7 @@ public class AbilitySlotUI : MonoBehaviour
     protected float GetCooldownFraction(Ability ability)
     {
         if (abilityManager.cooldowns == null) return 0f;
-        if (!abilityManager.cooldowns.TryGetValue(ability.abilityName, out CoolDown cd)) return 0f;
+        if (!abilityManager.cooldowns.TryGetValue(ability.baseSettings.abilityName, out CoolDown cd)) return 0f;
         if (cd.coolDownReady) return 0f;
 
         float duration = ability.baseSettings.cooldown;

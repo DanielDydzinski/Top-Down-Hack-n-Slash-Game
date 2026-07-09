@@ -38,6 +38,13 @@ public class FireBallBehaviour : MonoBehaviour
     // The single list tracking everything via Rigidbody
     private List<Rigidbody> capturedMasses = new List<Rigidbody>();
 
+    // Computed once in Initialize() - see PlayerStateMachine.GetFallDistanceDamageMultiplier.
+    private float fallDistanceMultiplier = 1f;
+    private GameObject groundImpactPrefab;
+
+    // Immutable reference for health refunds & energy gain, matching ShockWaveBehaviour/MeleeAttackBehavaiour.
+    private Ability sourceAbility;
+
     void Start()
     {
         howManyExplosions = 0;
@@ -131,15 +138,23 @@ public class FireBallBehaviour : MonoBehaviour
                     HitInfo info = new HitInfo
                     {
                         faction = myFaction,
-                        multiplier = 1.0f,
+                        multiplier = 1.0f * fallDistanceMultiplier,
                         type = damageType,
                         effects = this.effects,
-                        attacker = this.gameObject,
+                        attacker = caster != null ? caster : this.gameObject,
                         attackType = AttackType.Ranged,
-                        isExplosion = false
-                        
+                        isExplosion = false,
+                        sourceAbility = this.sourceAbility
                     };
                     damageable.TakeDamage(info);
+                }
+
+                // No radius of its own to match (this is a point-hit projectile, not an AoE sphere) -
+                // just the shared capped fall-distance factor, same as ShockWave's own cap.
+                if (groundImpactPrefab != null)
+                {
+                    GameObject impact = Instantiate(groundImpactPrefab, transform.position, Quaternion.identity);
+                    impact.transform.localScale = Vector3.one * Mathf.Min(fallDistanceMultiplier, Ability.MaxFallDistanceVisualScale);
                 }
 
                 if (explosionAbility != null)
@@ -275,14 +290,28 @@ public class FireBallBehaviour : MonoBehaviour
         ReleaseAllCaptured();
     }
 
-    // UPDATED: Extended signature to ingest targetLayer and wallLayer configurations upon casting initialization
-    public void UpdateValues(List<Effect> aeffects, float aprojSpeed, float aprojSize, float aprojRange, GameObject aproj, Ability aexplo, Faction faction, DamageType dmgType,
-                             AudioClip aclip, bool isbeam, GameObject whoCasted, LayerMask aTargetLayer, LayerMask aWallLayer)
+    public void Initialize(Ability aSourceAbility, BaseAbilitySettings baseSettings, FireBallSettings fireBallSettings, List<Effect> abilityEffects, GameObject whoCasted)
     {
-        effects = aeffects; projectileSpeed = aprojSpeed; projectileSize = aprojSize; projectileRange = aprojRange;
-        projectile = aproj; explosionAbility = aexplo; myFaction = faction; damageType = dmgType; fireBallAudioClip = aclip;
-        isBeam = isbeam; caster = whoCasted;
-        targetLayer = aTargetLayer; wallLayer = aWallLayer;
+        sourceAbility = aSourceAbility;
+        caster = whoCasted;
+
+        effects = abilityEffects;
+        projectileSpeed = fireBallSettings.projectileSpeed;
+        projectileSize = fireBallSettings.projectileSize;
+        projectileRange = fireBallSettings.projectileRange;
+        projectile = fireBallSettings.projectilePrefab;
+        explosionAbility = fireBallSettings.explosionAbility;
+        myFaction = baseSettings.myFaction;
+        damageType = baseSettings.damageType;
+        fireBallAudioClip = fireBallSettings.soundEffect;
+        isBeam = fireBallSettings.isBeam;
+        targetLayer = baseSettings.targetLayer;
+        wallLayer = baseSettings.wallLayer;
+
+        fallDistanceMultiplier = caster != null && caster.TryGetComponent<PlayerStateMachine>(out var psm)
+            ? psm.GetFallDistanceDamageMultiplier(baseSettings)
+            : 1f;
+        groundImpactPrefab = baseSettings.scalesWithFallDistance ? baseSettings.groundImpactPrefab : null;
     }
 
     private IEnumerator DelayedInstanciate()

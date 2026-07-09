@@ -81,11 +81,11 @@ public class ComboController : MonoBehaviour
     private void InitilizeComboSequences()
     {
         // Automatically sort into sequences
-        foreach (var a in equippedSequence) 
+        foreach (var a in equippedSequence)
         {
-            if (a.track == ComboTrack.Light) lightCombos.Add(a);
-            else if (a.track == ComboTrack.Heavy) heavyCombos.Add(a);
-            else if (a.track == ComboTrack.Magic) magicCombos.Add(a);
+            if (a.baseSettings.track == ComboTrack.Light) lightCombos.Add(a);
+            else if (a.baseSettings.track == ComboTrack.Heavy) heavyCombos.Add(a);
+            else if (a.baseSettings.track == ComboTrack.Magic) magicCombos.Add(a);
         }
     }
 
@@ -102,7 +102,7 @@ public class ComboController : MonoBehaviour
 
         // Check cooldown through the Manager. Bail out before mutating index/state so a
         // press that can't actually fire doesn't corrupt this track's combo position.
-        if (!psm.abilityManager.cooldowns[nextAb.abilityName].coolDownReady) return;
+        if (!psm.abilityManager.cooldowns[nextAb.baseSettings.abilityName].coolDownReady) return;
 
         index = candidateIndex;
         state.currentAbility = nextAb;
@@ -129,7 +129,7 @@ public class ComboController : MonoBehaviour
     private int GetCandidateIndex(TrackState state, int currentIndex, int count)
     {
         bool withinWindow = state.currentAbility != null
-            && Time.time - state.lastInputTime < state.currentAbility.comboWindow;
+            && Time.time - state.lastInputTime < state.currentAbility.baseSettings.comboWindow;
         return withinWindow ? (currentIndex + 1) % count : 0;
     }
 }

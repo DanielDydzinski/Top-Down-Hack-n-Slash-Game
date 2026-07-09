@@ -32,6 +32,15 @@ public class AoEoTBehaviour : MonoBehaviour
     private AudioSource audioSource;
     private GameObject caster;
 
+    // Computed once in Initialize() - see PlayerStateMachine.GetFallDistanceDamageMultiplier. Applied to
+    // every tick, same as TakeDoT caching isBlocked once for its whole tick loop - the fall that triggered
+    // this ability doesn't change mid-DoT.
+    private float fallDistanceMultiplier = 1f;
+    private GameObject groundImpactPrefab;
+
+    // Immutable reference for health refunds & energy gain, matching ShockWaveBehaviour/MeleeAttackBehavaiour.
+    private Ability sourceAbility;
+
     void Start()
     {
         audioSource = GetComponent<AudioSource>();
@@ -63,6 +72,15 @@ public class AoEoTBehaviour : MonoBehaviour
         if (sc != null) sc.radius = radius;
 
         if (particles != null) Instantiate(particles, transform);
+
+        // Matched exactly to radius (already the ability's fully resolved radius) rather than a
+        // separately-computed scale, same reasoning as ShockWaveBehaviour. Spawned once here rather
+        // than per-tick since the fall that triggered this ability doesn't change mid-DoT.
+        if (groundImpactPrefab != null)
+        {
+            GameObject impact = Instantiate(groundImpactPrefab, transform.position, Quaternion.identity);
+            impact.transform.localScale = Vector3.one * radius;
+        }
 
         if (audioClip != null && audioSource != null)
         {
@@ -130,13 +148,14 @@ public class AoEoTBehaviour : MonoBehaviour
 
                 HitInfo info = new HitInfo
                 {
-                    multiplier = 1.0f,
+                    multiplier = 1.0f * fallDistanceMultiplier,
                     type = damageType,
                     effects = this.effects,
                     attacker = caster != null ? caster : this.gameObject,
                     faction = this.myFaction,
                     forceDirection = pushDirection.normalized, // Dynamic radial vector out from the blast
-                    isExplosion = true
+                    isExplosion = true,
+                    sourceAbility = this.sourceAbility
                 };
 
                 // Targets will take damage freely even if separated by environment/walls
@@ -145,30 +164,32 @@ public class AoEoTBehaviour : MonoBehaviour
         }
     }
 
-    // UPDATED: Kept signature intact so your ability manager can pass configurations identically
-    public void UpdateValues(List<Effect> aeffects, float aduration, float arate, float aradius,
-                             Faction faction, GameObject aparticles, DamageType dmgType,
-                             AudioClip aclip, GameObject aCaster, bool aisPartial,
-                             float astrikeRadius, GameObject astrikeParticles,
-                             Vector3 aspawnOffset, AudioClip astrikeSound, LayerMask aTargetLayer, LayerMask aWallLayer)
+    public void Initialize(Ability aSourceAbility, BaseAbilitySettings baseSettings, AoEoTSettings aoEotSettings, List<Effect> abilityEffects, GameObject whoCasted)
     {
-        effects = aeffects;
-        duration = aduration;
-        rate = arate;
-        radius = aradius;
-        myFaction = faction;
-        particles = aparticles;
-        damageType = dmgType;
-        audioClip = aclip;
-        caster = aCaster;
+        sourceAbility = aSourceAbility;
+        caster = whoCasted;
 
-        isPartial = aisPartial;
-        strikeRadius = astrikeRadius;
-        strikeParticles = astrikeParticles;
-        spawnPositionOffset = aspawnOffset;
-        strikeSound = astrikeSound;
+        effects = abilityEffects;
+        duration = aoEotSettings.duration;
+        rate = aoEotSettings.rate;
+        radius = aoEotSettings.radius;
+        myFaction = baseSettings.myFaction;
+        particles = aoEotSettings.abilityParticles;
+        damageType = baseSettings.damageType;
+        audioClip = baseSettings.audioClip;
 
-        targetLayer = aTargetLayer;
-        wallLayer = aWallLayer; // Stored safely to avoid broken references elsewhere
+        isPartial = aoEotSettings.isPartial;
+        strikeRadius = aoEotSettings.strikeRadius;
+        strikeParticles = aoEotSettings.strikeParticles;
+        spawnPositionOffset = aoEotSettings.spawnPositionOffset;
+        strikeSound = aoEotSettings.strikeSound;
+
+        targetLayer = baseSettings.targetLayer;
+        wallLayer = baseSettings.wallLayer;
+
+        fallDistanceMultiplier = caster != null && caster.TryGetComponent<PlayerStateMachine>(out var psm)
+            ? psm.GetFallDistanceDamageMultiplier(baseSettings)
+            : 1f;
+        groundImpactPrefab = baseSettings.scalesWithFallDistance ? baseSettings.groundImpactPrefab : null;
     }
 }

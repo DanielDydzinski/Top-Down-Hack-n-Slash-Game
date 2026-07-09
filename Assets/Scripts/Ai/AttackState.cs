@@ -10,7 +10,7 @@ public class AttackState : BaseAttackState
     {
         _controller.abilityManager.StartCastingAbility(_activeAbility,_controller.target);
 
-        if (!_activeAbility.canMoveAttack)
+        if (!_activeAbility.baseSettings.canMoveAttack)
             _controller.SetObstacleMode(true); // cant move when attacking
     }
 
@@ -20,7 +20,7 @@ public class AttackState : BaseAttackState
         if (_controller.stats.isPushed) return;
 
         // If we can move while attacking, keep pathing
-        if (_activeAbility.canMoveAttack)
+        if (_activeAbility.baseSettings.canMoveAttack)
         {
             _controller.SetObstacleMode(false);
             _controller.nav.SetDestination(_controller.target.position);

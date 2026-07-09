@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public enum AnimationLayer { UpperBody, FullBody }
 public enum ComboTrack { Light, Heavy, Magic, Hidden }
@@ -86,10 +87,26 @@ public struct BaseAbilitySettings
     public Ability.abilitySpawnType spawnLocation;
     public Vector3 spawnLocationOffset;
     public Vector3 spawnRotationOffset;
+
+    [Header("Fall Distance Damage Scaling")]
+    [FormerlySerializedAs("scalesWithFallSpeed")]
+    [Tooltip("When enabled, this ability's damage/impact multiplier scales with how far (meters) the caster last fell before landing (see Mover.GetLastFallDistance). Used by mid-air Q/DodgeHeavy attacks and their grounded vault-jump (freezeInAir) counterparts. Off by default - has no effect unless set.")]
+    public bool scalesWithFallDistance;
+    [Tooltip("Fall distance (meters) at or below which no bonus is applied.")]
+    public float minDistanceForBonus;
+    [Tooltip("Fall distance (meters) at or above which the multiplier caps at maxDistanceMultiplier.")]
+    public float maxDistanceForBonus;
+    [FormerlySerializedAs("maxFallSpeedMultiplier")]
+    [Tooltip("Damage multiplier applied at/above maxDistanceForBonus. 1 = no bonus.")]
+    public float maxDistanceMultiplier;
+
+    [Tooltip("VFX prefab spawned where this ability resolves when scalesWithFallDistance is on - different abilities can use different impact prefabs. Scaled to match this ability's own fall-distance scaling (e.g. ShockWave matches it exactly to its blast radius - see ShockWaveBehaviour). Null = no ability-specific impact; the player's default ground impact plays instead for a plain fall (see PlayerStateMachine.defaultGroundImpactPrefab).")]
+    public GameObject groundImpactPrefab;
 }
 
 public abstract class Ability : ScriptableObject
 {
+    public enum abilitySpawnType { Onself, OnTarget, SpecifiedPoint, PlayerRoot };
 
     [Header("--- NEW REFACTORED CONTAINER ---")]
     public BaseAbilitySettings baseSettings;
@@ -100,85 +117,27 @@ public abstract class Ability : ScriptableObject
     [Header("List of Effects")]
     public List<Effect> abilityEffects;
 
-    [Header("--- LEGACY BASE FIELDS (TEMPORARY UNTIL MIGRATION) ---")]
-    [Header("Ability Info")]
-    public string abilityName;
-    public Sprite icon;
-    public string description;
-
-    [Header("Identity")]
-    public Faction myFaction; // for Identity Checks
-    public DamageType damageType;
-
-    [Header("Physics Filtering")]
-    public LayerMask targetLayer; // What this ability can target/damage
-    public LayerMask wallLayer;   // What blocks this ability's line-of-sight
-
-    [Header("Combo Settings")]
-    public Ability nextComboAbility; // If null, combo ends
-    public float comboWindow = 1.0f; // Time to press button again
-
-    [Header("State Control")]
-    public float movementMultiplier = 1.0f; // Slow down during cast? (e.g. 0.5f)
-    public bool canRotateDuringCast;
-
-    [Description("Lower the heavier turning during cast")]
-    public float rotationOomph = 100f;
-    public bool canMoveAttack;
-    public int attackState; // animaton state transition condition value // calls an animation with this state //animation trigger CastAbility()
-    public AnimationLayer animLayer;
-    public float cooldown;
-    public float requiredRange;
-    public int priority;
-    public bool isRanged;
-    public ComboTrack track; // which combo sequence/track does this belong to - player only
-
-    [Header("Dash Settings")]
-    public Vector3 dashDirection;
-    public float dashPower; //dash power during ability cast?
-    [Range(0f, 1f)]
-    public float dashStartTime;  // 0 to 1 - how far into animation to start dashing ( 0.1 = 10% into animation)
-    [Range(0f, 1f)]
-    public float dashEndTime;   // 0- 1 how far into animationtime to stop 0.9 = 90% of animation
-
-    [Header("Energy Settings")]
-    [Tooltip("How much energy it costs to use this ability.")]
-    public float energyCost;
-
-    [Tooltip("How much energy the player gets back per enemy hit (e.g. for Light Attacks).")]
-    public float energyGainOnHit;
-
-    [Tooltip("Percentage (0 to 100) of the energyCost refunded to the player if this attack lands a killing blow.")]
-    [Range(0f, 100f)]
-    public float energyRefundOnKillPercent;
-
-    public GameObject abilityVisualPartyicles; // visuals
-    public VisualAttachPoint attachPoint; // Instead of public Transform
-    public AudioClip AudioClip;
-    public AudioClip visualEffectAudio;
-
-    public enum abilitySpawnType { Onself, OnTarget, SpecifiedPoint, PlayerRoot };
-    [Header("Ability Positioning")]
-    public abilitySpawnType spawnLocation;
-    public Vector3 spawnLocationOffset;
-    public Vector3 spawnRotationOffset;
-
     // --- THE AUTOMATED INSPECTOR SHORTCUT ---
     protected virtual void OnEnable()
     {
         // If the layer mask is unassigned (Nothing), automatically inject your game's defaults!
         // This ensures all your existing assets get updated with zero manual work.
-        if (targetLayer == 0)
+        if (baseSettings.targetLayer == 0)
         {
-            targetLayer = LayerMask.GetMask("Player");
+            baseSettings.targetLayer = LayerMask.GetMask("Player");
         }
 
-        if (wallLayer == 0)
+        if (baseSettings.wallLayer == 0)
         {
             // Matching your exact project spelling "Enviroment" from your layer window
-            wallLayer = LayerMask.GetMask("Enviroment", "InteractableEnvironment");
+            baseSettings.wallLayer = LayerMask.GetMask("Enviroment", "InteractableEnvironment");
         }
     }
+
+    // Hard cap for any visual (ground impact prefab, ShockWave's blast radius, etc.) that scales off
+    // the fall-distance multiplier - kept separate from maxDistanceMultiplier (which only governs
+    // damage) so a huge damage bonus can't also blow a visual out uncontrollably.
+    public const float MaxFallDistanceVisualScale = 2f;
 
     public abstract GameObject Cast(Vector3 pos, Quaternion rot, GameObject caster);
 }

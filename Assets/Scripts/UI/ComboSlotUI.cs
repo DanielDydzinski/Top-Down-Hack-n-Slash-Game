@@ -31,20 +31,20 @@ public class ComboSlotUI : AbilitySlotUI
         // The window bar tracks THIS track's own last-fired ability/time, not the preview
         // ability shown by GetCurrentAbility() - each track now keeps its own state.
         Ability lastFired = comboController.GetLastFiredAbility(TrackId);
-        if (lastFired == null || lastFired.comboWindow <= 0f)
+        if (lastFired == null || lastFired.baseSettings.comboWindow <= 0f)
         {
             windowBar.fillAmount = 0f;
             return;
         }
 
         float elapsed = Time.time - comboController.GetLastInputTime(TrackId);
-        if (elapsed >= lastFired.comboWindow)
+        if (elapsed >= lastFired.baseSettings.comboWindow)
         {
             windowBar.fillAmount = 0f;
             return;
         }
 
-        windowBar.fillAmount = 1f - Mathf.Clamp01(elapsed / lastFired.comboWindow);
+        windowBar.fillAmount = 1f - Mathf.Clamp01(elapsed / lastFired.baseSettings.comboWindow);
     }
 
     protected override Ability GetCurrentAbility()

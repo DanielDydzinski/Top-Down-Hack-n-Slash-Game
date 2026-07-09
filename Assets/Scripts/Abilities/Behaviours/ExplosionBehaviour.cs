@@ -20,6 +20,13 @@ public class ExplosionBehaviour : MonoBehaviour
     private AudioSource audioSource;
     private GameObject caster;
 
+    // Computed once in Initialize() - see PlayerStateMachine.GetFallDistanceDamageMultiplier.
+    private float fallDistanceMultiplier = 1f;
+    private GameObject groundImpactPrefab;
+
+    // Immutable reference for health refunds & energy gain, matching ShockWaveBehaviour/MeleeAttackBehavaiour.
+    private Ability sourceAbility;
+
     void Start()
     {
         audioSource = GetComponent<AudioSource>();
@@ -27,20 +34,25 @@ public class ExplosionBehaviour : MonoBehaviour
         StartCoroutine(DelayedExplode());
     }
 
-    // UPDATED: Added targetLayer and wallLayer setup into initialization
-    public void UpdateValues(List<Effect> aeffects, GameObject aexploPrefab, float aRadius, Faction faction, DamageType dmgType,
-        bool dmgByDist, AudioClip aclip, GameObject aCaster, LayerMask aTargetLayer, LayerMask aWallLayer)
+    public void Initialize(Ability aSourceAbility, BaseAbilitySettings baseSettings, ExplosionSettings explosionSettings, List<Effect> abilityEffects, GameObject whoCasted)
     {
-        effects = aeffects;
-        explosionParticles = aexploPrefab;
-        explosionRadius = aRadius;
-        myFaction = faction;
-        damageType = dmgType;
-        damageByDistance = dmgByDist;
-        audioClip = aclip;
-        caster = aCaster;
-        targetLayer = aTargetLayer;
-        wallLayer = aWallLayer;
+        sourceAbility = aSourceAbility;
+        caster = whoCasted;
+
+        effects = abilityEffects;
+        explosionParticles = explosionSettings.explosionParticles;
+        explosionRadius = explosionSettings.radius;
+        myFaction = baseSettings.myFaction;
+        damageType = baseSettings.damageType;
+        damageByDistance = explosionSettings.damageByDistance;
+        audioClip = explosionSettings.soundEffect;
+        targetLayer = baseSettings.targetLayer;
+        wallLayer = baseSettings.wallLayer;
+
+        fallDistanceMultiplier = caster != null && caster.TryGetComponent<PlayerStateMachine>(out var psm)
+            ? psm.GetFallDistanceDamageMultiplier(baseSettings)
+            : 1f;
+        groundImpactPrefab = baseSettings.scalesWithFallDistance ? baseSettings.groundImpactPrefab : null;
     }
 
     private IEnumerator DelayedExplode()
@@ -52,6 +64,14 @@ public class ExplosionBehaviour : MonoBehaviour
         if (audioClip != null)
         {
             AudioSource.PlayClipAtPoint(audioClip, transform.position);
+        }
+
+        // Matched exactly to explosionRadius (already the ability's fully resolved radius) rather than
+        // a separately-computed scale, same reasoning as ShockWaveBehaviour.
+        if (groundImpactPrefab != null)
+        {
+            GameObject impact = Instantiate(groundImpactPrefab, transform.position, Quaternion.identity);
+            impact.transform.localScale = Vector3.one * explosionRadius;
         }
 
         yield return null; // Wait exactly one frame
@@ -109,9 +129,10 @@ public class ExplosionBehaviour : MonoBehaviour
                     effects = new List<Effect>(effects), // Pass the list copy
                     type = damageType,
                     attacker = caster != null ? caster : this.gameObject, // Set true attacker to caster if available
-                    multiplier = falloff,
+                    multiplier = falloff * fallDistanceMultiplier,
                     forceDirection = dir,
-                    isExplosion = true
+                    isExplosion = true,
+                    sourceAbility = this.sourceAbility
                 };
 
                 if (c.TryGetComponent<PushPropagator>(out var propagator))

@@ -49,7 +49,7 @@ public class ChaseState : IState
             _nextAbility = _controller.abilityManager.GetHighestPriorityAbility();
 
         _controller.nav.stoppingDistance = _nextAbility != null
-            ? _nextAbility.requiredRange
+            ? _nextAbility.baseSettings.requiredRange
             : _controller.defaultChaseDist;
     }
 
