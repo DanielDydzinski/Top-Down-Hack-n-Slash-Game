@@ -212,22 +212,18 @@ public class AbilityManager : MonoBehaviour
 
     private IEnumerator RunCoolDown(CoolDown cd)
     {
-        cd.stopwatch.Stop();
-        cd.stopwatch.Reset();
-        cd.stopwatch.Start();
-
         cd.coolDownReady = false;
         cd.timeLeft = cd.ability.baseSettings.cooldown;
 
+        float elapsed = 0f;
         while (!cd.coolDownReady)
         {
-            cd.timeLeft = cd.ability.baseSettings.cooldown - (float)cd.stopwatch.Elapsed.TotalSeconds;
+            elapsed += Time.deltaTime;
+            cd.timeLeft = cd.ability.baseSettings.cooldown - elapsed;
             cd.coolDownReady = (cd.timeLeft <= 0f);
             yield return null;
         }
 
-        cd.stopwatch.Stop();
-        cd.stopwatch.Reset();
         OnAbilityReady?.Invoke();
     }
 
