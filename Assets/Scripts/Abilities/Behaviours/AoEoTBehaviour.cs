@@ -78,7 +78,8 @@ public class AoEoTBehaviour : MonoBehaviour
         // than per-tick since the fall that triggered this ability doesn't change mid-DoT.
         if (groundImpactPrefab != null)
         {
-            GameObject impact = Instantiate(groundImpactPrefab, transform.position, Quaternion.identity);
+            Vector3 impactPos = AbilityVisualEffects.ResolveGroundImpactPosition(caster, transform.position);
+            GameObject impact = Instantiate(groundImpactPrefab, impactPos, Quaternion.identity);
             impact.transform.localScale = Vector3.one * radius;
         }
 

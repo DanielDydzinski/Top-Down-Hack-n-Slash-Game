@@ -153,7 +153,8 @@ public class FireBallBehaviour : MonoBehaviour
                 // just the shared capped fall-distance factor, same as ShockWave's own cap.
                 if (groundImpactPrefab != null)
                 {
-                    GameObject impact = Instantiate(groundImpactPrefab, transform.position, Quaternion.identity);
+                    Vector3 impactPos = AbilityVisualEffects.ResolveGroundImpactPosition(caster, transform.position);
+                    GameObject impact = Instantiate(groundImpactPrefab, impactPos, Quaternion.identity);
                     impact.transform.localScale = Vector3.one * Mathf.Min(fallDistanceMultiplier, Ability.MaxFallDistanceVisualScale);
                 }
 

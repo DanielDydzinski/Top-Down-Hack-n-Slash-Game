@@ -70,7 +70,8 @@ public class ExplosionBehaviour : MonoBehaviour
         // a separately-computed scale, same reasoning as ShockWaveBehaviour.
         if (groundImpactPrefab != null)
         {
-            GameObject impact = Instantiate(groundImpactPrefab, transform.position, Quaternion.identity);
+            Vector3 impactPos = AbilityVisualEffects.ResolveGroundImpactPosition(caster, transform.position);
+            GameObject impact = Instantiate(groundImpactPrefab, impactPos, Quaternion.identity);
             impact.transform.localScale = Vector3.one * explosionRadius;
         }
 

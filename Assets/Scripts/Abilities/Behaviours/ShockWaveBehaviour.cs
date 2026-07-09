@@ -66,7 +66,8 @@ public class ShockWaveBehaviour : MonoBehaviour
         // a separately-computed scale - keeps the visual honest about how big the actual damage sphere is.
         if (baseSettings.scalesWithFallDistance && baseSettings.groundImpactPrefab != null)
         {
-            GameObject impact = Instantiate(baseSettings.groundImpactPrefab, transform.position, Quaternion.identity);
+            Vector3 impactPos = AbilityVisualEffects.ResolveGroundImpactPosition(caster, transform.position);
+            GameObject impact = Instantiate(baseSettings.groundImpactPrefab, impactPos, Quaternion.identity);
             impact.transform.localScale = Vector3.one * maxRadius;
         }
 

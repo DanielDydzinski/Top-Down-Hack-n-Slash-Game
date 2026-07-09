@@ -52,7 +52,8 @@ public class MeleeAttackBehavaiour : MonoBehaviour
         // capped fall-distance factor, same as ShockWave's own cap.
         if (baseSettings.scalesWithFallDistance && baseSettings.groundImpactPrefab != null)
         {
-            GameObject impact = Instantiate(baseSettings.groundImpactPrefab, transform.position, Quaternion.identity);
+            Vector3 impactPos = AbilityVisualEffects.ResolveGroundImpactPosition(caster, transform.position);
+            GameObject impact = Instantiate(baseSettings.groundImpactPrefab, impactPos, Quaternion.identity);
             impact.transform.localScale = Vector3.one * Mathf.Min(fallDistanceMultiplier, Ability.MaxFallDistanceVisualScale);
         }
 
