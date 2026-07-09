@@ -8,10 +8,6 @@ public class FallingState : IPlayerState
 {
     private PlayerStateMachine psm;
 
-    // DEBUG - remove once fall-speed investigation is done
-    private Vector3 _startPosition;
-    private float _startTime;
-
     public FallingState(PlayerStateMachine _psm)
     {
         psm = _psm;
@@ -28,11 +24,6 @@ public class FallingState : IPlayerState
         Vector3 currentVelocity = psm.characterController.velocity;
         psm.mover.SetHorizontalVelocity(currentVelocity);
 
-        // DEBUG - remove once fall-speed investigation is done
-        _startPosition = psm.transform.position;
-        _startTime = Time.time;
-        Debug.Log($"[FallDebug] FallingState entered: height={_startPosition.y:F2} capturedVelocity={currentVelocity} speed={currentVelocity.magnitude:F2}");
-
         psm.playerMovement.enabled = false;
         //psm.rotator.enabled = false;
 
@@ -44,20 +35,8 @@ public class FallingState : IPlayerState
 
     public void UpdateState()
     {
-        // DEBUG - remove once fall-speed investigation is done
-        Vector3 vel = psm.characterController.velocity;
-        Debug.Log($"[FallDebug] t={Time.time - _startTime:F3} height={psm.transform.position.y:F2} vel={vel} speed={vel.magnitude:F2}");
-
         if (psm.characterController.isGrounded)
         {
-            // DEBUG - remove once fall-speed investigation is done
-            float duration = Time.time - _startTime;
-            Vector3 delta = psm.transform.position - _startPosition;
-            float heightDropped = -delta.y;
-            float horizontalDistance = new Vector3(delta.x, 0f, delta.z).magnitude;
-            float avgVerticalSpeed = heightDropped / Mathf.Max(duration, 0.0001f);
-            Debug.Log($"[FallDebug] LANDED: duration={duration:F3}s heightDropped={heightDropped:F2} horizontalDistance={horizontalDistance:F2} avgVerticalSpeed={avgVerticalSpeed:F2}");
-
             psm.SwitchState(new LandingState(psm));
         }
     }

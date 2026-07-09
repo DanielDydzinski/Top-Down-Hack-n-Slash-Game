@@ -84,6 +84,16 @@ public class PlayerStateMachine : MonoBehaviour
     [Tooltip("Fraction of the Landing clip's length (0-1) before LandingState returns to locomotion.")]
     [Range(0f, 1f)] public float landingExitAt = 0.9f;
 
+    [Header("Default Ground Impact")]
+    [Tooltip("VFX prefab spawned at the landing point for a plain fall (no scalesWithFallDistance ability active - see Mover.OnLanded / HandleLanded). Abilities that opt into scalesWithFallDistance spawn their own baseSettings.groundImpactPrefab instead, from within their own Behaviour.")]
+    public GameObject defaultGroundImpactPrefab;
+    [Tooltip("Minimum fall distance (meters) before the default ground impact plays at all - short drops from ordinary locomotion won't trigger it.")]
+    public float minFallDistanceForImpact = 3f;
+    [Tooltip("Fall distance (meters) at or above which the default impact's scale caps at maxGroundImpactScale.")]
+    public float maxFallDistanceForImpactScale = 15f;
+    [Tooltip("Scale multiplier applied to the default ground impact prefab at/above maxFallDistanceForImpactScale. 1 = no scaling.")]
+    public float maxGroundImpactScale = Ability.MaxFallDistanceVisualScale;
+
     private float _defaultControllerHeight;
     private Vector3 _defaultControllerCenter;
 
@@ -97,6 +107,20 @@ public class PlayerStateMachine : MonoBehaviour
     public float midAirAttackDriftSpeed = 8f;
     [Tooltip("How long (seconds) after landing a mid-air attack holds the forced close camera zoom before releasing it back to normal - not released the instant landing is detected.")]
     public float midAirAttackZoomReleaseDelay = 1f;
+
+    // Linear ramp between settings.minDistanceForBonus and settings.maxDistanceForBonus, clamped to
+    // settings.maxDistanceMultiplier - called directly from each ability Behaviour's Initialize() (e.g.
+    // ShockWaveBehaviour, MeleeAttackBehavaiour); this is the part that needs mover's live fall-distance reading.
+    public float GetFallDistanceDamageMultiplier(BaseAbilitySettings settings)
+    {
+        if (!settings.scalesWithFallDistance) return 1f;
+
+        float fallDistance = mover.GetLastFallDistance();
+        float t = Mathf.InverseLerp(settings.minDistanceForBonus, settings.maxDistanceForBonus, fallDistance);
+        float multiplier = Mathf.Lerp(1f, settings.maxDistanceMultiplier, t);
+        Debug.Log($"[FallDamage] {settings.abilityName}: fallDistance={fallDistance:F2}m -> multiplier={multiplier:F2}x (range {settings.minDistanceForBonus:F1}-{settings.maxDistanceForBonus:F1}m, cap {settings.maxDistanceMultiplier:F1}x)");
+        return multiplier;
+    }
 
 
     public readonly int CombatStanceStateHash = Animator.StringToHash("CombatStance");
@@ -161,11 +185,36 @@ public class PlayerStateMachine : MonoBehaviour
         blockState = new BlockState(this);
 
         SwitchState(locomotionState);
+
+        mover.OnLanded += HandleLanded;
+    }
+
+    void OnDestroy()
+    {
+        if (mover != null) mover.OnLanded -= HandleLanded;
     }
 
     void Update()
     {
         currentState?.UpdateState();
+    }
+
+    // Default ground impact for a plain fall - see Mover.OnLanded. An ability that opted into
+    // scalesWithFallDistance handles its own ground impact directly inside its own Behaviour instead
+    // (see ShockWaveBehaviour etc.), since that's also where the matching radius/multiplier is already
+    // computed - so this only fires when no such ability is currently active, to avoid a double-spawn.
+    private void HandleLanded(float fallDistance)
+    {
+        Ability active = abilityManager != null ? abilityManager.activeAbility : null;
+        if (active != null && active.baseSettings.scalesWithFallDistance) return;
+
+        if (defaultGroundImpactPrefab == null || fallDistance < minFallDistanceForImpact) return;
+
+        float t = Mathf.InverseLerp(minFallDistanceForImpact, maxFallDistanceForImpactScale, fallDistance);
+        float scale = Mathf.Lerp(1f, maxGroundImpactScale, t);
+
+        GameObject instance = Instantiate(defaultGroundImpactPrefab, GetGroundImpactPosition(), Quaternion.identity);
+        instance.transform.localScale *= scale;
     }
 
     public void SwitchState(IPlayerState newState)
@@ -274,5 +323,19 @@ public class PlayerStateMachine : MonoBehaviour
         Vector3 feetPosition = transform.position + characterController.center + Vector3.down * (characterController.height * 0.5f);
         Vector3 rayOrigin = feetPosition + Vector3.up * 0.1f;
         return Physics.Raycast(rayOrigin, Vector3.down, maxDistance + 0.1f, groundLayerMask);
+    }
+
+    // Same feet-position math as IsGroundedWithinDistance, but returns the actual ground contact point
+    // (falls back to the raw feet position if the raycast somehow misses) for placing the default
+    // ground impact VFX accurately on sloped/uneven ground.
+    private Vector3 GetGroundImpactPosition()
+    {
+        Vector3 feetPosition = transform.position + characterController.center + Vector3.down * (characterController.height * 0.5f);
+        Vector3 rayOrigin = feetPosition + Vector3.up * 0.1f;
+        if (Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, 1.1f, groundLayerMask))
+        {
+            return hit.point;
+        }
+        return feetPosition;
     }
 }

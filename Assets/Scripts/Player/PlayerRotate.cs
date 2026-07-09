@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -31,7 +31,7 @@ public class PlayerRotate : MonoBehaviour {
     private Vector3 negDiagonalLeft = new Vector3(-0.5f, 0.0f, -0.5f);
 
 
-
+    //********************************************* Main Loops **************************************************************************************************************
     void Start()
 	{	
 		//get these components attached to this object
@@ -50,9 +50,9 @@ public class PlayerRotate : MonoBehaviour {
 
 
 
+    //********************************************* Functions **************************************************************************************************************
 
-
-	void Turning ()
+    void Turning ()
 	{
 		// get the player to mouse vector
 		Vector3 playerMouseDir = playerToMouse.playerToMouseDir;
@@ -254,6 +254,7 @@ public class PlayerRotate : MonoBehaviour {
 
 		}
 	}
+
 
 	//function to rotate this object between two angles over time, notice we used Ienumerator as we are using while loop so we c	an jump in and out before loop is finished
 	private IEnumerator Qlerp(Quaternion from, Quaternion to, float timeFracture)

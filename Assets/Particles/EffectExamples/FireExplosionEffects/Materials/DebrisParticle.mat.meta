@@ -6,3 +6,10 @@ NativeFormatImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 363318
+  packageName: Game VFX - Ground Crack & Explosion
+  packageVersion: 1.0
+  assetPath: Assets/Particles/EffectExamples/FireExplosionEffects/Materials/DebrisParticle.mat
+  uploadId: 867466

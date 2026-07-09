@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 [RequireComponent(typeof(CharacterController))]
 public class Mover : MonoBehaviour
@@ -18,6 +19,26 @@ public class Mover : MonoBehaviour
     private Vector3 impactVelocity;
     [SerializeField] private float mass = 3f; // Higher mass = harder to push
 
+    // Height (meters) dropped between leaving the ground and landing again - _fallStartY is captured
+    // on the true->false isGrounded edge, _lastFallDistance on the matching false->true edge. Used by
+    // PlayerStateMachine.GetFallDistanceDamageMultiplier for fall-distance-scaled damage.
+    private bool _wasGrounded;
+    private float _fallStartY;
+    private float _lastFallDistance;
+    private float _lastLandTime = -Mathf.Infinity;
+
+    // How long (seconds) after landing GetLastFallDistance() still reports the real value. Without
+    // this, one real fall would keep scoring bonus damage on every later grounded ability cast -
+    // possibly minutes later - until the next big-enough fall happened to overwrite it.
+    private const float FallDistanceValidWindow = 2f;
+
+    // Fired once per qualifying landing (>0.3m, see the flicker guard below) with the distance fallen.
+    // PlayerStateMachine subscribes to trigger the default ground impact for a plain fall - see its
+    // HandleLanded. Ability-driven impacts are NOT routed through this: they resolve later (off an
+    // animation event) and each ability's own Behaviour already computes its own scaled radius/
+    // multiplier at that point, so spawning from here would mean re-deriving that math out of sync.
+    public event Action<float> OnLanded;
+
     [Header("Directional info")]
     public bool movingBottomLeft { get; set; }
     public bool movingBottomRight { get; set; }
@@ -28,15 +49,11 @@ public class Mover : MonoBehaviour
     private CharacterController controller;
     private Stats stats;
 
-    // DEBUG - remove once fall-speed investigation is done
-    private PlayerMovement _debugPlayerMovement;
-
     void Start()
     {
         controller = GetComponent<CharacterController>();
         moveDirection = Vector3.zero;
         stats = GetComponent<Stats>();
-        _debugPlayerMovement = GetComponent<PlayerMovement>();
     }
 
     // Everything that moves this character - knockback, WASD locomotion, gravity, and any drift fed
@@ -64,28 +81,59 @@ public class Mover : MonoBehaviour
         frameVelocity += moveDirection * finalSpeed;
 
         // 3. Gravity, plus any horizontal/vertical drift fed in by ability/dodge/fall states.
-        // DEBUG - remove once fall-speed investigation is done
         bool groundedBefore = controller.isGrounded;
-        bool wasClamped = false;
+
+        // CharacterController.isGrounded flickers false for a single frame on stairs/uneven ground
+        // (see fallHeightThreshold's tooltip in PlayerStateMachine) even while standing still - a
+        // flicker's fake "fall" only lasts one frame, so it drops a few centimeters at most. The 0.3m
+        // floor below filters that noise out instead of it clobbering a real landing's distance.
+        if (!groundedBefore && _wasGrounded)
+        {
+            _fallStartY = transform.position.y;
+        }
+        else if (groundedBefore && !_wasGrounded)
+        {
+            float fallDistance = _fallStartY - transform.position.y;
+            if (fallDistance > 0.3f)
+            {
+                _lastFallDistance = fallDistance;
+                _lastLandTime = Time.time;
+                Debug.Log($"[FallDistance] Landed after falling {fallDistance:F2}m - valid for {FallDistanceValidWindow:F1}s");
+                OnLanded?.Invoke(fallDistance);
+            }
+        }
+        _wasGrounded = groundedBefore;
+
         if (useGravity)
         {
             if (controller.isGrounded && verticalVelocity.y < 0)
             {
                 verticalVelocity.y = -2f;
-                wasClamped = true;
             }
             verticalVelocity.y += gravityValue * Time.deltaTime;
             frameVelocity += verticalVelocity;
         }
 
         controller.Move(frameVelocity * Time.deltaTime);
-
-        // DEBUG - remove once fall-speed investigation is done
-        Debug.Log($"[GravityDebug] t={Time.time:F3} isGroundedBefore={groundedBefore} clamped={wasClamped} playerMovementEnabled={(_debugPlayerMovement != null ? _debugPlayerMovement.enabled : (bool?)null)} moveDirection={moveDirection} finalSpeed={finalSpeed:F2} locomotionContribution={moveDirection * finalSpeed} vVel={verticalVelocity} frameVelocity={frameVelocity} controllerVelAfterMove={controller.velocity} isGroundedAfterMove={controller.isGrounded}");
     }
 
 
     public void SetSpeedMultiplier(float mult) => speedMultiplier = mult;
+
+    // Height (meters) dropped by whatever fall most recently ended in a landing - readable for
+    // FallDistanceValidWindow seconds after that landing (covers an ability's animation-event-driven
+    // damage resolving a few frames late), then reports 0 so a much later grounded cast doesn't
+    // silently inherit bonus damage from an old, unrelated fall.
+    public float GetLastFallDistance()
+    {
+        float age = Time.time - _lastLandTime;
+        if (age > FallDistanceValidWindow)
+        {
+            Debug.Log($"[FallDistance] Read requested {age:F2}s after last landing (> {FallDistanceValidWindow:F1}s window) - reporting 0");
+            return 0f;
+        }
+        return _lastFallDistance;
+    }
 
     public void AddForce(Vector3 direction, float force)
     {

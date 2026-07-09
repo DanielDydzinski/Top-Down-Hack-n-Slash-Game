@@ -9,7 +9,6 @@ public class LocomotionState : IPlayerState
     public static readonly int runBlendHash = Animator.StringToHash("RunBlend");
 
     private float _ungroundedTimer;
-    private bool _loggedAirborneStart; // DEBUG - remove once fall-speed investigation is done
 
     public LocomotionState(PlayerStateMachine stateMachine)
     {
@@ -28,7 +27,6 @@ public class LocomotionState : IPlayerState
         psm.anim.SetBool("isMoving", false);
 
         _ungroundedTimer = 0f;
-        _loggedAirborneStart = false;
     }
 
     public void UpdateState()
@@ -40,19 +38,8 @@ public class LocomotionState : IPlayerState
         // delay on top of that only guards against a single-frame raycast miss.
         bool looseGrounded = psm.IsGroundedWithinDistance(psm.fallHeightThreshold);
 
-        // DEBUG - remove once fall-speed investigation is done
-        Debug.Log($"[GroundDebug] t={Time.time:F3} height={psm.transform.position.y:F2} strictGrounded={psm.characterController.isGrounded} looseGrounded={looseGrounded} ungroundedTimer={_ungroundedTimer:F3}");
-
         if (!looseGrounded)
         {
-            // DEBUG - remove once fall-speed investigation is done
-            if (!_loggedAirborneStart)
-            {
-                _loggedAirborneStart = true;
-                bool inputHeld = Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D);
-                Debug.Log($"[FallDebug] Left ground: height={psm.transform.position.y:F2} time={Time.time:F3} velocity={psm.characterController.velocity} speed={psm.characterController.velocity.magnitude:F2} inputHeld={inputHeld}");
-            }
-
             _ungroundedTimer += Time.deltaTime;
             if (_ungroundedTimer >= psm.fallDetectionDelay)
             {
@@ -63,7 +50,6 @@ public class LocomotionState : IPlayerState
         else
         {
             _ungroundedTimer = 0f;
-            _loggedAirborneStart = false;
 
             // Safety net: a dodge that chained into an airborne vault leaves playerMovement disabled
             // on exit (see RollDodgeState.ExitState etc.) until grounded, so held WASD can't stack on

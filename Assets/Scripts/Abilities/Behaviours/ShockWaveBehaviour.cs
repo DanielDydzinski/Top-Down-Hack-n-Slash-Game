@@ -16,6 +16,9 @@ public class ShockWaveBehaviour : MonoBehaviour
     // --- IMMUTABLE REFERENCE FOR HEALTH REFUNDS & ENERGY GAIN ---
     private Ability sourceAbility;
 
+    // Computed once in Initialize() - see PlayerStateMachine.GetFallDistanceDamageMultiplier.
+    private float fallDistanceMultiplier = 1f;
+
     [Header("Physics Filtering & Occlusion")]
     public LayerMask targetLayer;
     public LayerMask wallLayer;
@@ -34,17 +37,38 @@ public class ShockWaveBehaviour : MonoBehaviour
         caster = whoCasted;
         sourceAbility = aSourceAbility;
 
+        fallDistanceMultiplier = caster != null && caster.TryGetComponent<PlayerStateMachine>(out var psm)
+            ? psm.GetFallDistanceDamageMultiplier(baseSettings)
+            : 1f;
+
         myFaction = baseSettings.myFaction;
         damageType = baseSettings.damageType;
         targetLayer = baseSettings.targetLayer;
         wallLayer = baseSettings.wallLayer;
 
         maxRadius = shockSettings.maxRadius;
+        if (shockSettings.scaleRadiusWithFallDistance)
+        {
+            // Independent hard cap from maxDistanceMultiplier (which only governs damage) - radius
+            // never scales past double the base maxRadius regardless of how the damage bonus is tuned.
+            maxRadius *= Mathf.Min(fallDistanceMultiplier, Ability.MaxFallDistanceVisualScale);
+        }
+
+        Debug.Log($"[GroundImpact] {aSourceAbility?.name}: baseRadius={shockSettings.maxRadius:F2} scaleRadiusWithFallDistance={shockSettings.scaleRadiusWithFallDistance} fallDistanceMultiplier={fallDistanceMultiplier:F2} finalMaxRadius={maxRadius:F2} scalesWithFallDistance={baseSettings.scalesWithFallDistance} groundImpactPrefabAssigned={baseSettings.groundImpactPrefab != null}");
+
         expansionSpeed = shockSettings.expansionSpeed;
         useLineOfSight = shockSettings.useLOS;
         visualParticles = shockSettings.shockWaveVisualPrefab;
 
         effects = abilityEffects;
+
+        // Ground impact matched exactly to the (already fall-scaled) blast radius above, rather than
+        // a separately-computed scale - keeps the visual honest about how big the actual damage sphere is.
+        if (baseSettings.scalesWithFallDistance && baseSettings.groundImpactPrefab != null)
+        {
+            GameObject impact = Instantiate(baseSettings.groundImpactPrefab, transform.position, Quaternion.identity);
+            impact.transform.localScale = Vector3.one * maxRadius;
+        }
 
         // Spawn visual effects if applicable
         if (visualParticles != null)
@@ -96,7 +120,7 @@ public class ShockWaveBehaviour : MonoBehaviour
         {
             overrideDeathType = DeathHandler.DeathType.Ragdoll,
             faction = myFaction,
-            multiplier = falloffMultiplier,
+            multiplier = falloffMultiplier * fallDistanceMultiplier,
             type = damageType,
             effects = this.effects,
             attacker = caster,

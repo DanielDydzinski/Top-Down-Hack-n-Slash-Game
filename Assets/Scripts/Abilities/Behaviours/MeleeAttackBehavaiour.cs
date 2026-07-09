@@ -17,6 +17,9 @@ public class MeleeAttackBehavaiour : MonoBehaviour
 
     private Ability sourceAbility;
 
+    // Computed once in Initialize() (not per-target) - see PlayerStateMachine.GetFallDistanceDamageMultiplier.
+    private float fallDistanceMultiplier = 1f;
+
     void Start()
     {
         StartCoroutine(DelayedStart());
@@ -30,7 +33,11 @@ public class MeleeAttackBehavaiour : MonoBehaviour
         meleeSettings = aMeleeSettings;
         effects = aeffect;
         caster = aCaster;
-        sourceAbility = aSourceAbility; 
+        sourceAbility = aSourceAbility;
+
+        fallDistanceMultiplier = caster != null && caster.TryGetComponent<PlayerStateMachine>(out var psm)
+            ? psm.GetFallDistanceDamageMultiplier(baseSettings)
+            : 1f;
     }
 
     private IEnumerator DelayedStart()
@@ -41,6 +48,14 @@ public class MeleeAttackBehavaiour : MonoBehaviour
 
     private void CastHitBox()
     {
+        // No radius of its own to match (this is a box hitbox, not an AoE sphere) - just the shared
+        // capped fall-distance factor, same as ShockWave's own cap.
+        if (baseSettings.scalesWithFallDistance && baseSettings.groundImpactPrefab != null)
+        {
+            GameObject impact = Instantiate(baseSettings.groundImpactPrefab, transform.position, Quaternion.identity);
+            impact.transform.localScale = Vector3.one * Mathf.Min(fallDistanceMultiplier, Ability.MaxFallDistanceVisualScale);
+        }
+
         List<Collider> allColliders = new List<Collider>();
         Dictionary<Collider, Vector3> hitPoints = new Dictionary<Collider, Vector3>();
 
@@ -132,7 +147,7 @@ public class MeleeAttackBehavaiour : MonoBehaviour
                 type = baseSettings.damageType,
                 effects = effects,
                 attacker = caster != null ? caster : this.gameObject,
-                multiplier = 1.0f,
+                multiplier = 1.0f * fallDistanceMultiplier,
                 forceDirection = transform.forward,
                 isExplosion = false,
                 impactPoint = targetPoint,
