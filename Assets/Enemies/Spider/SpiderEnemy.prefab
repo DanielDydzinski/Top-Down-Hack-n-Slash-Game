@@ -2169,6 +2169,7 @@ GameObject:
   - component: {fileID: 7083129809001196429}
   - component: {fileID: 7715072707473217220}
   - component: {fileID: 6229214319212635477}
+  - component: {fileID: 2777388480247277059}
   m_Layer: 9
   m_Name: SpiderEnemy
   m_TagString: Untagged
@@ -2357,8 +2358,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 3800c2b5990662f4594d816ab343829c, type: 2}
   - {fileID: 11400000, guid: ad2367b1ab9fff745ae45c7f37ccfedf, type: 2}
   activeAbility: {fileID: 0}
-  VisualLeftHandAttachPoint: {fileID: 0}
-  VisualRightHandAttachPoint: {fileID: 0}
 --- !u!114 &5730610957194913011
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2375,9 +2374,9 @@ MonoBehaviour:
   moveSpeed: 4
   abilityPower: 0
   physicalPower: 0
+  blockDamageMitigation: 75
   mass: 3
   dodgeAnimationSpeed: 1
-  dodgePower: 0
   isPushed: 0
 --- !u!114 &5315869849921809516
 MonoBehaviour:
@@ -2435,9 +2434,9 @@ MonoBehaviour:
   moveSpeed: 4
   abilityPower: 0
   physicalPower: 0
+  blockDamageMitigation: 75
   mass: 3
   dodgeAnimationSpeed: 1
-  dodgePower: 0
   isPushed: 0
 --- !u!114 &9216428788226169497
 MonoBehaviour:
@@ -2493,6 +2492,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e81617e8734d5f44b8699a900f136f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  damageSounds: []
   hitSounds:
   - {fileID: 8300000, guid: e27506e88af156f4aae802eba7f71ed5, type: 3}
   playChance: 0.5
@@ -2639,12 +2639,35 @@ MonoBehaviour:
   upwardModifier: 0.5
   explodingPartsPrefab: {fileID: 0}
   completeExplodeBlastForce: 750
+  bloodBathPrefabs: []
+  bloodBathOffset: {x: 0, y: 0, z: 0}
+  includeBloodBathAnimation: 0
+  includeBloodBathRagdoll: 0
+  includeBloodBathExploding: 0
+  bloodBathLifetime: 30
   ragdollLifespan: 10
   audioCleanupDelay: 3
   randomizeAnimationLifespan: 1
   minAnimationLifespan: 0.4
   maxAnimationLifespan: 0.8
   animationDeathLifespan: 4
+--- !u!114 &2777388480247277059
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1849966180446146}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0321d2595ee1596498ab7115bbc5eb3b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  abilityManager: {fileID: 0}
+  VisualLeftHandAttachPoint: {fileID: 0}
+  VisualRightHandAttachPoint: {fileID: 0}
+  VisualHeadAttachPoint: {fileID: 0}
+  VisualWeaponAttachPoint: {fileID: 0}
 --- !u!1 &1851782130573292
 GameObject:
   m_ObjectHideFlags: 0
