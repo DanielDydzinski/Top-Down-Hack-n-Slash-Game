@@ -25,11 +25,16 @@ public class AbilityManager : MonoBehaviour
     private Transform activeTarget;
     public event Action OnAbilityReady;
 
+    // Cast lifecycle - fired for both player and AI casters (this is the single choke point both
+    // go through). Listened to by sibling components (e.g. AbilityVisualEffects) that react to
+    // casts without AbilityManager needing to know they exist - same Observer relationship as
+    // DamageReceiver.OnHitReceived -> Health/EffectManager.
+    public event Action<Ability> OnAbilityStarted;
+    public event Action<Ability> OnAbilityExecuted;
+    public event Action<Ability> OnAbilityCanceled;
+
     private EffectSpawnPossitions effectSpawnPossitions;
     private PlayerEnergy playerEnergy; // Reference to our energy tracker system
-
-    public Transform VisualLeftHandAttachPoint, VisualRightHandAttachPoint;
-    private GameObject activeVisualEffect;
 
     void Start()
     {
@@ -87,10 +92,7 @@ public class AbilityManager : MonoBehaviour
     {
         animator.SetInteger(AttackStateHash, -1);
         Debug.Log("Canceling ability");
-        if (activeVisualEffect != null)
-        {
-            Destroy(activeVisualEffect);
-        }
+        OnAbilityCanceled?.Invoke(activeAbility);
         CancelGetHitAnim();
         ClearActiveAbility();
     }
@@ -154,6 +156,7 @@ public class AbilityManager : MonoBehaviour
 
             // Casts the ability prefab into the world
             currentAbilityObject = activeAbility.Cast(spawnPos, spawnRot, this.gameObject);
+            OnAbilityExecuted?.Invoke(activeAbility);
         }
         else
         {
@@ -187,6 +190,7 @@ public class AbilityManager : MonoBehaviour
             // 3. Begin active setup states safely (Works for everyone!)
             activeTarget = target;
             activeAbility = ab;
+            OnAbilityStarted?.Invoke(ab);
             animator.SetInteger(AttackStateHash, cooldowns[currentName].ability.baseSettings.attackState);
 
             if (ab.baseSettings.audioClip != null)
@@ -250,39 +254,6 @@ public class AbilityManager : MonoBehaviour
             }
         }
         return bestAbility;
-    }
-
-    public void PlayVisuals()
-    {
-        if (activeAbility == null) return;
-
-        Transform targetParent = transform;
-
-        if (activeAbility.baseSettings.attachPoint == VisualAttachPoint.RightHand)
-        {
-            if (VisualRightHandAttachPoint != null) targetParent = VisualRightHandAttachPoint;
-        }
-        else if (activeAbility.baseSettings.attachPoint == VisualAttachPoint.LeftHand)
-        {
-            if (VisualLeftHandAttachPoint != null) targetParent = VisualLeftHandAttachPoint;
-        }
-
-        Vector3 finalPos = targetParent.position + activeAbility.baseSettings.spawnLocationOffset;
-        Quaternion finalRot = targetParent.rotation * Quaternion.Euler(activeAbility.baseSettings.spawnRotationOffset);
-
-        if (activeAbility.baseSettings.abilityVisualParticles != null)
-        {
-            activeVisualEffect = Instantiate(
-                activeAbility.baseSettings.abilityVisualParticles,
-                finalPos,
-                finalRot,
-                targetParent
-            );
-        }
-        if (activeAbility.baseSettings.visualEffectAudio != null)
-        {
-            AudioSource.PlayClipAtPoint(activeAbility.baseSettings.visualEffectAudio, transform.position);
-        }
     }
 
     public Ability GetHighestPriorityReady(bool wantRanged)

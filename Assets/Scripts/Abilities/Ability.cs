@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using UnityEngine;
@@ -7,7 +7,7 @@ using UnityEngine.Serialization;
 public enum AnimationLayer { UpperBody, FullBody }
 public enum ComboTrack { Light, Heavy, Magic, Hidden }
 
-public enum VisualAttachPoint { Root, LeftHand, RightHand, Head, Weapon }
+public enum VisualAttachPoint { Root, LeftHand, RightHand, Head, Weapon, Feet }
 
 [System.Serializable]
 public struct BaseAbilitySettings
@@ -116,6 +116,9 @@ public abstract class Ability : ScriptableObject
 
     [Header("List of Effects")]
     public List<Effect> abilityEffects;
+
+    [Header("Visual Cues")]
+    public List<AbilityVisualCue> visualCues;
 
     // --- THE AUTOMATED INSPECTOR SHORTCUT ---
     protected virtual void OnEnable()
