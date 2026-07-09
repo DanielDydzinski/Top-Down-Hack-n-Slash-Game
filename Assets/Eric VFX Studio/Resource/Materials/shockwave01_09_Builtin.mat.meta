@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: d11eeb8252a16484c91f655942b7ebbf
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 363318
+  packageName: Game VFX - Ground Crack & Explosion
+  packageVersion: 1.0
+  assetPath: Assets/Eric VFX Studio/Resource/Materials/shockwave01_09_Builtin.mat
+  uploadId: 867466

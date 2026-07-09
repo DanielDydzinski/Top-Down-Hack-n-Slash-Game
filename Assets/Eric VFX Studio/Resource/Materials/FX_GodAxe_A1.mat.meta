@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 0d12c7855a2a3264a86d637e1d21cfb1
+timeCreated: 1517388056
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 363318
+  packageName: Game VFX - Ground Crack & Explosion
+  packageVersion: 1.0
+  assetPath: Assets/Eric VFX Studio/Resource/Materials/FX_GodAxe_A1.mat
+  uploadId: 867466

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: c2b3534d69d4a234c94d3c3804373f2d
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 363318
+  packageName: Game VFX - Ground Crack & Explosion
+  packageVersion: 1.0
+  assetPath: Assets/Eric VFX Studio/Resource/Materials/glow_point2_yellow_03_Builtin.mat
+  uploadId: 867466

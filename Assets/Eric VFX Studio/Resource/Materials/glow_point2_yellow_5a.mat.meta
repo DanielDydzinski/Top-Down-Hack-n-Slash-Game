@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 2347e032b533fbb4bbda514dbeecefae
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: fx_textures_glow_materials.unity3d
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 363318
+  packageName: Game VFX - Ground Crack & Explosion
+  packageVersion: 1.0
+  assetPath: Assets/Eric VFX Studio/Resource/Materials/glow_point2_yellow_5a.mat
+  uploadId: 867466

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 518e276c42e08f1489390feec66786fb
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 363318
+  packageName: Game VFX - Ground Crack & Explosion
+  packageVersion: 1.0
+  assetPath: Assets/Eric VFX Studio/Resource/Materials/aura_C001_Builtin.mat
+  uploadId: 867466

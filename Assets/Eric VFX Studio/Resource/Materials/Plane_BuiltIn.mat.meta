@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: f1903694f2057b74996c8ca06b6dc766
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 363318
+  packageName: Game VFX - Ground Crack & Explosion
+  packageVersion: 1.0
+  assetPath: Assets/Eric VFX Studio/Resource/Materials/Plane_BuiltIn.mat
+  uploadId: 867466

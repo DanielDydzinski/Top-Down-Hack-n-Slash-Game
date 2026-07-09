@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 6b828e24aed4fe846bd76a58d564ee53
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 363318
+  packageName: Game VFX - Ground Crack & Explosion
+  packageVersion: 1.0
+  assetPath: Assets/Eric VFX Studio/Resource/Materials/impact_particles_sheet_Builtin.mat
+  uploadId: 867466

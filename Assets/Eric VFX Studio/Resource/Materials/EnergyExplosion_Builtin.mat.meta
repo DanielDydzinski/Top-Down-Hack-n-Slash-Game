@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: e8746e79a28dc924d9d44db75dca6175
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 363318
+  packageName: Game VFX - Ground Crack & Explosion
+  packageVersion: 1.0
+  assetPath: Assets/Eric VFX Studio/Resource/Materials/EnergyExplosion_Builtin.mat
+  uploadId: 867466

@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 1db91805274c3724598cae7424e0db6e
+timeCreated: 1528879841
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: fx_textures_ground_materials.unity3d
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 363318
+  packageName: Game VFX - Ground Crack & Explosion
+  packageVersion: 1.0
+  assetPath: Assets/Eric VFX Studio/Resource/Materials/firerock 4.mat
+  uploadId: 867466

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 02d397531b7eb074b91c24d7c4fb4bbc
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 363318
+  packageName: Game VFX - Ground Crack & Explosion
+  packageVersion: 1.0
+  assetPath: Assets/Eric VFX Studio/Resource/Materials/corrosive_spit_particle_2_sheet_Builtin.mat
+  uploadId: 867466

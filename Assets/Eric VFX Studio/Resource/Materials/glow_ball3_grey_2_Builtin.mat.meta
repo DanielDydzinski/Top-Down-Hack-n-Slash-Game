@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 74b9066106ba28545aa54b6cae351081
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 363318
+  packageName: Game VFX - Ground Crack & Explosion
+  packageVersion: 1.0
+  assetPath: Assets/Eric VFX Studio/Resource/Materials/glow_ball3_grey_2_Builtin.mat
+  uploadId: 867466

@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 358b0c9d7d95efc4aba4f61adccc31b9
+timeCreated: 1531551215
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 363318
+  packageName: Game VFX - Ground Crack & Explosion
+  packageVersion: 1.0
+  assetPath: Assets/Eric VFX Studio/Resource/Materials/cloud_02.mat
+  uploadId: 867466

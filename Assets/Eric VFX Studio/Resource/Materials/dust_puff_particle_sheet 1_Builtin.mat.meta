@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: f751016a8a5d7ff498cab111598cda9f
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 363318
+  packageName: Game VFX - Ground Crack & Explosion
+  packageVersion: 1.0
+  assetPath: Assets/Eric VFX Studio/Resource/Materials/dust_puff_particle_sheet 1_Builtin.mat
+  uploadId: 867466

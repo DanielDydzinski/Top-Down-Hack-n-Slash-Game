@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 28a9cb65d150346379968d26eb5a431e
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: fx_textures_dust_materials.unity3d
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 363318
+  packageName: Game VFX - Ground Crack & Explosion
+  packageVersion: 1.0
+  assetPath: Assets/Eric VFX Studio/Resource/Materials/M_2D_Explode_03.mat
+  uploadId: 867466
