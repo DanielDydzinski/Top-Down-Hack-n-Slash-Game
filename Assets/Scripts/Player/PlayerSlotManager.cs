@@ -60,8 +60,9 @@ public class PlayerSlotManager : MonoBehaviour
             return GetSlotWorldPosition(bestSlot);
         }
 
-        // Return Vector3.zero if no slots are available (Enemy should wait/idle)
-        return Vector3.zero;
+        // No slots available - tell the enemy to idle exactly where it already is, not path toward
+        // world origin (which, on multi-level terrain, is very unlikely to be the local floor height).
+        return enemy.transform.position;
     }
 
     // Dynamically updates the position for enemies already holding a slot

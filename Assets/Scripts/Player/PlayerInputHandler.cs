@@ -27,8 +27,10 @@ public class PlayerInputHandler : MonoBehaviour
         {
             comboController.OnAbilityInput(ComboController.ComboTrackId.Counter, ref comboController.counterIndex, comboController.counterAbilities);
         }
-        // Prevent attacking/casting if the player is actively blocking
-        else if (!psm.IsDodging() && !(psm.GetCurrentState() is BlockState))
+        // Prevent attacking/casting if the player is actively blocking, or landing (no attacks allowed
+        // until Landing hands back to locomotion - see LandingState.DodgeReady for why dodge isn't
+        // gated here too).
+        else if (!psm.IsDodging() && !(psm.GetCurrentState() is BlockState) && !psm.IsLanding())
         {
             // While airborne, only Heavy (mouse 1) and Q are allowed through - everything else used to
             // fire straight into the glitched mid-air animation. Both route into MidFallAttackState
@@ -37,7 +39,13 @@ public class PlayerInputHandler : MonoBehaviour
             // LocomotionState while still airborne (e.g. mid-vault) would otherwise read as grounded
             // until LocomotionState's fallDetectionDelay elapses, letting the full ground combo set
             // (and, via HandleDefensiveInput below, even a fresh dodge) fire mid-air.
-            bool isFalling = psm.IsAirborne();
+            // Also true for the last ~1m of an actual fall: psm.IsAirborne()'s raycast threshold
+            // reads "grounded" there before CharacterController.isGrounded actually fires the
+            // Falling->Landing transition, so "currentState is FallingState" is checked directly too -
+            // otherwise an attack could still slip through FallingState itself (skipping Landing's
+            // animator cleanup entirely) in that gap. See animator_falling_state_fix memory for the
+            // FullBodyLayer-stuck-on-Falling bug this caused.
+            bool isFalling = psm.IsAirborne() || psm.GetCurrentState() is FallingState;
 
             if (!isFalling && Input.GetKeyDown(KeyCode.Space))
             {
@@ -127,7 +135,15 @@ public class PlayerInputHandler : MonoBehaviour
         // Global safety lockouts. See the isFalling comment above - psm.IsAirborne() catches the gap
         // where a dodge/attack has exited back to LocomotionState but hasn't actually landed yet, so a
         // fresh Shift+direction press can't chain into another dodge (or trigger block) mid-air.
-        if (psm.IsStunned() || psm.IsDodging() || psm.IsAirborne()) return;
+        // currentState is FallingState closes the same tail-of-fall race the ability branch guards
+        // against above - psm.IsAirborne() alone can already read "grounded" a moment before
+        // FallingState actually hands off to Landing.
+        if (psm.IsStunned() || psm.IsDodging() || psm.IsAirborne() || psm.GetCurrentState() is FallingState) return;
+
+        // Landing itself allows a dodge (unlike attacks, which are fully blocked - see the ability
+        // branch above), but only after psm.landingDodgeDelay has elapsed since touchdown, so a
+        // landing-frame dodge doesn't feel instant/glitchy.
+        if (psm.GetCurrentState() is LandingState landingState && !landingState.DodgeReady) return;
 
         // --- NEW: Check if the player is physically pressing WASD / Directional keys right now ---
         bool isTouchingDirectionKeys = Input.GetAxisRaw("Horizontal") != 0f || Input.GetAxisRaw("Vertical") != 0f;

@@ -3,6 +3,34 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
+// TODO (design agreed, not yet implemented): damage-type-specific death VFX (burn/electric/frost/
+// poison corpses), scoped to DeathType.Ragdoll and DeathType.AnimationOnly only for now
+// (ExplodingRagdoll intentionally excluded).
+//
+// - Data-driven list, not one field per damage type: a small [System.Serializable]
+//   DamageTypeDeathEffect { DamageType damageType; GameObject prefab; string boneName;
+//   Vector3 positionOffset; } and a `List<DamageTypeDeathEffect> deathEffectsByDamageType` field
+//   here. Adding a new damage type's death effect later (or several prefabs for the same type) is
+//   then just Inspector data, no code changes - same reasoning as why AbilityVisualCue replaced a
+//   single fixed visual field with a list (see docs/ABILITY_SYSTEM.md §9). `boneName` is optional -
+//   empty means attach to root; a name lets an effect sit on e.g. the chest specifically later
+//   without forcing every entry to specify one.
+// - ProcessDeath(HitInfo info) already has info.type (the killing blow's DamageType) - that's the
+//   lookup key into deathEffectsByDamageType. A damage type with no matching entry spawns nothing
+//   (fully opt-in, e.g. Physical needs no special effect beyond the existing gore/ragdoll).
+// - Two call sites:
+//   1. ExecuteRagdollSwap's non-explode branch already builds `ragdollInstance` - spawn the
+//      matching effect parented to it right after MatchTargetPose(), so it rides along as physics
+//      tumbles the body.
+//   2. HandleAnimationDeath() currently doesn't receive HitInfo at all (only ExecuteRagdollSwap
+//      does) - needs a one-line signature change (HandleAnimationDeath(HitInfo info), threaded from
+//      ProcessDeath's switch-case call site) to get at info.type, then parent the effect to
+//      `transform` (the character itself, mid-death-animation). That GameObject gets Destroy()'d at
+//      the end of AnimationDeathSequenceRoutine, so the effect dies with it - accept that as the
+//      expected "vanish" behavior for animation-only deaths unless it should detach and outlive the
+//      corpse instead (open decision).
+// - Spawning reuses the same ObjectPooler-first pattern already used by SpawnRagdollPart in this
+//   file - no new spawning convention needed.
 public class DeathHandler : MonoBehaviour
 {
     public enum DeathType

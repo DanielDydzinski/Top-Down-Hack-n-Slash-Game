@@ -9,6 +9,10 @@ public class LandingState : IPlayerState
     private float _duration;
     private float _timer;
 
+    // Attacks are blocked outright for the whole state (see PlayerInputHandler's IsLanding() check) -
+    // dodging just gets a short delay instead, so a landing-frame dodge doesn't feel instant/glitchy.
+    public bool DodgeReady => _timer >= psm.landingDodgeDelay;
+
     public LandingState(PlayerStateMachine _psm)
     {
         psm = _psm;
