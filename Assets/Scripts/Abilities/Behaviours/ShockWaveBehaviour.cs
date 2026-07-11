@@ -50,9 +50,10 @@ public class ShockWaveBehaviour : MonoBehaviour
         maxRadius = shockSettings.maxRadius;
         if (shockSettings.scaleRadiusWithFallDistance)
         {
-            // Independent hard cap from maxDistanceMultiplier (which only governs damage) - radius
-            // never scales past double the base maxRadius regardless of how the damage bonus is tuned.
-            maxRadius *= Mathf.Min(fallDistanceMultiplier, Ability.MaxFallDistanceVisualScale);
+            // Grows proportionally with how far fallDistanceMultiplier is toward its own max, capped
+            // at MaxFallDistanceVisualScale only once the damage multiplier itself hits its max -
+            // not the instant it happens to exceed the (much smaller) visual cap.
+            maxRadius *= Ability.GetVisualFallDistanceScale(fallDistanceMultiplier, baseSettings.maxDistanceMultiplier);
         }
 
         Debug.Log($"[GroundImpact] {aSourceAbility?.name}: baseRadius={shockSettings.maxRadius:F2} scaleRadiusWithFallDistance={shockSettings.scaleRadiusWithFallDistance} fallDistanceMultiplier={fallDistanceMultiplier:F2} finalMaxRadius={maxRadius:F2} scalesWithFallDistance={baseSettings.scalesWithFallDistance} groundImpactPrefabAssigned={baseSettings.groundImpactPrefab != null}");

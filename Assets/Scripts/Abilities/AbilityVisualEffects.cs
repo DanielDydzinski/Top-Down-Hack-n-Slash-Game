@@ -15,8 +15,10 @@ public class AbilityVisualEffects : MonoBehaviour
     private float activePersistentEffectDelay;
 
     // Coroutines are stopped automatically when this component disables - tracked separately so
-    // OnDisable can force-clean a still-pending delayed removal instead of leaking the instance.
+    // OnDisable/a hard cancel can force-clean a still-pending delayed removal instead of leaking the
+    // instance, or later resuming and returning an already-reused pooled object to the pool.
     private GameObject pendingRemoveInstance;
+    private Coroutine pendingRemoveCoroutine;
 
     void Awake()
     {
@@ -36,11 +38,7 @@ public class AbilityVisualEffects : MonoBehaviour
         abilityManager.OnAbilityExecuted -= HandleExecuted;
         abilityManager.OnAbilityCanceled -= HandleCanceled;
 
-        if (pendingRemoveInstance != null)
-        {
-            RemoveInstance(pendingRemoveInstance);
-            pendingRemoveInstance = null;
-        }
+        FlushPendingRemoval();
     }
 
     private void HandleStarted(Ability ability) => FireCuesForTrigger(ability, CueTrigger.OnStart);
@@ -54,9 +52,13 @@ public class AbilityVisualEffects : MonoBehaviour
         FireCuesForTrigger(ability, CueTrigger.OnExecute);
     }
 
+    // Cancel means stop now, full stop - unlike Execute (a controlled handoff to the next phase),
+    // there's no next phase to hand off to here, so delayedDestroyTime is bypassed entirely and any
+    // still-fading-out effect from an earlier handoff is force-finished immediately too.
     private void HandleCanceled(Ability ability)
     {
-        ClearPersistentEffect();
+        ClearPersistentEffect(immediate: true);
+        FlushPendingRemoval();
         FireCuesForTrigger(ability, CueTrigger.OnCancel);
     }
 
@@ -135,19 +137,19 @@ public class AbilityVisualEffects : MonoBehaviour
         }
     }
 
-    private void ClearPersistentEffect()
+    private void ClearPersistentEffect(bool immediate = false)
     {
         if (activePersistentEffect == null) return;
 
         GameObject toRemove = activePersistentEffect;
-        float delay = activePersistentEffectDelay;
+        float delay = immediate ? 0f : activePersistentEffectDelay;
         activePersistentEffect = null;
         activePersistentEffectDelay = 0f;
 
         if (delay > 0f)
         {
             pendingRemoveInstance = toRemove;
-            StartCoroutine(DelayedRemoveInstance(toRemove, delay));
+            pendingRemoveCoroutine = StartCoroutine(DelayedRemoveInstance(toRemove, delay));
         }
         else
         {
@@ -160,7 +162,29 @@ public class AbilityVisualEffects : MonoBehaviour
         // Respects Time.timeScale (pause), same as everything else in the ability/effect pipeline.
         yield return new WaitForSeconds(delay);
         RemoveInstance(instance);
-        if (pendingRemoveInstance == instance) pendingRemoveInstance = null;
+        if (pendingRemoveInstance == instance)
+        {
+            pendingRemoveInstance = null;
+            pendingRemoveCoroutine = null;
+        }
+    }
+
+    // Force-finishes any still-in-flight delayedDestroyTime removal right now instead of waiting out
+    // its remaining delay. Stops the coroutine first - letting it resume later and call RemoveInstance
+    // a second time on a GameObject that, by then, may have been recycled by the pool into a different
+    // active effect would incorrectly pull that unrelated effect back out of use.
+    private void FlushPendingRemoval()
+    {
+        if (pendingRemoveCoroutine != null)
+        {
+            StopCoroutine(pendingRemoveCoroutine);
+            pendingRemoveCoroutine = null;
+        }
+        if (pendingRemoveInstance != null)
+        {
+            RemoveInstance(pendingRemoveInstance);
+            pendingRemoveInstance = null;
+        }
     }
 
     private void RemoveInstance(GameObject instance)

@@ -40,6 +40,7 @@ public class FireBallBehaviour : MonoBehaviour
 
     // Computed once in Initialize() - see PlayerStateMachine.GetFallDistanceDamageMultiplier.
     private float fallDistanceMultiplier = 1f;
+    private float maxDistanceMultiplier = 1f;
     private GameObject groundImpactPrefab;
 
     // Immutable reference for health refunds & energy gain, matching ShockWaveBehaviour/MeleeAttackBehavaiour.
@@ -150,12 +151,12 @@ public class FireBallBehaviour : MonoBehaviour
                 }
 
                 // No radius of its own to match (this is a point-hit projectile, not an AoE sphere) -
-                // just the shared capped fall-distance factor, same as ShockWave's own cap.
+                // just the shared proportional fall-distance scale, same as ShockWave's own.
                 if (groundImpactPrefab != null)
                 {
                     Vector3 impactPos = AbilityVisualEffects.ResolveGroundImpactPosition(caster, transform.position);
                     GameObject impact = Instantiate(groundImpactPrefab, impactPos, Quaternion.identity);
-                    impact.transform.localScale = Vector3.one * Mathf.Min(fallDistanceMultiplier, Ability.MaxFallDistanceVisualScale);
+                    impact.transform.localScale = Vector3.one * Ability.GetVisualFallDistanceScale(fallDistanceMultiplier, maxDistanceMultiplier);
                 }
 
                 if (explosionAbility != null)
@@ -312,6 +313,7 @@ public class FireBallBehaviour : MonoBehaviour
         fallDistanceMultiplier = caster != null && caster.TryGetComponent<PlayerStateMachine>(out var psm)
             ? psm.GetFallDistanceDamageMultiplier(baseSettings)
             : 1f;
+        maxDistanceMultiplier = baseSettings.maxDistanceMultiplier;
         groundImpactPrefab = baseSettings.scalesWithFallDistance ? baseSettings.groundImpactPrefab : null;
     }
 

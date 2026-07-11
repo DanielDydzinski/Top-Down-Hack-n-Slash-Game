@@ -142,5 +142,17 @@ public abstract class Ability : ScriptableObject
     // damage) so a huge damage bonus can't also blow a visual out uncontrollably.
     public const float MaxFallDistanceVisualScale = 2f;
 
+    // Remaps fallDistanceMultiplier's position within its own [1, maxDistanceMultiplier] range onto
+    // the visual's separate [1, MaxFallDistanceVisualScale] range, so the visual grows at the same
+    // proportional rate as the damage bonus instead of snapping straight to the visual cap the moment
+    // the (much larger) damage multiplier range happens to exceed it. Same InverseLerp/Lerp idiom as
+    // PlayerStateMachine.HandleLanded uses for the default (non-ability) ground impact.
+    public static float GetVisualFallDistanceScale(float fallDistanceMultiplier, float maxDistanceMultiplier)
+    {
+        if (maxDistanceMultiplier <= 1f) return 1f;
+        float t = Mathf.InverseLerp(1f, maxDistanceMultiplier, fallDistanceMultiplier);
+        return Mathf.Lerp(1f, MaxFallDistanceVisualScale, t);
+    }
+
     public abstract GameObject Cast(Vector3 pos, Quaternion rot, GameObject caster);
 }

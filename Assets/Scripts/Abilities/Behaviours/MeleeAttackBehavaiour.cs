@@ -49,12 +49,12 @@ public class MeleeAttackBehavaiour : MonoBehaviour
     private void CastHitBox()
     {
         // No radius of its own to match (this is a box hitbox, not an AoE sphere) - just the shared
-        // capped fall-distance factor, same as ShockWave's own cap.
+        // proportional fall-distance scale, same as ShockWave's own.
         if (baseSettings.scalesWithFallDistance && baseSettings.groundImpactPrefab != null)
         {
             Vector3 impactPos = AbilityVisualEffects.ResolveGroundImpactPosition(caster, transform.position);
             GameObject impact = Instantiate(baseSettings.groundImpactPrefab, impactPos, Quaternion.identity);
-            impact.transform.localScale = Vector3.one * Mathf.Min(fallDistanceMultiplier, Ability.MaxFallDistanceVisualScale);
+            impact.transform.localScale = Vector3.one * Ability.GetVisualFallDistanceScale(fallDistanceMultiplier, baseSettings.maxDistanceMultiplier);
         }
 
         List<Collider> allColliders = new List<Collider>();
