@@ -83,6 +83,8 @@ public class PlayerStateMachine : MonoBehaviour
     public float fallDetectionDelay = 0.1f;
     [Tooltip("Fraction of the Landing clip's length (0-1) before LandingState returns to locomotion.")]
     [Range(0f, 1f)] public float landingExitAt = 0.9f;
+    [Tooltip("How long (seconds) after LandingState begins before a fresh dodge input is accepted. Attacks are fully blocked for the whole Landing state regardless of this value - this only softens how instant a landing-frame dodge feels.")]
+    public float landingDodgeDelay = 0.3f;
 
     [Header("Default Ground Impact")]
     [Tooltip("VFX prefab spawned at the landing point for a plain fall (no scalesWithFallDistance ability active - see Mover.OnLanded / HandleLanded). Abilities that opt into scalesWithFallDistance spawn their own baseSettings.groundImpactPrefab instead, from within their own Behaviour.")]
@@ -267,6 +269,11 @@ public class PlayerStateMachine : MonoBehaviour
             || currentState is SecondRollDodgeState || currentState is SecondBackflipDodgeState;
     }
 
+    public bool IsLanding()
+    {
+        return currentState is LandingState;
+    }
+
     // Ground truth for input-gating (mid-air-only ability variants, blocking a fresh dodge while
     // airborne), instead of checking "is currentState FallingState". LocomotionState only switches
     // to FallingState after fallDetectionDelay has elapsed (a debounce against a single-frame raycast
@@ -318,11 +325,37 @@ public class PlayerStateMachine : MonoBehaviour
     // than trusting CharacterController.isGrounded - which flickers false on stairs and platform
     // edges regardless of how small the actual gap is. Returns true if ground is found within
     // maxDistance of the feet.
+    //
+    // Samples a small ring of points across the capsule's own footprint, not just dead center - a
+    // center-only ray can hang out over empty air right at a ledge while the rest of the capsule (and
+    // therefore CharacterController.isGrounded, which FallingState.UpdateState checks to leave this
+    // state) is still solidly supported. That mismatch was causing Falling/Landing to flicker in a
+    // loop while walking slowly along an edge: this check would fail (center ray over the drop) and
+    // commit to FallingState, which would then immediately see isGrounded still true (capsule still
+    // supported) and bounce straight back via LandingState, repeating. Sampling the footprint keeps
+    // this check in agreement with what isGrounded would actually report.
     public bool IsGroundedWithinDistance(float maxDistance)
     {
         Vector3 feetPosition = transform.position + characterController.center + Vector3.down * (characterController.height * 0.5f);
         Vector3 rayOrigin = feetPosition + Vector3.up * 0.1f;
-        return Physics.Raycast(rayOrigin, Vector3.down, maxDistance + 0.1f, groundLayerMask);
+
+        if (Physics.Raycast(rayOrigin, Vector3.down, maxDistance + 0.1f, groundLayerMask)) return true;
+
+        float sampleRadius = characterController.radius * 0.8f;
+        Vector3[] ringOffsets =
+        {
+            new Vector3(sampleRadius, 0f, 0f),
+            new Vector3(-sampleRadius, 0f, 0f),
+            new Vector3(0f, 0f, sampleRadius),
+            new Vector3(0f, 0f, -sampleRadius),
+        };
+
+        foreach (Vector3 offset in ringOffsets)
+        {
+            if (Physics.Raycast(rayOrigin + offset, Vector3.down, maxDistance + 0.1f, groundLayerMask)) return true;
+        }
+
+        return false;
     }
 
     // Same feet-position math as IsGroundedWithinDistance, but returns the actual ground contact point

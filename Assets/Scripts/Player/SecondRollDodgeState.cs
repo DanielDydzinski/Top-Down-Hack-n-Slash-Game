@@ -134,5 +134,18 @@ public class SecondRollDodgeState : IPlayerState
         psm.gameObject.layer = LayerMask.NameToLayer("Player");
         psm.RestoreControllerSize();
         psm.StartDodgeHeavyWindow();
+
+        // Defensive, same as EnterState(): the exit-timer above can fire before UpdateState's own
+        // grounded check catches up (landing on a ledge, where IsGroundedWithinDistance can lag a
+        // frame or two behind the timer), leaving _driftActive true and this drift never cleared -
+        // it then leaks straight into LocomotionState (which doesn't clear it either) and keeps
+        // sliding the player indefinitely. Gated on actually being grounded (not just "still
+        // active") - if this dodge chained into a vault that's still airborne when the timer ends,
+        // this drift IS the carried momentum FallingState.EnterState() expects to inherit; clearing
+        // it unconditionally here would erase that momentum before Falling ever gets to see it.
+        if (_driftActive && psm.IsGroundedWithinDistance(psm.fallHeightThreshold))
+        {
+            psm.mover.SetHorizontalVelocity(Vector3.zero);
+        }
     }
 }

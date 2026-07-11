@@ -117,12 +117,6 @@ public class MidFallAttackState : IPlayerState
 
             _isFrozen = false;
             psm.anim.speed = _originalAnimSpeed;
-
-            if (ability.baseSettings.stopDashOnGrounded)
-            {
-                psm.mover.SetHorizontalVelocity(Vector3.zero);
-                _driftStopped = true;
-            }
         }
 
         if (!_routed)
@@ -157,6 +151,20 @@ public class MidFallAttackState : IPlayerState
             }
             // Already grounded by the time we routed - never freezes, so the unfreeze branch above
             // never runs either. Fall through to the exit check.
+        }
+
+        // Independent of the freeze/unfreeze branch above: that branch only stops the drift if we
+        // actually froze mid-air first. If the ability is cast close enough to the ground that
+        // IsGroundedWithinDistance already reads true the instant we route (the "already grounded"
+        // fall-through just above), _isFrozen never becomes true and that branch never runs - so
+        // drift-stop has to be checked here too, on every frame once routed, or it never fires and the
+        // player keeps sliding at full drift speed until something else (animation end, CancelAbility)
+        // forces the state to exit.
+        if (_routed && !_driftStopped && ability.baseSettings.stopDashOnGrounded
+            && psm.IsGroundedWithinDistance(psm.fallHeightThreshold))
+        {
+            psm.mover.SetHorizontalVelocity(Vector3.zero);
+            _driftStopped = true;
         }
 
         // Landed (or grounded before ever needing to freeze): let the rest of the clip play out, then

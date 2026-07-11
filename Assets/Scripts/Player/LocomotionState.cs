@@ -55,6 +55,19 @@ public class LocomotionState : IPlayerState
             // on exit (see RollDodgeState.ExitState etc.) until grounded, so held WASD can't stack on
             // top of the carried drift. Re-enable it here once we're actually back on the ground.
             if (psm.playerMovement != null && !psm.playerMovement.enabled) psm.playerMovement.enabled = true;
+
+            // Locomotion is the terminal owner of "this drift is done" the moment it's actually
+            // grounded - it never itself feeds Mover.SetHorizontalVelocity (WASD goes through the
+            // separate moveDirection path), so any nonzero value here is a carryover from whatever
+            // put us in this state. Normally FallingState.ExitState() is what clears carried momentum
+            // on landing, but a dodge/vault whose exit-timer ends while technically still airborne
+            // (per IsGroundedWithinDistance) can land for real before LocomotionState's own
+            // fallDetectionDelay-gated check ever gets a chance to hand off to FallingState - so
+            // FallingState never runs and never clears it. Without this, that drift silently keeps
+            // pushing the player every frame until an unrelated state (e.g. the next dodge) happens
+            // to overwrite it.
+            Vector3 leftoverDrift = psm.mover.GetHorizontalDrift();
+            if (leftoverDrift.magnitude > 0.01f) psm.mover.SetHorizontalVelocity(Vector3.zero);
         }
 
         UpdateAnimator();

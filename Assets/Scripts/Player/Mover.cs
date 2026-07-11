@@ -120,6 +120,10 @@ public class Mover : MonoBehaviour
 
     public void SetSpeedMultiplier(float mult) => speedMultiplier = mult;
 
+    // Exposes the raw drift currently stored in verticalVelocity.x/z (see SetHorizontalVelocity) -
+    // LocomotionState uses this to detect and clear stale carried momentum once actually grounded.
+    public Vector3 GetHorizontalDrift() => new Vector3(verticalVelocity.x, 0f, verticalVelocity.z);
+
     // Height (meters) dropped by whatever fall most recently ended in a landing - readable for
     // FallDistanceValidWindow seconds after that landing (covers an ability's animation-event-driven
     // damage resolving a few frames late), then reports 0 so a much later grounded cast doesn't
