@@ -20,11 +20,6 @@ public class MeleeAttackBehavaiour : MonoBehaviour
     // Computed once in Initialize() (not per-target) - see PlayerStateMachine.GetFallDistanceDamageMultiplier.
     private float fallDistanceMultiplier = 1f;
 
-    void Start()
-    {
-        StartCoroutine(DelayedStart());
-    }
-
     // UPDATED: Now receives the structured packages cleanly from the cast sequence
     // UPDATED: Ensure this matches the 4-argument call from MeleeAttackAbility
     public void Initialize(Ability aSourceAbility,BaseAbilitySettings aBaseSettings, MeleeAttackSettings aMeleeSettings, List<Effect> aeffect, GameObject aCaster)
@@ -38,6 +33,10 @@ public class MeleeAttackBehavaiour : MonoBehaviour
         fallDistanceMultiplier = caster != null && caster.TryGetComponent<PlayerStateMachine>(out var psm)
             ? psm.GetFallDistanceDamageMultiplier(baseSettings)
             : 1f;
+
+        // Was in Start() - but Start() only ever fires once per component instance, which would
+        // leave every pooled reuse of this prefab past the first never actually swinging.
+        StartCoroutine(DelayedStart());
     }
 
     private IEnumerator DelayedStart()
@@ -67,7 +66,7 @@ public class MeleeAttackBehavaiour : MonoBehaviour
         foreach (Collider col in overlapping)
         {
             allColliders.Add(col);
-            hitPoints[col] = GetTrueImpactPoint(col, transform.position, Vector3.zero);
+            hitPoints[col] = Ability.GetTrueImpactPoint(col, transform.position, Vector3.zero);
         }
 
         // 2. Catch anything hit during the sweep (BoxCast)
@@ -80,7 +79,7 @@ public class MeleeAttackBehavaiour : MonoBehaviour
             if (!allColliders.Contains(h.collider))
             {
                 allColliders.Add(h.collider);
-                hitPoints[h.collider] = GetTrueImpactPoint(h.collider, transform.position, h.point);
+                hitPoints[h.collider] = Ability.GetTrueImpactPoint(h.collider, transform.position, h.point);
             }
         }
 
@@ -178,31 +177,7 @@ public class MeleeAttackBehavaiour : MonoBehaviour
 
         DrawDebugBox(transform.position, meleeSettings.halfExtents, transform.rotation, transform.forward, meleeSettings.length, hitCount > 0 ? Color.green : Color.red, 2.0f);
 
-        Destroy(gameObject);
-    }
-
-    private Vector3 GetTrueImpactPoint(Collider col, Vector3 castOrigin, Vector3 castHitPoint)
-    {
-        if (castHitPoint != Vector3.zero && Vector3.Distance(castHitPoint, castOrigin) > 0.05f)
-        {
-            return castHitPoint;
-        }
-
-        Vector3 closest = col.ClosestPoint(castOrigin);
-        if (closest != Vector3.zero && closest != castOrigin)
-        {
-            return closest;
-        }
-
-        Vector3 dirToCenter = (col.bounds.center - castOrigin).normalized;
-        Ray skinRay = new Ray(castOrigin - (dirToCenter * 0.5f), dirToCenter);
-
-        if (col.Raycast(skinRay, out RaycastHit skinHit, 20f))
-        {
-            return skinHit.point;
-        }
-
-        return col.bounds.ClosestPoint(castOrigin);
+        Ability.RetireAbilityInstance(gameObject);
     }
 
     private void DrawDebugBox(Vector3 origin, Vector3 halfExtents, Quaternion orientation, Vector3 direction, float distance, Color color, float duration)

@@ -23,7 +23,7 @@ public class Explosion : Ability
 
     public override GameObject Cast(Vector3 pos, Quaternion rot, GameObject caster)
     {
-        GameObject instance = Instantiate(abilityPrefab, pos, rot);
+        GameObject instance = SpawnAbilityInstance(abilityPrefab, pos, rot);
 
         explosionBehaviour = instance.GetComponent<ExplosionBehaviour>();
         if (explosionBehaviour != null)

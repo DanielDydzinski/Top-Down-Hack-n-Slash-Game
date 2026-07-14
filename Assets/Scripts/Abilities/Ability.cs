@@ -154,5 +154,54 @@ public abstract class Ability : ScriptableObject
         return Mathf.Lerp(1f, MaxFallDistanceVisualScale, t);
     }
 
+    // Resolves the real point of contact on a target's collider rather than its (possibly
+    // far-off-surface) transform.position/pivot - used for both LOS raycast aim and falloff-distance
+    // measurement, so a pivot offset from its hitbox (tall enemies, off-center capsules) doesn't throw
+    // off either. Ported from MeleeAttackBehavaiour.GetTrueImpactPoint - same logic, shared so
+    // ShockWaveBehaviour/ExplosionBehaviour stop measuring against col.transform.position.
+    // castHitPoint is an already-known cast/raycast hit point if one exists (Vector3.zero if not).
+    public static Vector3 GetTrueImpactPoint(Collider col, Vector3 castOrigin, Vector3 castHitPoint)
+    {
+        if (castHitPoint != Vector3.zero && Vector3.Distance(castHitPoint, castOrigin) > 0.05f)
+        {
+            return castHitPoint;
+        }
+
+        Vector3 closest = col.ClosestPoint(castOrigin);
+        if (closest != Vector3.zero && closest != castOrigin)
+        {
+            return closest;
+        }
+
+        Vector3 dirToCenter = (col.bounds.center - castOrigin).normalized;
+        Ray skinRay = new Ray(castOrigin - (dirToCenter * 0.5f), dirToCenter);
+
+        if (col.Raycast(skinRay, out RaycastHit skinHit, 20f))
+        {
+            return skinHit.point;
+        }
+
+        return col.bounds.ClosestPoint(castOrigin);
+    }
+
+    // Shared pool-first spawn/retire for the root abilityPrefab instance each Cast() creates -
+    // every ActualAbilities/*.cs Cast() should route through these instead of calling
+    // Instantiate/Destroy directly, so the root ability GameObject (projectile, AoE volume, etc.)
+    // is reused instead of paying a fresh Instantiate cost - and a cold first-cast hitch - every time.
+    public static GameObject SpawnAbilityInstance(GameObject prefab, Vector3 pos, Quaternion rot)
+    {
+        return ObjectPooler.Instance != null
+            ? ObjectPooler.Instance.SpawnFromPool(prefab, pos, rot)
+            : Instantiate(prefab, pos, rot);
+    }
+
+    public static void RetireAbilityInstance(GameObject instance)
+    {
+        if (instance == null) return;
+
+        if (ObjectPooler.Instance != null) ObjectPooler.Instance.ReturnToPool(instance);
+        else Destroy(instance);
+    }
+
     public abstract GameObject Cast(Vector3 pos, Quaternion rot, GameObject caster);
 }

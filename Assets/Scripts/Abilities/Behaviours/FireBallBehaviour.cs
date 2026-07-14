@@ -46,51 +46,51 @@ public class FireBallBehaviour : MonoBehaviour
     // Immutable reference for health refunds & energy gain, matching ShockWaveBehaviour/MeleeAttackBehavaiour.
     private Ability sourceAbility;
 
-    void Start()
-    {
-        howManyExplosions = 0;
-        spawnPos = this.transform.position;
-        currentEffectiveSpeed = projectileSpeed;
+    private GameObject trailInstance;
 
-        if (isBeam)
-        {
-            SphereCollider oldSc = GetComponent<SphereCollider>();
-            if (oldSc != null) Destroy(oldSc);
-
-            BoxCollider bc = gameObject.AddComponent<BoxCollider>();
-            bc.isTrigger = true;
-            bc.size = new Vector3(projectileSize * 2f, projectileSize, projectileSize);
-        }
-        else
-        {
-            sc = GetComponent<SphereCollider>();
-            if (sc == null) sc = gameObject.AddComponent<SphereCollider>();
-            sc.radius = projectileSize;
-            sc.isTrigger = true;
-        }
-
-        if (caster != null)
-        {
-            CharacterController playerCC = caster.GetComponent<CharacterController>();
-            Collider fireballCollider = GetComponent<Collider>();
-
-            if (playerCC != null && fireballCollider != null)
-            {
-                Physics.IgnoreCollision(playerCC, fireballCollider);
-            }
-        }
-
-        audioSource = GetComponent<AudioSource>();
-        StartCoroutine(DelayedInstanciate());
-    }
+    // Physics.IgnoreCollision is a PERSISTENT pairing at the physics engine level - it survives
+    // SetActive(false)/reactivation entirely, unlike everything else on a pooled instance. Track who
+    // it was set up for so a later cast by a DIFFERENT caster (sharing this same pooled collider) can
+    // undo it - otherwise a fireball first cast by the Player would permanently ignore the Player's
+    // own collider forever, even after being reused for an Enemy's cast against that same Player.
+    private Collider ignoredCasterCollider;
 
     void Update()
     {
         if (isBeam) CalculateBeamSpeed();
         else currentEffectiveSpeed = projectileSpeed;
 
-        transform.Translate(Vector3.forward * currentEffectiveSpeed * Time.deltaTime);
+        MoveWithTunnelingSweep(currentEffectiveSpeed * Time.deltaTime);
         DestroyByDistance();
+    }
+
+    // A plain transform.Translate can jump clean over a thin/fast target in one big-delta frame
+    // (a hitch, or just a fast projectile) without ever generating an OnTriggerEnter - Unity's
+    // trigger system only checks whether colliders overlap at their CURRENT position each physics
+    // step, it never considers the path a non-Rigidbody transform took to get there. Sweep the
+    // intended step first and, if something's in the way, stop right at contact instead of past
+    // it, so the very next physics step's overlap check (and the existing OnTriggerEnter logic,
+    // unchanged) actually gets a chance to see it.
+    private void MoveWithTunnelingSweep(float step)
+    {
+        if (step <= 0f) return;
+
+        Vector3 direction = transform.forward;
+        float sweepRadius = Mathf.Max(projectileSize, 0.05f);
+        int hitMask = targetLayer | wallLayer;
+
+        if (Physics.SphereCast(transform.position, sweepRadius, direction, out RaycastHit hit, step, hitMask))
+        {
+            // Push slightly past the contact point (not just to it) so the collider is left
+            // genuinely overlapping, not merely touching - trigger events need real penetration,
+            // not tangency, to fire.
+            float travelDistance = Mathf.Min(hit.distance + 0.05f, step);
+            transform.position += direction * travelDistance;
+        }
+        else
+        {
+            transform.position += direction * step;
+        }
     }
 
     private void CalculateBeamSpeed()
@@ -112,9 +112,9 @@ public class FireBallBehaviour : MonoBehaviour
                 explosionAbility.Cast(transform.position, Quaternion.identity, caster);
                 howManyExplosions++;
             }
-            ReleaseAllCaptured();
+            ReleaseChildrenBeforeRetire();
 
-            Destroy(this.gameObject);
+            Ability.RetireAbilityInstance(this.gameObject);
             return;
         }
 
@@ -165,7 +165,8 @@ public class FireBallBehaviour : MonoBehaviour
                 }
 
                 howManyExplosions++;
-                Destroy(this.gameObject);
+                ReleaseChildrenBeforeRetire();
+                Ability.RetireAbilityInstance(this.gameObject);
             }
         }
     }
@@ -261,8 +262,8 @@ public class FireBallBehaviour : MonoBehaviour
                 explosionAbility.Cast(transform.position, Quaternion.identity, caster);
                 howManyExplosions++;
             }
-            ReleaseAllCaptured();
-            Destroy(this.gameObject);
+            ReleaseChildrenBeforeRetire();
+            Ability.RetireAbilityInstance(this.gameObject);
         }
     }
 
@@ -282,14 +283,26 @@ public class FireBallBehaviour : MonoBehaviour
                 howManyExplosions++;
             }
 
-            ReleaseAllCaptured();
-            Destroy(this.gameObject);
+            ReleaseChildrenBeforeRetire();
+            Ability.RetireAbilityInstance(this.gameObject);
         }
     }
 
-    private void OnDestroy()
+    // Must run BEFORE this projectile itself gets deactivated/retired, never from OnDisable - Unity
+    // refuses to reparent a child (the trail, or a captured beam enemy) while its parent is itself in
+    // the middle of activating/deactivating, which is exactly what OnDisable would be doing here.
+    // Every retire call site below calls this first, then hands the projectile itself to the pool.
+    private void ReleaseChildrenBeforeRetire()
     {
         ReleaseAllCaptured();
+
+        // Detach and hand the trail back to its own pool while this projectile is still fully active -
+        // otherwise it's gone for good instead of being reused next cast.
+        if (trailInstance != null && ObjectPooler.Instance != null)
+        {
+            ObjectPooler.Instance.ReturnToPool(trailInstance);
+            trailInstance = null;
+        }
     }
 
     public void Initialize(Ability aSourceAbility, BaseAbilitySettings baseSettings, FireBallSettings fireBallSettings, List<Effect> abilityEffects, GameObject whoCasted)
@@ -315,6 +328,58 @@ public class FireBallBehaviour : MonoBehaviour
             : 1f;
         maxDistanceMultiplier = baseSettings.maxDistanceMultiplier;
         groundImpactPrefab = baseSettings.scalesWithFallDistance ? baseSettings.groundImpactPrefab : null;
+
+        // Was in Start() - but Start() only ever fires once per component instance, and this pooled
+        // prefab is shared by both beam (Kamehameha) and non-beam (FireBall/IceBall) abilities, so
+        // every one of these has to be redone on every cast, not just the very first spawn ever.
+        howManyExplosions = 0;
+        spawnPos = this.transform.position;
+        currentEffectiveSpeed = projectileSpeed;
+
+        // Idempotent both ways round - a pooled instance may currently be wearing the OTHER mode's
+        // collider from whichever ability cast it last, since the same prefab is shared across
+        // beam/non-beam abilities (see FireBallPrefab.prefab's shared guid across Kamehameha/FireBall).
+        if (isBeam)
+        {
+            SphereCollider staleSphere = GetComponent<SphereCollider>();
+            if (staleSphere != null) Destroy(staleSphere);
+            sc = null;
+
+            BoxCollider bc = GetComponent<BoxCollider>();
+            if (bc == null) bc = gameObject.AddComponent<BoxCollider>();
+            bc.isTrigger = true;
+            bc.size = new Vector3(projectileSize * 2f, projectileSize, projectileSize);
+        }
+        else
+        {
+            BoxCollider staleBox = GetComponent<BoxCollider>();
+            if (staleBox != null) Destroy(staleBox);
+
+            sc = GetComponent<SphereCollider>();
+            if (sc == null) sc = gameObject.AddComponent<SphereCollider>();
+            sc.radius = projectileSize;
+            sc.isTrigger = true;
+        }
+
+        {
+            Collider casterCollider = caster != null ? caster.GetComponent<CharacterController>() : null;
+            Collider fireballCollider = GetComponent<Collider>();
+
+            if (ignoredCasterCollider != null && ignoredCasterCollider != casterCollider)
+            {
+                Physics.IgnoreCollision(ignoredCasterCollider, fireballCollider, false);
+                ignoredCasterCollider = null;
+            }
+
+            if (casterCollider != null && fireballCollider != null)
+            {
+                Physics.IgnoreCollision(casterCollider, fireballCollider);
+                ignoredCasterCollider = casterCollider;
+            }
+        }
+
+        audioSource = GetComponent<AudioSource>();
+        StartCoroutine(DelayedInstanciate());
     }
 
     private IEnumerator DelayedInstanciate()
@@ -322,7 +387,9 @@ public class FireBallBehaviour : MonoBehaviour
         yield return null;
         if (projectile != null)
         {
-            Instantiate(projectile, this.gameObject.transform);
+            trailInstance = ObjectPooler.Instance != null
+                ? ObjectPooler.Instance.SpawnFromPool(projectile, transform.position, transform.rotation, this.transform)
+                : Instantiate(projectile, this.gameObject.transform);
             if (fireBallAudioClip != null && audioSource != null) audioSource.PlayOneShot(fireBallAudioClip);
         }
     }

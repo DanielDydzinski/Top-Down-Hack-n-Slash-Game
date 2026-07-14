@@ -6,7 +6,10 @@ public class ChasingBeam : MonoBehaviour
     public float beamLength = 5.0f; // Max length before tail starts chasing
     private Vector3 startPoint;
 
-    void Start()
+    // OnEnable (not Start) so a pooled instance re-anchors its tail every time it's reactivated -
+    // Start only fires once per component instance, which would leave a reused instance chasing
+    // forward from wherever its very first spawn began instead of its current spawn point.
+    void OnEnable()
     {
         startPoint = transform.position;
         if (line == null) line = GetComponent<LineRenderer>();

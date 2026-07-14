@@ -35,6 +35,12 @@ public class ShockWaveBehaviour : MonoBehaviour
     // FIXED: Keeps the direct master reference for gain-on-hit tracking
     public void Initialize(Ability aSourceAbility, BaseAbilitySettings baseSettings, ShockWaveSettings shockSettings, List<Effect> abilityEffects, GameObject whoCasted)
     {
+        // A pooled reuse would otherwise still be carrying hitTargets/childMaterials from its
+        // previous cast - the former would silently skip anyone it already hit last time, the
+        // latter would pile up duplicate material refs on top of the fresh ones added below.
+        hitTargets.Clear();
+        childMaterials.Clear();
+
         caster = whoCasted;
         sourceAbility = aSourceAbility;
 
@@ -101,7 +107,11 @@ public class ShockWaveBehaviour : MonoBehaviour
         EntityIdentity victimIdentity = col.GetComponent<EntityIdentity>();
         if (victimIdentity != null && victimIdentity.faction == myFaction) return;
 
-        Vector3 dir = col.transform.position - transform.position;
+        // Measure against the collider's actual surface, not its (possibly pivot-offset) transform -
+        // otherwise a wall raycast aimed at an off-surface pivot can be blocked by ground clutter that
+        // never actually occludes the target's real hitbox, and falloff distance is thrown off too.
+        Vector3 impactPoint = Ability.GetTrueImpactPoint(col, transform.position, Vector3.zero);
+        Vector3 dir = impactPoint - transform.position;
         float distance = dir.magnitude;
 
         if (useLineOfSight && distance > 0.01f)
@@ -179,7 +189,7 @@ public class ShockWaveBehaviour : MonoBehaviour
         {
             // Clean up objects instantly since it reached max radius and is fully transparent
             if (activeVisual != null) Destroy(activeVisual);
-            Destroy(gameObject);
+            Ability.RetireAbilityInstance(gameObject);
         }
     }
 }

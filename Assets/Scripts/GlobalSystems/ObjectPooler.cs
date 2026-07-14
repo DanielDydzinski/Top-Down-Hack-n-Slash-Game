@@ -163,6 +163,7 @@ public class ObjectPooler : MonoBehaviour
         objectToSpawn.transform.rotation = rotation;
         objectToSpawn.SetActive(true);
         info.RestoreInitialHierarchyState();
+        info.ResetTrails();
 
         RefreshDebugView(prefab);
 
@@ -271,6 +272,17 @@ public class PoolInfo : MonoBehaviour
     private void OnDisable()
     {
         CancelInvoke(nameof(AutoReturn));
+    }
+
+    // TrailRenderers keep their point-history buffer while inactive - without this, a reused trail
+    // reappears at the new spawn position still holding points from its previous use, drawing one
+    // long streak connecting the two before it starts accumulating fresh points.
+    public void ResetTrails()
+    {
+        foreach (TrailRenderer trail in GetComponentsInChildren<TrailRenderer>(true))
+        {
+            trail.Clear();
+        }
     }
 
     // Some multi-part effect prefabs have nested pieces that retire themselves independently

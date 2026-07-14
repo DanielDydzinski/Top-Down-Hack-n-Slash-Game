@@ -31,7 +31,7 @@ public class ShockWave : Ability
         if (this.abilityPrefab == null) return null;
 
         // Instantiates using the abilityPrefab inherited from the unified base layout
-        GameObject instance = Instantiate(this.abilityPrefab, position, rotation);
+        GameObject instance = SpawnAbilityInstance(this.abilityPrefab, position, rotation);
         ShockWaveBehaviour behaviour = instance.GetComponent<ShockWaveBehaviour>();
 
         if (behaviour != null)

@@ -25,7 +25,7 @@ public class MeleeAttackAbility : Ability
     {
         if (abilityPrefab == null) return null;
 
-        GameObject instance = Instantiate(abilityPrefab, pos, rot);
+        GameObject instance = SpawnAbilityInstance(abilityPrefab, pos, rot);
 
         meleeAttackBehavaiour = instance.GetComponent<MeleeAttackBehavaiour>();
         if (meleeAttackBehavaiour != null)

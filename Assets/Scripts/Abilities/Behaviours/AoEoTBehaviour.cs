@@ -41,16 +41,6 @@ public class AoEoTBehaviour : MonoBehaviour
     // Immutable reference for health refunds & energy gain, matching ShockWaveBehaviour/MeleeAttackBehavaiour.
     private Ability sourceAbility;
 
-    void Start()
-    {
-        audioSource = GetComponent<AudioSource>();
-        if (audioSource == null)
-        {
-            audioSource = gameObject.AddComponent<AudioSource>();
-        }
-        StartCoroutine(DelayedStart());
-    }
-
     void Update()
     {
         lifeTimer += Time.deltaTime;
@@ -62,7 +52,7 @@ public class AoEoTBehaviour : MonoBehaviour
             Tick();
         }
 
-        if (lifeTimer >= duration) Destroy(gameObject);
+        if (lifeTimer >= duration) Ability.RetireAbilityInstance(gameObject);
     }
 
     private IEnumerator DelayedStart()
@@ -88,6 +78,12 @@ public class AoEoTBehaviour : MonoBehaviour
             audioSource.clip = audioClip;
             audioSource.loop = true;
             audioSource.Play();
+        }
+        else if (audioSource != null)
+        {
+            // Otherwise a pooled reuse whose new cast has no audioClip would keep looping whatever
+            // the previous cast left playing, forever, since nothing else ever stops it.
+            audioSource.Stop();
         }
     }
 
@@ -192,5 +188,17 @@ public class AoEoTBehaviour : MonoBehaviour
             ? psm.GetFallDistanceDamageMultiplier(baseSettings)
             : 1f;
         groundImpactPrefab = baseSettings.scalesWithFallDistance ? baseSettings.groundImpactPrefab : null;
+
+        // Was in Start() - but Start() only ever fires once per component instance, which would leave
+        // every pooled reuse of this prefab past the first never actually ticking or expiring.
+        lifeTimer = 0f;
+        tickTimer = 0f;
+
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
+        StartCoroutine(DelayedStart());
     }
 }

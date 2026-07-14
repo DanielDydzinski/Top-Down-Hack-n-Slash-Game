@@ -35,7 +35,7 @@ public class AoEoT : Ability
     public override GameObject Cast(Vector3 pos, Quaternion rot, GameObject caster)
     {
         // Instantiates using the abilityPrefab inherited from the unified base layout
-        GameObject instance = Instantiate(abilityPrefab, pos, rot);
+        GameObject instance = SpawnAbilityInstance(abilityPrefab, pos, rot);
 
         aoeotBehaviour = instance.GetComponent<AoEoTBehaviour>();
 
@@ -50,6 +50,7 @@ public class AoEoT : Ability
                 dest.enabled = true;
                 dest.lethalType = this.aoEotSettings.lethalType;
                 dest.destructionParticles = this.aoEotSettings.destructionParticles;
+                dest.ResetState();
 
                 // Manage identity safely without hidden AddComponent if possible
                 if (!instance.TryGetComponent<EntityIdentity>(out var identity))

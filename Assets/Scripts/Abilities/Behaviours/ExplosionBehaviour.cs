@@ -27,13 +27,6 @@ public class ExplosionBehaviour : MonoBehaviour
     // Immutable reference for health refunds & energy gain, matching ShockWaveBehaviour/MeleeAttackBehavaiour.
     private Ability sourceAbility;
 
-    void Start()
-    {
-        audioSource = GetComponent<AudioSource>();
-        // Wait one frame for values to update
-        StartCoroutine(DelayedExplode());
-    }
-
     public void Initialize(Ability aSourceAbility, BaseAbilitySettings baseSettings, ExplosionSettings explosionSettings, List<Effect> abilityEffects, GameObject whoCasted)
     {
         sourceAbility = aSourceAbility;
@@ -53,6 +46,12 @@ public class ExplosionBehaviour : MonoBehaviour
             ? psm.GetFallDistanceDamageMultiplier(baseSettings)
             : 1f;
         groundImpactPrefab = baseSettings.scalesWithFallDistance ? baseSettings.groundImpactPrefab : null;
+
+        // Was in Start() - but Start() only ever fires once per component instance, which would leave
+        // every pooled reuse of this prefab past the first never actually detonating.
+        audioSource = GetComponent<AudioSource>();
+        // Wait one frame for values to update
+        StartCoroutine(DelayedExplode());
     }
 
     private IEnumerator DelayedExplode()
@@ -93,11 +92,14 @@ public class ExplosionBehaviour : MonoBehaviour
             EntityIdentity victimIdentity = c.GetComponent<EntityIdentity>();
             if (victimIdentity != null && victimIdentity.faction == myFaction) continue;
 
-            // 2. Wall Check
-            float dist = Vector3.Distance(transform.position, c.transform.position);
+            // 2. Wall Check - measured against the collider's actual surface, not its (possibly
+            // pivot-offset) transform.position, so ground clutter doesn't wrongly occlude a target
+            // whose real hitbox is unobstructed, and falloff distance matches the real nearest point.
+            Vector3 impactPoint = Ability.GetTrueImpactPoint(c, transform.position, Vector3.zero);
+            float dist = Vector3.Distance(transform.position, impactPoint);
 
             // Avoid NaN errors or division by zero if target is exactly on top of explosion origin
-            Vector3 dir = dist > 0.001f ? (c.transform.position - transform.position).normalized : transform.forward;
+            Vector3 dir = dist > 0.001f ? (impactPoint - transform.position).normalized : transform.forward;
 
             if (dist > 0.01f)
             {
@@ -145,6 +147,6 @@ public class ExplosionBehaviour : MonoBehaviour
                 damageable.TakeDamage(info);
             }
         }
-        Destroy(gameObject);
+        Ability.RetireAbilityInstance(gameObject);
     }
 }
