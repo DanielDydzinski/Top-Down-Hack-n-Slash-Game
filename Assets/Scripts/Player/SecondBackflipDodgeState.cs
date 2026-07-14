@@ -24,6 +24,8 @@ public class SecondBackflipDodgeState : IPlayerState
 
     public void EnterState()
     {
+        psm.rotator.UpdateOrientation();
+
         psm.gameObject.layer = LayerMask.NameToLayer("Default");
 
         _timer = 0;
@@ -95,7 +97,7 @@ public class SecondBackflipDodgeState : IPlayerState
         if (psm.playerMovement && psm.IsGroundedWithinDistance(psm.fallHeightThreshold)) psm.playerMovement.enabled = true;
         psm.rotator.enabled = true;
         psm.rotator.UpdateOrientation();
-        psm.anim.CrossFade(psm.TransitionStateHash, psm.FullBodyLayer);
+        psm.anim.CrossFade(psm.TransitionStateHash, 0.1f, psm.FullBodyLayer);
         psm.anim.ResetTrigger(psm.isSecondBackFlipDodgeHash);
         psm.gameObject.layer = LayerMask.NameToLayer("Player");
         psm.RestoreControllerSize();

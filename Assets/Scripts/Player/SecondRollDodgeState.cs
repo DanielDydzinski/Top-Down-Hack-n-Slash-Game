@@ -44,7 +44,7 @@ public class SecondRollDodgeState : IPlayerState
 
         psm.anim.Play(psm.TransitionStateHash, psm.AttackLayer);
         psm.anim.Play(psm.TransitionStateHash, psm.FullBodyLayer);
-        psm.anim.CrossFade(psm.secondRollDodgeHash, 0.15f, psm.FullBodyLayer);
+        psm.anim.CrossFade(psm.secondRollDodgeHash, 0.25f, psm.FullBodyLayer);
         psm.anim.SetTrigger(psm.isSecondRollDodgeHash);
 
         float playbackSpeed = psm.dodgeAnimationSpeed;
