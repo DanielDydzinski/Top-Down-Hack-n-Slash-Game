@@ -13,7 +13,8 @@ public class DamageReceiver : MonoBehaviour, IDamageable
     {
         PlayerStateMachine psm = GetComponent<PlayerStateMachine>();
 
-        if (psm != null)
+        // Unavoidable hits (e.g. traps) skip dodge/block resolution entirely.
+        if (psm != null && !info.unavoidable)
         {
             // Check the Animator for the "Dodge" tag
             bool isDOdgeState = psm.anim.GetCurrentAnimatorStateInfo(psm.FullBodyLayer).IsTag("Dodge");
